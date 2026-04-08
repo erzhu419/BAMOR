@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../BAPR"
+		},
+		{
+			"path": "../proof"
+		},
+		{
+			"path": "../morl-baselines"
+		}
+	],
+	"settings": {}
+}
