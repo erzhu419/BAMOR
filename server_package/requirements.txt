@@ -1,0 +1,6 @@
+numpy>=1.24
+torch>=2.0
+gymnasium>=0.29
+# Optional for CAPQL baseline (skipped automatically if missing):
+# mo-gymnasium>=1.0
+# pymoo>=0.6
