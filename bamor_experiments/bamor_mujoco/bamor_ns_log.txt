@@ -1,0 +1,654 @@
+
+============================================================
+  Method: bamor_ns  Env: mo-halfcheetah-v5  Seed: 0
+============================================================
+/home/erzhu419/.local/lib/python3.10/site-packages/gymnasium/utils/passive_env_checker.py:245: UserWarning: [33mWARN: The reward returned by `step()` must be a float, int, np.integer or np.floating, actual type: <class 'numpy.ndarray'>[0m
+  logger.warn(
+[bamor_ns] env=mo-halfcheetah-v5, obs=17, act=6, rew=2, modes=3
+  [bamor_ns] step=   1000 ep=   1 avg_r=[    8.2 -5935.2] mode_sw=0 sps=1000 Δl/Δg=0.00/0.00
+  [bamor_ns] step=   2000 ep=   2 avg_r=[   11.4 -6007.6] mode_sw=0 sps=2000 Δl/Δg=0.00/0.00
+  [bamor_ns] step=   3000 ep=   3 avg_r=[    7.8 -6063.8] mode_sw=0 sps=3000 Δl/Δg=0.00/0.00
+  [bamor_ns] step=   4000 ep=   4 avg_r=[    7.  -6051.1] mode_sw=0 sps=4000 Δl/Δg=0.00/0.00
+  [bamor_ns] step=   5000 ep=   5 avg_r=[ 4.2000e+00 -6.0594e+03] mode_sw=0 sps=1511 Δl/Δg=0.00/0.00
+  [bamor_ns] step=   6000 ep=   6 avg_r=[ 5.0000e+00 -5.9722e+03] mode_sw=0 sps=75 Δl/Δg=0.16/0.21
+  [bamor_ns] step=   7000 ep=   7 avg_r=[ 2.8000e+00 -5.1299e+03] mode_sw=0 sps=45 Δl/Δg=0.09/0.27
+  [bamor_ns] step=   8000 ep=   8 avg_r=[ 3.4000e+00 -4.1669e+03] mode_sw=0 sps=35 Δl/Δg=0.11/0.32
+  [bamor_ns] step=   9000 ep=   9 avg_r=[ 2.9000e+00 -3.3021e+03] mode_sw=0 sps=25 Δl/Δg=0.11/0.28
+  [bamor_ns] step=  10000 ep=  10 avg_r=[    5.8 -2473.9] mode_sw=0 sps=20 Δl/Δg=0.08/0.26
+  [bamor_ns] step=  11000 ep=  11 avg_r=[    4.7 -1794.9] mode_sw=0 sps=18 Δl/Δg=0.10/0.26
+  [bamor_ns] step=  12000 ep=  12 avg_r=[    5.3 -1849.7] mode_sw=0 sps=19 Δl/Δg=0.13/0.31
+  [bamor_ns] step=  13000 ep=  13 avg_r=[    6.4 -2010.2] mode_sw=0 sps=20 Δl/Δg=0.13/0.46
+  [bamor_ns] step=  14000 ep=  14 avg_r=[    7.7 -2097. ] mode_sw=0 sps=20 Δl/Δg=0.26/0.59
+  [bamor_ns] step=  15000 ep=  15 avg_r=[    7.8 -2157.4] mode_sw=0 sps=21 Δl/Δg=0.28/0.81
+  [bamor_ns] step=  16000 ep=  16 avg_r=[    7.6 -2150.5] mode_sw=0 sps=22 Δl/Δg=0.42/1.08
+  [bamor_ns] step=  17000 ep=  17 avg_r=[    7.3 -2162.8] mode_sw=0 sps=22 Δl/Δg=0.52/1.30
+  [bamor_ns] step=  18000 ep=  18 avg_r=[    7.2 -2160.7] mode_sw=0 sps=22 Δl/Δg=0.53/1.48
+  [bamor_ns] step=  19000 ep=  19 avg_r=[    8.  -2187.5] mode_sw=0 sps=22 Δl/Δg=0.70/1.66
+  [bamor_ns] step=  20000 ep=  20 avg_r=[    9.1 -2190.9] mode_sw=0 sps=22 Δl/Δg=0.64/1.81
+  [bamor_ns] EVAL step=20000: Pareto range obj0=[-0.5, 0.1] obj1=[-1245.3, -122.8]
+  [bamor_ns] step=  21000 ep=  21 avg_r=[    9.1 -2209.7] mode_sw=0 sps=18 Δl/Δg=1.02/2.24
+  [bamor_ns] step=  22000 ep=  22 avg_r=[   10.5 -2215.1] mode_sw=0 sps=18 Δl/Δg=0.44/2.11
+  [bamor_ns] step=  23000 ep=  23 avg_r=[   10.1 -2229.1] mode_sw=0 sps=17 Δl/Δg=1.13/2.42
+  [bamor_ns] step=  24000 ep=  24 avg_r=[    9.2 -2220.6] mode_sw=0 sps=16 Δl/Δg=0.90/2.39
+  [bamor_ns] step=  25000 ep=  25 avg_r=[    8.9 -2194.4] mode_sw=0 sps=16 Δl/Δg=0.82/2.44
+  [bamor_ns] step=  26000 ep=  26 avg_r=[   10.5 -2196.2] mode_sw=0 sps=15 Δl/Δg=0.72/2.40
+  [bamor_ns] step=  27000 ep=  27 avg_r=[   10.6 -2193.1] mode_sw=0 sps=15 Δl/Δg=1.10/2.75
+  [bamor_ns] step=  28000 ep=  28 avg_r=[   10.5 -2170.6] mode_sw=0 sps=14 Δl/Δg=1.09/2.80
+  [bamor_ns] step=  29000 ep=  29 avg_r=[    9.4 -1904.5] mode_sw=0 sps=14 Δl/Δg=0.88/2.83
+  [bamor_ns] step=  30000 ep=  30 avg_r=[    9.6 -1914.6] mode_sw=0 sps=14 Δl/Δg=0.80/3.00
+  [bamor_ns] step=  31000 ep=  31 avg_r=[    9.6 -1895.6] mode_sw=0 sps=13 Δl/Δg=0.89/2.87
+  [bamor_ns] step=  32000 ep=  32 avg_r=[    8.7 -1851.6] mode_sw=0 sps=13 Δl/Δg=0.90/3.03
+  [bamor_ns] step=  33000 ep=  33 avg_r=[    9.4 -1846.6] mode_sw=0 sps=13 Δl/Δg=1.22/3.01
+  [bamor_ns] step=  34000 ep=  34 avg_r=[   11.9 -2052.4] mode_sw=0 sps=13 Δl/Δg=0.96/2.95
+  [bamor_ns] step=  35000 ep=  35 avg_r=[   11.6 -1996. ] mode_sw=0 sps=13 Δl/Δg=1.19/2.79
+  [bamor_ns] step=  36000 ep=  36 avg_r=[   12.1 -1963. ] mode_sw=0 sps=12 Δl/Δg=1.04/2.87
+  [bamor_ns] step=  37000 ep=  37 avg_r=[   11.6 -1932.2] mode_sw=0 sps=12 Δl/Δg=1.19/2.97
+  [bamor_ns] step=  38000 ep=  38 avg_r=[   11.1 -1891.3] mode_sw=0 sps=12 Δl/Δg=1.21/2.77
+  [bamor_ns] step=  39000 ep=  39 avg_r=[   10.9 -1891.6] mode_sw=0 sps=12 Δl/Δg=0.97/2.51
+  [bamor_ns] step=  40000 ep=  40 avg_r=[   10.8 -1894.8] mode_sw=0 sps=12 Δl/Δg=1.49/2.69
+  [bamor_ns] EVAL step=40000: Pareto range obj0=[-4.4, 3.1] obj1=[-599.3, -8.2]
+  [bamor_ns] step=  41000 ep=  41 avg_r=[    9.5 -1890.6] mode_sw=0 sps=11 Δl/Δg=0.97/2.68
+  [bamor_ns] step=  42000 ep=  42 avg_r=[   11.1 -1889.6] mode_sw=0 sps=11 Δl/Δg=0.96/2.55
+  [bamor_ns] step=  43000 ep=  43 avg_r=[   11.7 -1888.2] mode_sw=0 sps=11 Δl/Δg=1.30/2.81
+  [bamor_ns] step=  44000 ep=  44 avg_r=[   10.3 -1880.8] mode_sw=0 sps=11 Δl/Δg=1.07/2.73
+  [bamor_ns] step=  45000 ep=  45 avg_r=[   10.2 -1868.2] mode_sw=0 sps=11 Δl/Δg=0.95/2.64
+  [bamor_ns] step=  46000 ep=  46 avg_r=[   10.3 -1878. ] mode_sw=0 sps=11 Δl/Δg=0.78/2.69
+  [bamor_ns] step=  47000 ep=  47 avg_r=[   10.1 -1890.1] mode_sw=0 sps=11 Δl/Δg=1.07/2.92
+  [bamor_ns] step=  48000 ep=  48 avg_r=[   29.4 -1798.1] mode_sw=1 sps=11 Δl/Δg=0.59/2.80
+  [bamor_ns] step=  49000 ep=  49 avg_r=[   75.5 -1494.4] mode_sw=1 sps=11 Δl/Δg=0.61/2.95
+  [bamor_ns] step=  50000 ep=  50 avg_r=[  126.5 -1203.2] mode_sw=1 sps=11 Δl/Δg=0.62/3.08
+  [bamor_ns] step=  51000 ep=  51 avg_r=[ 183.7 -906.9] mode_sw=1 sps=11 Δl/Δg=0.62/3.03
+  [bamor_ns] step=  52000 ep=  52 avg_r=[ 257.2 -624.8] mode_sw=1 sps=10 Δl/Δg=0.64/3.27
+  [bamor_ns] step=  53000 ep=  53 avg_r=[ 284.9 -441.2] mode_sw=1 sps=10 Δl/Δg=0.62/3.20
+  [bamor_ns] step=  54000 ep=  54 avg_r=[ 268.  -470.5] mode_sw=1 sps=10 Δl/Δg=0.73/3.56
+  [bamor_ns] step=  55000 ep=  55 avg_r=[ 300.2 -487. ] mode_sw=1 sps=10 Δl/Δg=0.68/3.60
+  [bamor_ns] step=  56000 ep=  56 avg_r=[ 345.  -494.3] mode_sw=1 sps=10 Δl/Δg=0.67/3.49
+  [bamor_ns] step=  57000 ep=  57 avg_r=[ 380.7 -490.9] mode_sw=1 sps=10 Δl/Δg=0.74/3.95
+  [bamor_ns] step=  58000 ep=  58 avg_r=[ 428.6 -486.5] mode_sw=1 sps=10 Δl/Δg=0.76/4.19
+  [bamor_ns] step=  59000 ep=  59 avg_r=[ 546.2 -474.1] mode_sw=1 sps=10 Δl/Δg=0.86/4.07
+  [bamor_ns] step=  60000 ep=  60 avg_r=[ 713.3 -479.1] mode_sw=1 sps=10 Δl/Δg=0.69/3.74
+  [bamor_ns] EVAL step=60000: Pareto range obj0=[-42.9, 1747.4] obj1=[-312.0, -9.2]
+  [bamor_ns] step=  61000 ep=  61 avg_r=[ 742.2 -502.8] mode_sw=1 sps=10 Δl/Δg=0.76/4.06
+  [bamor_ns] step=  62000 ep=  62 avg_r=[ 719.2 -566.8] mode_sw=1 sps=10 Δl/Δg=0.88/4.65
+  [bamor_ns] step=  63000 ep=  63 avg_r=[ 807.3 -630.9] mode_sw=1 sps=10 Δl/Δg=0.93/4.77
+  [bamor_ns] step=  64000 ep=  64 avg_r=[ 657.7 -725.5] mode_sw=1 sps=10 Δl/Δg=0.96/4.97
+  [bamor_ns] step=  65000 ep=  65 avg_r=[ 387.6 -820. ] mode_sw=1 sps=10 Δl/Δg=1.16/5.42
+  [bamor_ns] step=  66000 ep=  66 avg_r=[ 277. -864.] mode_sw=1 sps=10 Δl/Δg=1.27/5.41
+  [bamor_ns] step=  67000 ep=  67 avg_r=[ 174.2 -863.2] mode_sw=1 sps=10 Δl/Δg=1.34/5.65
+  [bamor_ns] step=  68000 ep=  68 avg_r=[  -9.9 -883.3] mode_sw=1 sps=10 Δl/Δg=1.55/6.17
+  [bamor_ns] step=  69000 ep=  69 avg_r=[   1.4 -875.6] mode_sw=1 sps=10 Δl/Δg=1.72/6.53
+  [bamor_ns] step=  70000 ep=  70 avg_r=[  25.9 -824.1] mode_sw=1 sps=10 Δl/Δg=1.96/7.44
+  [bamor_ns] step=  71000 ep=  71 avg_r=[  62.4 -815.6] mode_sw=1 sps=10 Δl/Δg=2.10/6.80
+  [bamor_ns] step=  72000 ep=  72 avg_r=[  72.  -769.9] mode_sw=1 sps=10 Δl/Δg=1.98/6.53
+  [bamor_ns] step=  73000 ep=  73 avg_r=[ 113.1 -738.9] mode_sw=1 sps=10 Δl/Δg=2.09/7.14
+  [bamor_ns] step=  74000 ep=  74 avg_r=[ 226.9 -668.6] mode_sw=1 sps=10 Δl/Δg=2.21/6.87
+  [bamor_ns] step=  75000 ep=  75 avg_r=[ 909.9 -682.2] mode_sw=1 sps=10 Δl/Δg=2.25/7.27
+  [bamor_ns] step=  76000 ep=  76 avg_r=[1782.8 -701.9] mode_sw=1 sps=10 Δl/Δg=2.42/7.74
+  [bamor_ns] step=  77000 ep=  77 avg_r=[2032.4 -710.2] mode_sw=1 sps=10 Δl/Δg=2.72/7.87
+  [bamor_ns] step=  78000 ep=  78 avg_r=[2094.1 -669.7] mode_sw=1 sps=10 Δl/Δg=2.73/8.09
+  [bamor_ns] step=  79000 ep=  79 avg_r=[2917.  -766.3] mode_sw=1 sps=10 Δl/Δg=2.99/9.26
+  [bamor_ns] step=  80000 ep=  80 avg_r=[3072.4 -808.4] mode_sw=1 sps=10 Δl/Δg=3.55/10.61
+  [bamor_ns] EVAL step=80000: Pareto range obj0=[-62.3, 1426.2] obj1=[-3648.6, -103.2]
+  [bamor_ns] step=  81000 ep=  81 avg_r=[3026.8 -837.6] mode_sw=1 sps=10 Δl/Δg=3.52/10.57
+  [bamor_ns] step=  82000 ep=  82 avg_r=[3729.7 -924.7] mode_sw=1 sps=10 Δl/Δg=3.93/10.96
+  [bamor_ns] step=  83000 ep=  83 avg_r=[4237.6 -985. ] mode_sw=1 sps=10 Δl/Δg=4.25/11.46
+  [bamor_ns] step=  84000 ep=  84 avg_r=[4336.2 -977.6] mode_sw=1 sps=10 Δl/Δg=4.74/12.65
+  [bamor_ns] step=  85000 ep=  85 avg_r=[4598.9 -973.3] mode_sw=1 sps=10 Δl/Δg=4.55/12.91
+  [bamor_ns] step=  86000 ep=  86 avg_r=[4837.4 -950.8] mode_sw=1 sps=10 Δl/Δg=5.10/12.88
+  [bamor_ns] step=  87000 ep=  87 avg_r=[5056.8 -932.4] mode_sw=1 sps=10 Δl/Δg=5.14/13.58
+  [bamor_ns] step=  88000 ep=  88 avg_r=[5782.5 -959.3] mode_sw=1 sps=10 Δl/Δg=5.67/15.07
+  [bamor_ns] step=  89000 ep=  89 avg_r=[6080.  -964.8] mode_sw=1 sps=10 Δl/Δg=6.19/15.45
+  [bamor_ns] step=  90000 ep=  90 avg_r=[6211.1 -966.2] mode_sw=1 sps=10 Δl/Δg=5.94/15.30
+  [bamor_ns] step=  91000 ep=  91 avg_r=[6603.5 -990.7] mode_sw=1 sps=10 Δl/Δg=6.91/16.78
+  [bamor_ns] step=  92000 ep=  92 avg_r=[ 6936.9 -1017.1] mode_sw=1 sps=10 Δl/Δg=6.56/15.93
+  [bamor_ns] step=  93000 ep=  93 avg_r=[ 6959.2 -1031.3] mode_sw=1 sps=10 Δl/Δg=6.57/15.57
+  [bamor_ns] step=  94000 ep=  94 avg_r=[ 7182.7 -1038.1] mode_sw=1 sps=10 Δl/Δg=7.48/17.19
+  [bamor_ns] step=  95000 ep=  95 avg_r=[ 7489.3 -1051.7] mode_sw=1 sps=10 Δl/Δg=7.85/17.27
+  [bamor_ns] step=  96000 ep=  96 avg_r=[ 7404.7 -1048.3] mode_sw=1 sps=10 Δl/Δg=8.27/18.62
+  [bamor_ns] step=  97000 ep=  97 avg_r=[ 7486.8 -1040.5] mode_sw=1 sps=10 Δl/Δg=9.27/18.40
+  [bamor_ns] step=  98000 ep=  98 avg_r=[ 7721.9 -1041.4] mode_sw=1 sps=10 Δl/Δg=9.42/18.27
+  [bamor_ns] step=  99000 ep=  99 avg_r=[ 7776.8 -1046.6] mode_sw=1 sps=10 Δl/Δg=10.47/19.80
+  [bamor_ns] step= 100000 ep= 100 avg_r=[ 7753.9 -1052.5] mode_sw=1 sps=10 Δl/Δg=9.53/18.19
+  [bamor_ns] EVAL step=100000: Pareto range obj0=[-92.6, 2110.4] obj1=[-9830.2, -142.7]
+  [bamor_ns] step= 101000 ep= 101 avg_r=[ 7979.9 -1054.5] mode_sw=1 sps=9 Δl/Δg=9.61/18.30
+  [bamor_ns] step= 102000 ep= 102 avg_r=[ 8174.7 -1060.3] mode_sw=1 sps=9 Δl/Δg=8.98/17.97
+  [bamor_ns] step= 103000 ep= 103 avg_r=[ 7527.  -1073.9] mode_sw=2 sps=9 Δl/Δg=18.44/19.82
+  [bamor_ns] step= 104000 ep= 104 avg_r=[ 5908.8 -1005.3] mode_sw=2 sps=9 Δl/Δg=19.38/19.91
+  [bamor_ns] step= 105000 ep= 105 avg_r=[4383.8 -943.1] mode_sw=2 sps=9 Δl/Δg=20.57/21.95
+  [bamor_ns] step= 106000 ep= 106 avg_r=[2730.9 -894. ] mode_sw=2 sps=9 Δl/Δg=20.95/21.79
+  [bamor_ns] step= 107000 ep= 107 avg_r=[ 967.  -874.1] mode_sw=2 sps=9 Δl/Δg=22.99/23.33
+  [bamor_ns] step= 108000 ep= 108 avg_r=[  36.6 -811.1] mode_sw=2 sps=9 Δl/Δg=22.54/23.86
+  [bamor_ns] step= 109000 ep= 109 avg_r=[  41.7 -765.6] mode_sw=2 sps=9 Δl/Δg=23.35/24.66
+  [bamor_ns] step= 110000 ep= 110 avg_r=[  51.1 -689.4] mode_sw=2 sps=9 Δl/Δg=22.54/25.84
+  [bamor_ns] step= 111000 ep= 111 avg_r=[  52.6 -600.4] mode_sw=2 sps=9 Δl/Δg=23.15/25.91
+  [bamor_ns] step= 112000 ep= 112 avg_r=[  41.8 -473.4] mode_sw=2 sps=9 Δl/Δg=24.08/27.37
+  [bamor_ns] step= 113000 ep= 113 avg_r=[  30.4 -373.1] mode_sw=2 sps=9 Δl/Δg=25.24/27.98
+  [bamor_ns] step= 114000 ep= 114 avg_r=[  27.1 -338. ] mode_sw=2 sps=9 Δl/Δg=24.54/28.16
+  [bamor_ns] step= 115000 ep= 115 avg_r=[  26.2 -321.1] mode_sw=2 sps=9 Δl/Δg=23.48/28.34
+  [bamor_ns] step= 116000 ep= 116 avg_r=[  24.5 -310.9] mode_sw=2 sps=9 Δl/Δg=25.65/30.47
+  [bamor_ns] step= 117000 ep= 117 avg_r=[  25.2 -305.9] mode_sw=2 sps=9 Δl/Δg=26.08/30.84
+  [bamor_ns] step= 118000 ep= 118 avg_r=[  26.1 -315.2] mode_sw=2 sps=9 Δl/Δg=29.29/31.83
+  [bamor_ns] step= 119000 ep= 119 avg_r=[  27.4 -327. ] mode_sw=2 sps=9 Δl/Δg=29.14/31.89
+  [bamor_ns] step= 120000 ep= 120 avg_r=[  33.  -343.5] mode_sw=2 sps=9 Δl/Δg=29.01/32.13
+  [bamor_ns] EVAL step=120000: Pareto range obj0=[-0.9, 462.2] obj1=[-11032.5, -163.1]
+  [bamor_ns] step= 121000 ep= 121 avg_r=[  40.1 -364.3] mode_sw=2 sps=9 Δl/Δg=30.38/33.48
+  [bamor_ns] step= 122000 ep= 122 avg_r=[  47.4 -389.6] mode_sw=2 sps=9 Δl/Δg=34.82/36.42
+  [bamor_ns] step= 123000 ep= 123 avg_r=[  50.8 -408.4] mode_sw=2 sps=9 Δl/Δg=32.84/34.89
+  [bamor_ns] step= 124000 ep= 124 avg_r=[  53.4 -417.8] mode_sw=2 sps=9 Δl/Δg=31.53/34.69
+  [bamor_ns] step= 125000 ep= 125 avg_r=[  49.6 -421.4] mode_sw=2 sps=9 Δl/Δg=31.09/33.92
+  [bamor_ns] step= 126000 ep= 126 avg_r=[  45.1 -424.7] mode_sw=2 sps=9 Δl/Δg=33.63/37.48
+  [bamor_ns] step= 127000 ep= 127 avg_r=[  41. -424.] mode_sw=2 sps=9 Δl/Δg=33.94/36.04
+  [bamor_ns] step= 128000 ep= 128 avg_r=[  39.8 -422.4] mode_sw=2 sps=9 Δl/Δg=35.47/37.95
+  [bamor_ns] step= 129000 ep= 129 avg_r=[  39.7 -427.3] mode_sw=2 sps=9 Δl/Δg=35.15/39.31
+  [bamor_ns] step= 130000 ep= 130 avg_r=[  41.7 -435.9] mode_sw=2 sps=9 Δl/Δg=35.99/37.45
+  [bamor_ns] step= 131000 ep= 131 avg_r=[  37.9 -442.9] mode_sw=2 sps=9 Δl/Δg=35.61/39.15
+  [bamor_ns] step= 132000 ep= 132 avg_r=[  37.9 -448.8] mode_sw=2 sps=9 Δl/Δg=35.25/38.72
+  [bamor_ns] step= 133000 ep= 133 avg_r=[  35.6 -451.4] mode_sw=2 sps=9 Δl/Δg=37.23/40.15
+  [bamor_ns] step= 134000 ep= 134 avg_r=[  33.5 -451.4] mode_sw=2 sps=9 Δl/Δg=36.51/39.71
+  [bamor_ns] step= 135000 ep= 135 avg_r=[  27.3 -448.6] mode_sw=2 sps=9 Δl/Δg=41.80/45.56
+  [bamor_ns] step= 136000 ep= 136 avg_r=[  30.4 -449.2] mode_sw=2 sps=9 Δl/Δg=43.24/45.31
+  [bamor_ns] step= 137000 ep= 137 avg_r=[  24.3 -453. ] mode_sw=2 sps=9 Δl/Δg=39.88/42.43
+  [bamor_ns] step= 138000 ep= 138 avg_r=[  18.3 -462.8] mode_sw=2 sps=9 Δl/Δg=45.17/46.96
+  [bamor_ns] step= 139000 ep= 139 avg_r=[   2.8 -471.1] mode_sw=2 sps=9 Δl/Δg=40.46/43.02
+  [bamor_ns] step= 140000 ep= 140 avg_r=[  -7.2 -476.7] mode_sw=2 sps=9 Δl/Δg=43.33/46.58
+  [bamor_ns] EVAL step=140000: Pareto range obj0=[-78.7, 11466.1] obj1=[-1529.2, -42.4]
+  [bamor_ns] step= 141000 ep= 141 avg_r=[ -16.7 -481.7] mode_sw=2 sps=9 Δl/Δg=44.83/46.63
+  [bamor_ns] step= 142000 ep= 142 avg_r=[ -17.5 -487.9] mode_sw=2 sps=9 Δl/Δg=44.75/48.15
+  [bamor_ns] step= 143000 ep= 143 avg_r=[ -11.3 -494.8] mode_sw=2 sps=9 Δl/Δg=42.91/46.46
+  [bamor_ns] step= 144000 ep= 144 avg_r=[  -4.7 -498.3] mode_sw=2 sps=9 Δl/Δg=44.56/46.86
+  [bamor_ns] step= 145000 ep= 145 avg_r=[   4.2 -506.6] mode_sw=2 sps=9 Δl/Δg=45.52/49.08
+  [bamor_ns] step= 146000 ep= 146 avg_r=[   7.3 -507.9] mode_sw=2 sps=9 Δl/Δg=47.05/49.73
+  [bamor_ns] step= 147000 ep= 147 avg_r=[   4.6 -503.4] mode_sw=2 sps=9 Δl/Δg=45.76/48.88
+  [bamor_ns] step= 148000 ep= 148 avg_r=[  -5.3 -493. ] mode_sw=2 sps=9 Δl/Δg=46.21/48.05
+  [bamor_ns] step= 149000 ep= 149 avg_r=[  -4.9 -490.2] mode_sw=2 sps=9 Δl/Δg=46.80/47.84
+  [bamor_ns] step= 150000 ep= 150 avg_r=[ -10.6 -489. ] mode_sw=2 sps=9 Δl/Δg=46.12/49.89
+  [bamor_ns] step= 151000 ep= 151 avg_r=[ -15.7 -533.3] mode_sw=3 sps=9 Δl/Δg=50.46/50.65
+  [bamor_ns] step= 152000 ep= 152 avg_r=[ -13.4 -831.8] mode_sw=3 sps=9 Δl/Δg=50.04/50.53
+  [bamor_ns] step= 153000 ep= 153 avg_r=[  -10.4 -1216.7] mode_sw=3 sps=9 Δl/Δg=52.58/52.69
+  [bamor_ns] step= 154000 ep= 154 avg_r=[   -8.5 -1527.7] mode_sw=3 sps=9 Δl/Δg=50.43/50.71
+  [bamor_ns] step= 155000 ep= 155 avg_r=[   -5.6 -1743.5] mode_sw=3 sps=9 Δl/Δg=51.81/51.86
+  [bamor_ns] step= 156000 ep= 156 avg_r=[-9.0000e-01 -1.9211e+03] mode_sw=3 sps=9 Δl/Δg=51.80/51.86
+  [bamor_ns] step= 157000 ep= 157 avg_r=[-8.0000e-01 -1.8673e+03] mode_sw=3 sps=9 Δl/Δg=53.23/53.32
+  [bamor_ns] step= 158000 ep= 158 avg_r=[ 1.0000e-01 -1.6765e+03] mode_sw=3 sps=9 Δl/Δg=50.42/50.68
+  [bamor_ns] step= 159000 ep= 159 avg_r=[ 6.0000e-01 -1.5404e+03] mode_sw=3 sps=9 Δl/Δg=54.10/54.59
+  [bamor_ns] step= 160000 ep= 160 avg_r=[ 9.0000e-01 -1.5228e+03] mode_sw=3 sps=9 Δl/Δg=53.87/53.97
+  [bamor_ns] EVAL step=160000: Pareto range obj0=[-7.2, 2886.1] obj1=[-3695.0, -109.9]
+  [bamor_ns] step= 161000 ep= 161 avg_r=[ 1.0000e+00 -1.4765e+03] mode_sw=3 sps=9 Δl/Δg=55.46/55.64
+  [bamor_ns] step= 162000 ep= 162 avg_r=[ 8.0000e-01 -1.4198e+03] mode_sw=3 sps=9 Δl/Δg=61.11/61.39
+  [bamor_ns] step= 163000 ep= 163 avg_r=[    0.  -1456.9] mode_sw=3 sps=9 Δl/Δg=56.90/56.99
+  [bamor_ns] step= 164000 ep= 164 avg_r=[    0.  -1491.2] mode_sw=3 sps=9 Δl/Δg=56.69/56.88
+  [bamor_ns] step= 165000 ep= 165 avg_r=[-4.0000e-01 -1.4877e+03] mode_sw=3 sps=9 Δl/Δg=52.11/52.29
+  [bamor_ns] step= 166000 ep= 166 avg_r=[-4.0000e-01 -1.4986e+03] mode_sw=3 sps=9 Δl/Δg=54.45/54.98
+  [bamor_ns] step= 167000 ep= 167 avg_r=[    0.  -1502.1] mode_sw=3 sps=9 Δl/Δg=59.58/60.09
+  [bamor_ns] step= 168000 ep= 168 avg_r=[ 4.0000e-01 -1.4319e+03] mode_sw=3 sps=9 Δl/Δg=60.32/60.49
+  [bamor_ns] step= 169000 ep= 169 avg_r=[ 5.000e-01 -1.355e+03] mode_sw=3 sps=9 Δl/Δg=56.16/56.29
+  [bamor_ns] step= 170000 ep= 170 avg_r=[ 4.0000e-01 -1.2835e+03] mode_sw=3 sps=9 Δl/Δg=58.60/58.84
+  [bamor_ns] step= 171000 ep= 171 avg_r=[ 1.0000e-01 -1.2285e+03] mode_sw=3 sps=9 Δl/Δg=57.70/57.80
+  [bamor_ns] step= 172000 ep= 172 avg_r=[ 2.0000e-01 -1.1761e+03] mode_sw=3 sps=9 Δl/Δg=59.33/59.67
+  [bamor_ns] step= 173000 ep= 173 avg_r=[ 3.000e-01 -1.138e+03] mode_sw=3 sps=9 Δl/Δg=60.84/61.26
+  [bamor_ns] step= 174000 ep= 174 avg_r=[-1.0000e-01 -1.1038e+03] mode_sw=3 sps=9 Δl/Δg=63.21/63.52
+  [bamor_ns] step= 175000 ep= 175 avg_r=[ 2.0000e-01 -1.0535e+03] mode_sw=3 sps=9 Δl/Δg=61.01/61.38
+  [bamor_ns] step= 176000 ep= 176 avg_r=[ 2.0000e-01 -1.0077e+03] mode_sw=3 sps=9 Δl/Δg=58.94/59.42
+  [bamor_ns] step= 177000 ep= 177 avg_r=[-2.00e-01 -9.54e+02] mode_sw=3 sps=9 Δl/Δg=62.75/63.35
+  [bamor_ns] step= 178000 ep= 178 avg_r=[-5.000e-01 -9.174e+02] mode_sw=3 sps=9 Δl/Δg=63.32/63.57
+  [bamor_ns] step= 179000 ep= 179 avg_r=[-3.000e-01 -8.831e+02] mode_sw=3 sps=9 Δl/Δg=58.72/58.85
+  [bamor_ns] step= 180000 ep= 180 avg_r=[-6.000e-01 -8.753e+02] mode_sw=3 sps=9 Δl/Δg=62.94/62.97
+  [bamor_ns] EVAL step=180000: Pareto range obj0=[-185.0, 2749.9] obj1=[-3878.7, -176.0]
+  [bamor_ns] step= 181000 ep= 181 avg_r=[-8.000e-01 -8.526e+02] mode_sw=3 sps=9 Δl/Δg=65.34/65.52
+  [bamor_ns] step= 182000 ep= 182 avg_r=[-7.000e-01 -8.456e+02] mode_sw=3 sps=9 Δl/Δg=67.67/67.86
+  [bamor_ns] step= 183000 ep= 183 avg_r=[-6.000e-01 -8.228e+02] mode_sw=3 sps=9 Δl/Δg=61.26/62.20
+  [bamor_ns] step= 184000 ep= 184 avg_r=[-6.000e-01 -8.188e+02] mode_sw=3 sps=9 Δl/Δg=61.14/61.58
+  [bamor_ns] step= 185000 ep= 185 avg_r=[-6.000e-01 -8.121e+02] mode_sw=3 sps=9 Δl/Δg=63.63/63.72
+  [bamor_ns] step= 186000 ep= 186 avg_r=[-5.000e-01 -7.976e+02] mode_sw=3 sps=9 Δl/Δg=60.72/61.08
+  [bamor_ns] step= 187000 ep= 187 avg_r=[-5.00e-01 -7.77e+02] mode_sw=3 sps=9 Δl/Δg=65.48/65.54
+  [bamor_ns] step= 188000 ep= 188 avg_r=[-7.00e-01 -7.67e+02] mode_sw=3 sps=9 Δl/Δg=64.10/64.55
+  [bamor_ns] step= 189000 ep= 189 avg_r=[  -0.8 -760.5] mode_sw=3 sps=9 Δl/Δg=68.60/69.12
+  [bamor_ns] step= 190000 ep= 190 avg_r=[-7.000e-01 -7.466e+02] mode_sw=3 sps=9 Δl/Δg=63.22/63.31
+  [bamor_ns] step= 191000 ep= 191 avg_r=[-6.000e-01 -7.467e+02] mode_sw=3 sps=9 Δl/Δg=62.84/63.00
+  [bamor_ns] step= 192000 ep= 192 avg_r=[-6.000e-01 -7.391e+02] mode_sw=3 sps=9 Δl/Δg=61.83/62.26
+  [bamor_ns] step= 193000 ep= 193 avg_r=[-6.000e-01 -7.315e+02] mode_sw=3 sps=9 Δl/Δg=62.06/63.27
+  [bamor_ns] step= 194000 ep= 194 avg_r=[-5.000e-01 -7.398e+02] mode_sw=3 sps=9 Δl/Δg=60.43/60.59
+  [bamor_ns] step= 195000 ep= 195 avg_r=[-5.000e-01 -7.579e+02] mode_sw=3 sps=9 Δl/Δg=65.62/65.83
+  [bamor_ns] step= 196000 ep= 196 avg_r=[  -0.8 -772.2] mode_sw=3 sps=9 Δl/Δg=65.64/65.80
+  [bamor_ns] step= 197000 ep= 197 avg_r=[-7.000e-01 -7.797e+02] mode_sw=3 sps=9 Δl/Δg=72.69/72.94
+  [bamor_ns] step= 198000 ep= 198 avg_r=[-6.000e-01 -7.819e+02] mode_sw=3 sps=9 Δl/Δg=70.29/70.47
+  [bamor_ns] step= 199000 ep= 199 avg_r=[  -0.8 -765.1] mode_sw=3 sps=9 Δl/Δg=65.71/65.98
+  [bamor_ns] step= 200000 ep= 200 avg_r=[  -1.  -774.3] mode_sw=3 sps=9 Δl/Δg=68.97/69.39
+  [bamor_ns] EVAL step=200000: Pareto range obj0=[-442.4, 610.1] obj1=[-12688.4, -203.7]
+[bamor_ns] Saved to results/bamor_mujoco/mo_halfcheetah_v5/bamor_ns_seed0.json
+
+============================================================
+  Method: bamor_ns  Env: mo-halfcheetah-v5  Seed: 1
+============================================================
+/home/erzhu419/.local/lib/python3.10/site-packages/gymnasium/utils/passive_env_checker.py:245: UserWarning: [33mWARN: The reward returned by `step()` must be a float, int, np.integer or np.floating, actual type: <class 'numpy.ndarray'>[0m
+  logger.warn(
+[bamor_ns] env=mo-halfcheetah-v5, obs=17, act=6, rew=2, modes=3
+  [bamor_ns] step=   1000 ep=   1 avg_r=[-6.0000e-01 -5.8956e+03] mode_sw=0 sps=667 Δl/Δg=0.00/0.00
+  [bamor_ns] step=   2000 ep=   2 avg_r=[-3.2000e+00 -5.9658e+03] mode_sw=0 sps=975 Δl/Δg=0.00/0.00
+  [bamor_ns] step=   3000 ep=   3 avg_r=[-3.9000e+00 -5.9745e+03] mode_sw=0 sps=1160 Δl/Δg=0.00/0.00
+  [bamor_ns] step=   4000 ep=   4 avg_r=[-2.00e-01 -5.96e+03] mode_sw=0 sps=1280 Δl/Δg=0.00/0.00
+  [bamor_ns] step=   5000 ep=   5 avg_r=[ 2.9000e+00 -5.9807e+03] mode_sw=0 sps=1310 Δl/Δg=0.00/0.00
+  [bamor_ns] step=   6000 ep=   6 avg_r=[ 5.7000e+00 -5.8608e+03] mode_sw=0 sps=97 Δl/Δg=0.13/0.21
+  [bamor_ns] step=   7000 ep=   7 avg_r=[    7.4 -4990.8] mode_sw=0 sps=53 Δl/Δg=0.11/0.29
+  [bamor_ns] step=   8000 ep=   8 avg_r=[    9.4 -4063.7] mode_sw=0 sps=40 Δl/Δg=0.09/0.30
+  [bamor_ns] step=   9000 ep=   9 avg_r=[    8.2 -3215.5] mode_sw=0 sps=37 Δl/Δg=0.10/0.31
+  [bamor_ns] step=  10000 ep=  10 avg_r=[    5.5 -2394.5] mode_sw=0 sps=32 Δl/Δg=0.08/0.30
+  [bamor_ns] step=  11000 ep=  11 avg_r=[    3.4 -1749. ] mode_sw=0 sps=29 Δl/Δg=0.13/0.29
+  [bamor_ns] step=  12000 ep=  12 avg_r=[    3.5 -1815.4] mode_sw=0 sps=27 Δl/Δg=0.15/0.33
+  [bamor_ns] step=  13000 ep=  13 avg_r=[    3.8 -1940. ] mode_sw=0 sps=26 Δl/Δg=0.14/0.38
+  [bamor_ns] step=  14000 ep=  14 avg_r=[    5.4 -2027.5] mode_sw=0 sps=25 Δl/Δg=0.17/0.52
+  [bamor_ns] step=  15000 ep=  15 avg_r=[    6.7 -2048.1] mode_sw=0 sps=24 Δl/Δg=0.25/0.59
+  [bamor_ns] step=  16000 ep=  16 avg_r=[    7.9 -2051.2] mode_sw=0 sps=23 Δl/Δg=0.33/0.80
+  [bamor_ns] step=  17000 ep=  17 avg_r=[    8.6 -2062.3] mode_sw=0 sps=23 Δl/Δg=0.31/0.84
+  [bamor_ns] step=  18000 ep=  18 avg_r=[    8.6 -2100.6] mode_sw=0 sps=22 Δl/Δg=0.39/0.92
+  [bamor_ns] step=  19000 ep=  19 avg_r=[    7.2 -2096.1] mode_sw=0 sps=22 Δl/Δg=0.31/0.99
+  [bamor_ns] step=  20000 ep=  20 avg_r=[    7.3 -2115.7] mode_sw=0 sps=21 Δl/Δg=0.38/1.09
+  [bamor_ns] EVAL step=20000: Pareto range obj0=[-0.4, -0.0] obj1=[-366.1, -24.4]
+  [bamor_ns] step=  21000 ep=  21 avg_r=[    6.9 -2127.6] mode_sw=0 sps=19 Δl/Δg=0.37/1.23
+  [bamor_ns] step=  22000 ep=  22 avg_r=[    6.9 -2125.2] mode_sw=0 sps=20 Δl/Δg=0.55/1.35
+  [bamor_ns] step=  23000 ep=  23 avg_r=[    7.1 -2119. ] mode_sw=0 sps=20 Δl/Δg=0.43/1.60
+  [bamor_ns] step=  24000 ep=  24 avg_r=[    7.9 -2145. ] mode_sw=0 sps=21 Δl/Δg=0.70/1.54
+  [bamor_ns] step=  25000 ep=  25 avg_r=[    7.7 -2129.9] mode_sw=0 sps=21 Δl/Δg=0.42/1.48
+  [bamor_ns] step=  26000 ep=  26 avg_r=[    8.7 -2090.6] mode_sw=0 sps=21 Δl/Δg=0.59/1.82
+  [bamor_ns] step=  27000 ep=  27 avg_r=[    9.9 -2093.3] mode_sw=0 sps=22 Δl/Δg=0.46/1.63
+  [bamor_ns] step=  28000 ep=  28 avg_r=[    9.9 -2083.8] mode_sw=0 sps=22 Δl/Δg=0.59/1.95
+  [bamor_ns] step=  29000 ep=  29 avg_r=[    9.4 -2058.7] mode_sw=0 sps=22 Δl/Δg=0.68/2.07
+  [bamor_ns] step=  30000 ep=  30 avg_r=[    9. -2052.] mode_sw=0 sps=23 Δl/Δg=0.96/1.97
+  [bamor_ns] step=  31000 ep=  31 avg_r=[    8.1 -2056.3] mode_sw=0 sps=23 Δl/Δg=0.51/1.97
+  [bamor_ns] step=  32000 ep=  32 avg_r=[    7.9 -2048.4] mode_sw=0 sps=23 Δl/Δg=0.60/2.09
+  [bamor_ns] step=  33000 ep=  33 avg_r=[    8.1 -2062.7] mode_sw=0 sps=24 Δl/Δg=0.58/2.11
+  [bamor_ns] step=  34000 ep=  34 avg_r=[    9.  -2055.3] mode_sw=0 sps=24 Δl/Δg=0.84/2.21
+  [bamor_ns] step=  35000 ep=  35 avg_r=[    9.3 -2052.3] mode_sw=0 sps=24 Δl/Δg=0.84/2.23
+  [bamor_ns] step=  36000 ep=  36 avg_r=[    9.2 -2055.5] mode_sw=0 sps=24 Δl/Δg=0.74/2.34
+  [bamor_ns] step=  37000 ep=  37 avg_r=[    8.7 -2039.5] mode_sw=0 sps=25 Δl/Δg=0.70/2.48
+  [bamor_ns] step=  38000 ep=  38 avg_r=[    8.2 -1989.1] mode_sw=0 sps=25 Δl/Δg=1.06/2.49
+  [bamor_ns] step=  39000 ep=  39 avg_r=[    8.1 -1980.7] mode_sw=0 sps=25 Δl/Δg=1.12/2.38
+  [bamor_ns] step=  40000 ep=  40 avg_r=[    8.5 -1967.7] mode_sw=0 sps=25 Δl/Δg=0.69/2.34
+  [bamor_ns] EVAL step=40000: Pareto range obj0=[-2.2, 1.0] obj1=[-944.7, -17.9]
+  [bamor_ns] step=  41000 ep=  41 avg_r=[    9.7 -1950.4] mode_sw=0 sps=25 Δl/Δg=0.81/2.43
+  [bamor_ns] step=  42000 ep=  42 avg_r=[   10.3 -1938.8] mode_sw=0 sps=25 Δl/Δg=0.49/2.48
+  [bamor_ns] step=  43000 ep=  43 avg_r=[   11.2 -1933.6] mode_sw=0 sps=25 Δl/Δg=0.96/2.50
+  [bamor_ns] step=  44000 ep=  44 avg_r=[   11.4 -1917.8] mode_sw=0 sps=25 Δl/Δg=1.07/2.66
+  [bamor_ns] step=  45000 ep=  45 avg_r=[   11.8 -1917.8] mode_sw=0 sps=26 Δl/Δg=1.08/2.80
+  [bamor_ns] step=  46000 ep=  46 avg_r=[   22.8 -1683.8] mode_sw=1 sps=26 Δl/Δg=0.38/2.87
+  [bamor_ns] step=  47000 ep=  47 avg_r=[   87.7 -1377.1] mode_sw=1 sps=26 Δl/Δg=0.38/3.01
+  [bamor_ns] step=  48000 ep=  48 avg_r=[  139.9 -1087.1] mode_sw=1 sps=26 Δl/Δg=0.38/2.93
+  [bamor_ns] step=  49000 ep=  49 avg_r=[ 233.1 -796.4] mode_sw=1 sps=26 Δl/Δg=0.38/2.91
+  [bamor_ns] step=  50000 ep=  50 avg_r=[ 298.6 -512.8] mode_sw=1 sps=27 Δl/Δg=0.39/3.26
+  [bamor_ns] step=  51000 ep=  51 avg_r=[ 352.2 -483.4] mode_sw=1 sps=27 Δl/Δg=0.48/3.68
+  [bamor_ns] step=  52000 ep=  52 avg_r=[ 382.2 -516.3] mode_sw=1 sps=27 Δl/Δg=0.43/3.36
+  [bamor_ns] step=  53000 ep=  53 avg_r=[ 381.1 -533.7] mode_sw=1 sps=27 Δl/Δg=0.47/3.89
+  [bamor_ns] step=  54000 ep=  54 avg_r=[ 380.2 -542.6] mode_sw=1 sps=27 Δl/Δg=0.54/3.97
+  [bamor_ns] step=  55000 ep=  55 avg_r=[ 331.5 -531.1] mode_sw=1 sps=27 Δl/Δg=0.52/3.90
+  [bamor_ns] step=  56000 ep=  56 avg_r=[ 281.1 -541. ] mode_sw=1 sps=27 Δl/Δg=0.51/3.93
+  [bamor_ns] step=  57000 ep=  57 avg_r=[ 193.9 -562.6] mode_sw=1 sps=28 Δl/Δg=0.56/4.25
+  [bamor_ns] step=  58000 ep=  58 avg_r=[ 164.1 -632.5] mode_sw=1 sps=28 Δl/Δg=0.65/4.61
+  [bamor_ns] step=  59000 ep=  59 avg_r=[  94.3 -691.3] mode_sw=1 sps=28 Δl/Δg=0.67/4.67
+  [bamor_ns] step=  60000 ep=  60 avg_r=[ 122.1 -761.8] mode_sw=1 sps=28 Δl/Δg=0.78/4.71
+  [bamor_ns] EVAL step=60000: Pareto range obj0=[-927.6, 40.2] obj1=[-1762.1, -46.7]
+  [bamor_ns] step=  61000 ep=  61 avg_r=[  -1.3 -749.2] mode_sw=1 sps=27 Δl/Δg=0.82/4.77
+  [bamor_ns] step=  62000 ep=  62 avg_r=[  24.5 -764.7] mode_sw=1 sps=28 Δl/Δg=0.92/5.18
+  [bamor_ns] step=  63000 ep=  63 avg_r=[  17.6 -722.4] mode_sw=1 sps=28 Δl/Δg=0.94/5.50
+  [bamor_ns] step=  64000 ep=  64 avg_r=[  27.7 -681.7] mode_sw=1 sps=28 Δl/Δg=1.00/6.08
+  [bamor_ns] step=  65000 ep=  65 avg_r=[  17.2 -644.7] mode_sw=1 sps=28 Δl/Δg=1.09/5.97
+  [bamor_ns] step=  66000 ep=  66 avg_r=[ 154.6 -629.7] mode_sw=1 sps=28 Δl/Δg=1.00/5.56
+  [bamor_ns] step=  67000 ep=  67 avg_r=[ 179.6 -586.8] mode_sw=1 sps=28 Δl/Δg=1.10/6.36
+  [bamor_ns] step=  68000 ep=  68 avg_r=[ 235.4 -556.7] mode_sw=1 sps=28 Δl/Δg=1.05/6.24
+  [bamor_ns] step=  69000 ep=  69 avg_r=[ 293.1 -534. ] mode_sw=1 sps=29 Δl/Δg=1.14/6.19
+  [bamor_ns] step=  70000 ep=  70 avg_r=[ 341.6 -504.7] mode_sw=1 sps=29 Δl/Δg=1.06/6.45
+  [bamor_ns] step=  71000 ep=  71 avg_r=[ 394.4 -508.8] mode_sw=1 sps=29 Δl/Δg=0.98/6.29
+  [bamor_ns] step=  72000 ep=  72 avg_r=[ 402.7 -514.4] mode_sw=1 sps=29 Δl/Δg=1.05/6.55
+  [bamor_ns] step=  73000 ep=  73 avg_r=[ 401.1 -525.9] mode_sw=1 sps=29 Δl/Δg=1.05/7.11
+  [bamor_ns] step=  74000 ep=  74 avg_r=[ 328.6 -544.9] mode_sw=1 sps=29 Δl/Δg=0.98/6.59
+  [bamor_ns] step=  75000 ep=  75 avg_r=[ 328.3 -556.7] mode_sw=1 sps=29 Δl/Δg=1.03/7.41
+  [bamor_ns] step=  76000 ep=  76 avg_r=[ 327.3 -562.2] mode_sw=1 sps=29 Δl/Δg=1.00/6.82
+  [bamor_ns] step=  77000 ep=  77 avg_r=[ 359.9 -561.6] mode_sw=1 sps=29 Δl/Δg=1.06/7.25
+  [bamor_ns] step=  78000 ep=  78 avg_r=[ 394.3 -553.9] mode_sw=1 sps=29 Δl/Δg=1.03/7.25
+  [bamor_ns] step=  79000 ep=  79 avg_r=[ 478. -554.] mode_sw=1 sps=30 Δl/Δg=1.08/7.61
+  [bamor_ns] step=  80000 ep=  80 avg_r=[ 519.8 -544.4] mode_sw=1 sps=30 Δl/Δg=1.10/7.64
+  [bamor_ns] EVAL step=80000: Pareto range obj0=[-15.3, 35.1] obj1=[-1004.7, -130.4]
+  [bamor_ns] step=  81000 ep=  81 avg_r=[ 600.3 -539.5] mode_sw=1 sps=29 Δl/Δg=1.21/8.37
+  [bamor_ns] step=  82000 ep=  82 avg_r=[ 679.7 -544.1] mode_sw=1 sps=29 Δl/Δg=1.16/8.21
+  [bamor_ns] step=  83000 ep=  83 avg_r=[ 768.2 -541.6] mode_sw=1 sps=29 Δl/Δg=1.15/8.03
+  [bamor_ns] step=  84000 ep=  84 avg_r=[ 788.1 -535. ] mode_sw=1 sps=29 Δl/Δg=1.23/8.63
+  [bamor_ns] step=  85000 ep=  85 avg_r=[ 884.3 -534.5] mode_sw=1 sps=29 Δl/Δg=1.26/8.79
+  [bamor_ns] step=  86000 ep=  86 avg_r=[ 971.9 -541. ] mode_sw=1 sps=30 Δl/Δg=1.27/8.86
+  [bamor_ns] step=  87000 ep=  87 avg_r=[1101.4 -544.8] mode_sw=1 sps=30 Δl/Δg=1.32/9.51
+  [bamor_ns] step=  88000 ep=  88 avg_r=[1232.6 -557.4] mode_sw=1 sps=30 Δl/Δg=1.36/10.00
+  [bamor_ns] step=  89000 ep=  89 avg_r=[1394.4 -568.6] mode_sw=1 sps=30 Δl/Δg=1.42/10.64
+  [bamor_ns] step=  90000 ep=  90 avg_r=[1533.8 -596.9] mode_sw=1 sps=30 Δl/Δg=1.60/10.87
+  [bamor_ns] step=  91000 ep=  91 avg_r=[1712.  -625.3] mode_sw=1 sps=30 Δl/Δg=1.72/10.57
+  [bamor_ns] step=  92000 ep=  92 avg_r=[1822.3 -650.1] mode_sw=1 sps=30 Δl/Δg=1.62/11.20
+  [bamor_ns] step=  93000 ep=  93 avg_r=[1920.4 -676.5] mode_sw=1 sps=30 Δl/Δg=1.80/11.85
+  [bamor_ns] step=  94000 ep=  94 avg_r=[2115.8 -694.8] mode_sw=1 sps=30 Δl/Δg=2.00/11.31
+  [bamor_ns] step=  95000 ep=  95 avg_r=[1854.3 -720.4] mode_sw=1 sps=30 Δl/Δg=1.80/11.91
+  [bamor_ns] step=  96000 ep=  96 avg_r=[1680.8 -814.4] mode_sw=2 sps=30 Δl/Δg=9.78/12.67
+  [bamor_ns] step=  97000 ep=  97 avg_r=[1281.  -874.6] mode_sw=2 sps=30 Δl/Δg=5.19/12.80
+  [bamor_ns] step=  98000 ep=  98 avg_r=[ 883.8 -942.8] mode_sw=2 sps=30 Δl/Δg=7.66/12.97
+  [bamor_ns] step=  99000 ep=  99 avg_r=[ 431.9 -983.4] mode_sw=2 sps=31 Δl/Δg=9.84/14.03
+  [bamor_ns] step= 100000 ep= 100 avg_r=[  363.5 -1030.5] mode_sw=2 sps=31 Δl/Δg=6.86/14.21
+  [bamor_ns] EVAL step=100000: Pareto range obj0=[0.1, 227.7] obj1=[-7498.9, -190.4]
+  [bamor_ns] step= 101000 ep= 101 avg_r=[  153.1 -1024.9] mode_sw=2 sps=30 Δl/Δg=8.38/16.20
+  [bamor_ns] step= 102000 ep= 102 avg_r=[ 173.  -985.6] mode_sw=2 sps=30 Δl/Δg=8.42/17.04
+  [bamor_ns] step= 103000 ep= 103 avg_r=[ 168.4 -888.6] mode_sw=2 sps=30 Δl/Δg=8.23/17.03
+  [bamor_ns] step= 104000 ep= 104 avg_r=[ 167.2 -822.3] mode_sw=2 sps=30 Δl/Δg=11.32/19.08
+  [bamor_ns] step= 105000 ep= 105 avg_r=[ 157.  -736.7] mode_sw=2 sps=30 Δl/Δg=12.00/19.74
+  [bamor_ns] step= 106000 ep= 106 avg_r=[ 130.8 -634. ] mode_sw=2 sps=30 Δl/Δg=13.25/20.72
+  [bamor_ns] step= 107000 ep= 107 avg_r=[ 113.3 -599. ] mode_sw=2 sps=30 Δl/Δg=15.55/22.00
+  [bamor_ns] step= 108000 ep= 108 avg_r=[ 106.3 -616.6] mode_sw=2 sps=31 Δl/Δg=11.08/22.49
+  [bamor_ns] step= 109000 ep= 109 avg_r=[  94.6 -633.1] mode_sw=2 sps=31 Δl/Δg=13.60/21.80
+  [bamor_ns] step= 110000 ep= 110 avg_r=[  91.5 -640.6] mode_sw=2 sps=31 Δl/Δg=13.39/25.33
+  [bamor_ns] step= 111000 ep= 111 avg_r=[  75.  -656.4] mode_sw=2 sps=31 Δl/Δg=20.68/26.26
+  [bamor_ns] step= 112000 ep= 112 avg_r=[  56.9 -671.6] mode_sw=2 sps=31 Δl/Δg=14.69/27.08
+  [bamor_ns] step= 113000 ep= 113 avg_r=[  47.7 -661.6] mode_sw=2 sps=31 Δl/Δg=15.23/26.43
+  [bamor_ns] step= 114000 ep= 114 avg_r=[  39.5 -649.5] mode_sw=2 sps=31 Δl/Δg=15.54/28.48
+  [bamor_ns] step= 115000 ep= 115 avg_r=[  26.6 -642.6] mode_sw=2 sps=31 Δl/Δg=24.58/31.21
+  [bamor_ns] step= 116000 ep= 116 avg_r=[  29.4 -620.7] mode_sw=2 sps=31 Δl/Δg=19.76/30.60
+  [bamor_ns] step= 117000 ep= 117 avg_r=[  37.5 -601. ] mode_sw=2 sps=31 Δl/Δg=13.09/29.43
+  [bamor_ns] step= 118000 ep= 118 avg_r=[  44.3 -596.7] mode_sw=2 sps=31 Δl/Δg=21.31/33.31
+  [bamor_ns] step= 119000 ep= 119 avg_r=[  42.4 -598.8] mode_sw=2 sps=31 Δl/Δg=25.34/33.36
+  [bamor_ns] step= 120000 ep= 120 avg_r=[  47.  -621.7] mode_sw=2 sps=31 Δl/Δg=18.56/33.89
+  [bamor_ns] EVAL step=120000: Pareto range obj0=[-2.2, 4368.3] obj1=[-10053.3, -780.4]
+  [bamor_ns] step= 121000 ep= 121 avg_r=[  54.4 -701.1] mode_sw=2 sps=31 Δl/Δg=32.79/36.98
+  [bamor_ns] step= 122000 ep= 122 avg_r=[  53.6 -769.8] mode_sw=2 sps=31 Δl/Δg=23.51/39.35
+  [bamor_ns] step= 123000 ep= 123 avg_r=[  50.9 -773.4] mode_sw=2 sps=31 Δl/Δg=21.98/33.47
+  [bamor_ns] step= 124000 ep= 124 avg_r=[  54.5 -764.8] mode_sw=2 sps=31 Δl/Δg=19.69/38.85
+  [bamor_ns] step= 125000 ep= 125 avg_r=[  54.6 -730.5] mode_sw=2 sps=31 Δl/Δg=24.47/37.09
+  [bamor_ns] step= 126000 ep= 126 avg_r=[  56.  -642.7] mode_sw=2 sps=31 Δl/Δg=19.53/40.03
+  [bamor_ns] step= 127000 ep= 127 avg_r=[  51.3 -556.1] mode_sw=2 sps=31 Δl/Δg=32.17/39.35
+  [bamor_ns] step= 128000 ep= 128 avg_r=[  55.7 -539. ] mode_sw=2 sps=31 Δl/Δg=25.27/39.99
+  [bamor_ns] step= 129000 ep= 129 avg_r=[  53.3 -526.6] mode_sw=2 sps=31 Δl/Δg=26.10/43.30
+  [bamor_ns] step= 130000 ep= 130 avg_r=[  50.7 -518.9] mode_sw=2 sps=31 Δl/Δg=24.67/44.63
+  [bamor_ns] step= 131000 ep= 131 avg_r=[  44.6 -515.6] mode_sw=2 sps=31 Δl/Δg=30.09/44.47
+  [bamor_ns] step= 132000 ep= 132 avg_r=[  50.3 -523.7] mode_sw=2 sps=31 Δl/Δg=29.29/47.08
+  [bamor_ns] step= 133000 ep= 133 avg_r=[  52.9 -526.5] mode_sw=2 sps=31 Δl/Δg=29.10/44.51
+  [bamor_ns] step= 134000 ep= 134 avg_r=[  53.5 -531.2] mode_sw=2 sps=31 Δl/Δg=21.71/40.95
+  [bamor_ns] step= 135000 ep= 135 avg_r=[  54.  -533.5] mode_sw=2 sps=31 Δl/Δg=21.38/47.20
+  [bamor_ns] step= 136000 ep= 136 avg_r=[  54.2 -532.5] mode_sw=2 sps=31 Δl/Δg=22.93/46.27
+  [bamor_ns] step= 137000 ep= 137 avg_r=[  49.8 -539.8] mode_sw=2 sps=31 Δl/Δg=23.13/43.82
+  [bamor_ns] step= 138000 ep= 138 avg_r=[  37.4 -553.6] mode_sw=2 sps=32 Δl/Δg=27.91/47.82
+  [bamor_ns] step= 139000 ep= 139 avg_r=[  29.3 -574.7] mode_sw=2 sps=32 Δl/Δg=28.17/47.27
+  [bamor_ns] step= 140000 ep= 140 avg_r=[   4.2 -613.4] mode_sw=2 sps=32 Δl/Δg=25.86/43.20
+  [bamor_ns] EVAL step=140000: Pareto range obj0=[-257.8, 4151.3] obj1=[-1115.5, -23.3]
+  [bamor_ns] step= 141000 ep= 141 avg_r=[ -15.1 -656.2] mode_sw=2 sps=31 Δl/Δg=31.74/43.52
+  [bamor_ns] step= 142000 ep= 142 avg_r=[  -28.5 -1082.1] mode_sw=3 sps=31 Δl/Δg=45.21/45.83
+  [bamor_ns] step= 143000 ep= 143 avg_r=[  -32.9 -1689.4] mode_sw=3 sps=31 Δl/Δg=44.07/44.15
+  [bamor_ns] step= 144000 ep= 144 avg_r=[  -32.9 -2015.7] mode_sw=3 sps=31 Δl/Δg=44.42/45.08
+  [bamor_ns] step= 145000 ep= 145 avg_r=[  -16.9 -2323.7] mode_sw=3 sps=31 Δl/Δg=41.67/42.37
+  [bamor_ns] step= 146000 ep= 146 avg_r=[   -5.2 -2550.3] mode_sw=3 sps=31 Δl/Δg=44.57/44.78
+  [bamor_ns] step= 147000 ep= 147 avg_r=[-9.0000e-01 -2.3556e+03] mode_sw=3 sps=32 Δl/Δg=44.44/44.87
+  [bamor_ns] step= 148000 ep= 148 avg_r=[-2.0000e-01 -2.0062e+03] mode_sw=3 sps=32 Δl/Δg=43.54/43.60
+  [bamor_ns] step= 149000 ep= 149 avg_r=[ 4.0000e-01 -1.8533e+03] mode_sw=3 sps=32 Δl/Δg=44.78/45.79
+  [bamor_ns] step= 150000 ep= 150 avg_r=[ 1.1000e+00 -1.6724e+03] mode_sw=3 sps=32 Δl/Δg=47.39/47.55
+  [bamor_ns] step= 151000 ep= 151 avg_r=[ 1.5000e+00 -1.5244e+03] mode_sw=3 sps=32 Δl/Δg=44.37/44.94
+  [bamor_ns] step= 152000 ep= 152 avg_r=[    1.4 -1371.2] mode_sw=3 sps=32 Δl/Δg=47.58/48.09
+  [bamor_ns] step= 153000 ep= 153 avg_r=[    1.7 -1175.5] mode_sw=3 sps=32 Δl/Δg=44.53/45.73
+  [bamor_ns] step= 154000 ep= 154 avg_r=[    1.8 -1053.3] mode_sw=3 sps=32 Δl/Δg=41.70/43.55
+  [bamor_ns] step= 155000 ep= 155 avg_r=[   1.6 -952.5] mode_sw=3 sps=32 Δl/Δg=43.73/44.18
+  [bamor_ns] step= 156000 ep= 156 avg_r=[ 7.000e-01 -8.711e+02] mode_sw=3 sps=32 Δl/Δg=45.18/46.98
+  [bamor_ns] step= 157000 ep= 157 avg_r=[ 7.000e-01 -8.155e+02] mode_sw=3 sps=32 Δl/Δg=42.80/44.62
+  [bamor_ns] step= 158000 ep= 158 avg_r=[ 5.000e-01 -7.679e+02] mode_sw=3 sps=32 Δl/Δg=45.94/47.12
+  [bamor_ns] step= 159000 ep= 159 avg_r=[    1.8 -1246.7] mode_sw=3 sps=32 Δl/Δg=45.14/46.38
+  [bamor_ns] step= 160000 ep= 160 avg_r=[    2.  -1210.9] mode_sw=3 sps=32 Δl/Δg=46.59/48.61
+  [bamor_ns] EVAL step=160000: Pareto range obj0=[-381.2, 42.7] obj1=[-3531.0, -76.6]
+  [bamor_ns] step= 161000 ep= 161 avg_r=[    2.2 -1194.3] mode_sw=3 sps=31 Δl/Δg=46.35/46.92
+  [bamor_ns] step= 162000 ep= 162 avg_r=[    2.8 -1248.4] mode_sw=3 sps=31 Δl/Δg=47.76/47.85
+  [bamor_ns] step= 163000 ep= 163 avg_r=[    2.6 -1234.2] mode_sw=3 sps=31 Δl/Δg=46.54/46.79
+  [bamor_ns] step= 164000 ep= 164 avg_r=[   1.1 -707.8] mode_sw=3 sps=32 Δl/Δg=48.04/48.45
+  [bamor_ns] step= 165000 ep= 165 avg_r=[   0.9 -713.6] mode_sw=3 sps=32 Δl/Δg=45.02/46.16
+  [bamor_ns] step= 166000 ep= 166 avg_r=[   1.  -713.1] mode_sw=3 sps=32 Δl/Δg=47.76/48.31
+  [bamor_ns] step= 167000 ep= 167 avg_r=[ 6.000e-01 -6.599e+02] mode_sw=3 sps=32 Δl/Δg=48.53/49.91
+  [bamor_ns] step= 168000 ep= 168 avg_r=[   0.7 -656.2] mode_sw=3 sps=32 Δl/Δg=48.74/49.09
+  [bamor_ns] step= 169000 ep= 169 avg_r=[ 6.000e-01 -6.438e+02] mode_sw=3 sps=32 Δl/Δg=44.63/45.85
+  [bamor_ns] step= 170000 ep= 170 avg_r=[   0.8 -628.4] mode_sw=3 sps=32 Δl/Δg=47.01/47.53
+  [bamor_ns] step= 171000 ep= 171 avg_r=[ 6.00e-01 -6.16e+02] mode_sw=3 sps=32 Δl/Δg=42.48/43.27
+  [bamor_ns] step= 172000 ep= 172 avg_r=[   0.6 -582.2] mode_sw=3 sps=32 Δl/Δg=48.80/49.58
+  [bamor_ns] step= 173000 ep= 173 avg_r=[ 5.000e-01 -5.697e+02] mode_sw=3 sps=32 Δl/Δg=48.49/48.81
+  [bamor_ns] step= 174000 ep= 174 avg_r=[   0.6 -583.7] mode_sw=3 sps=32 Δl/Δg=46.77/47.55
+  [bamor_ns] step= 175000 ep= 175 avg_r=[ 3.000e-01 -5.679e+02] mode_sw=3 sps=32 Δl/Δg=50.40/50.81
+  [bamor_ns] step= 176000 ep= 176 avg_r=[ 5.000e-01 -5.494e+02] mode_sw=3 sps=32 Δl/Δg=50.52/50.97
+  [bamor_ns] step= 177000 ep= 177 avg_r=[   0.8 -713.6] mode_sw=3 sps=32 Δl/Δg=53.69/54.29
+  [bamor_ns] step= 178000 ep= 178 avg_r=[   1.  -768.5] mode_sw=3 sps=32 Δl/Δg=51.13/52.69
+  [bamor_ns] step= 179000 ep= 179 avg_r=[   2.2 -807. ] mode_sw=3 sps=32 Δl/Δg=50.91/51.85
+  [bamor_ns] step= 180000 ep= 180 avg_r=[   2.8 -856.7] mode_sw=3 sps=32 Δl/Δg=52.32/53.09
+  [bamor_ns] EVAL step=180000: Pareto range obj0=[-16.3, 8.8] obj1=[-7879.6, -242.0]
+  [bamor_ns] step= 181000 ep= 181 avg_r=[   2.8 -903. ] mode_sw=3 sps=32 Δl/Δg=57.87/60.04
+  [bamor_ns] step= 182000 ep= 182 avg_r=[   2.8 -768.9] mode_sw=3 sps=32 Δl/Δg=54.34/54.77
+  [bamor_ns] step= 183000 ep= 183 avg_r=[   2.9 -731.1] mode_sw=3 sps=32 Δl/Δg=53.71/56.47
+  [bamor_ns] step= 184000 ep= 184 avg_r=[   2.3 -680.4] mode_sw=3 sps=32 Δl/Δg=57.68/59.49
+  [bamor_ns] step= 185000 ep= 185 avg_r=[   2.  -627.5] mode_sw=3 sps=32 Δl/Δg=59.39/61.23
+  [bamor_ns] step= 186000 ep= 186 avg_r=[   1.9 -887. ] mode_sw=3 sps=32 Δl/Δg=57.01/59.00
+  [bamor_ns] step= 187000 ep= 187 avg_r=[   1.9 -870.5] mode_sw=3 sps=32 Δl/Δg=61.11/63.01
+  [bamor_ns] step= 188000 ep= 188 avg_r=[   1.8 -856.7] mode_sw=3 sps=32 Δl/Δg=59.70/61.15
+  [bamor_ns] step= 189000 ep= 189 avg_r=[   1.8 -977. ] mode_sw=3 sps=32 Δl/Δg=61.73/62.51
+  [bamor_ns] step= 190000 ep= 190 avg_r=[    1.9 -1043.6] mode_sw=3 sps=32 Δl/Δg=62.48/62.78
+  [bamor_ns] step= 191000 ep= 191 avg_r=[   2.3 -843.7] mode_sw=3 sps=32 Δl/Δg=60.33/64.58
+  [bamor_ns] step= 192000 ep= 192 avg_r=[   2.  -820.7] mode_sw=3 sps=32 Δl/Δg=57.53/62.46
+  [bamor_ns] step= 193000 ep= 193 avg_r=[   1.9 -805.3] mode_sw=3 sps=32 Δl/Δg=61.07/64.49
+  [bamor_ns] step= 194000 ep= 194 avg_r=[   1.7 -653.1] mode_sw=3 sps=32 Δl/Δg=62.76/66.27
+  [bamor_ns] step= 195000 ep= 195 avg_r=[ 465.5 -634.3] mode_sw=4 sps=32 Δl/Δg=10.64/66.91
+  [bamor_ns] step= 196000 ep= 196 avg_r=[ 495.2 -575.1] mode_sw=4 sps=32 Δl/Δg=8.95/63.99
+  [bamor_ns] step= 197000 ep= 197 avg_r=[ 692.7 -619.5] mode_sw=4 sps=32 Δl/Δg=10.11/66.10
+  [bamor_ns] step= 198000 ep= 198 avg_r=[ 932.2 -677.6] mode_sw=4 sps=32 Δl/Δg=9.84/68.10
+  [bamor_ns] step= 199000 ep= 199 avg_r=[1111.2 -734.6] mode_sw=4 sps=32 Δl/Δg=9.82/66.74
+  [bamor_ns] step= 200000 ep= 200 avg_r=[ 806.4 -729. ] mode_sw=4 sps=32 Δl/Δg=10.04/71.32
+  [bamor_ns] EVAL step=200000: Pareto range obj0=[-1.0, 925.8] obj1=[-9589.9, -102.2]
+[bamor_ns] Saved to results/bamor_mujoco/mo_halfcheetah_v5/bamor_ns_seed1.json
+
+============================================================
+  Method: bamor_ns  Env: mo-halfcheetah-v5  Seed: 2
+============================================================
+[bamor_ns] env=mo-halfcheetah-v5, obs=17, act=6, rew=2, modes=3
+  [bamor_ns] step=   1000 ep=   1 avg_r=[ 3.4000e+00 -5.9571e+03] mode_sw=0 sps=1000 Δl/Δg=0.00/0.00
+  [bamor_ns] step=   2000 ep=   2 avg_r=[-1.0000e-01 -5.9704e+03] mode_sw=0 sps=2000 Δl/Δg=0.00/0.00
+  [bamor_ns] step=   3000 ep=   3 avg_r=[ 4.5000e+00 -5.9474e+03] mode_sw=0 sps=3000 Δl/Δg=0.00/0.00
+  [bamor_ns] step=   4000 ep=   4 avg_r=[ 4.4000e+00 -5.9455e+03] mode_sw=0 sps=4000 Δl/Δg=0.00/0.00
+  [bamor_ns] step=   5000 ep=   5 avg_r=[ 4.5000e+00 -5.9712e+03] mode_sw=0 sps=4598 Δl/Δg=0.00/0.00
+  [bamor_ns] step=   6000 ep=   6 avg_r=[    5.9 -5832.4] mode_sw=0 sps=225 Δl/Δg=0.18/0.24
+  [bamor_ns] step=   7000 ep=   7 avg_r=[    6.7 -4980.4] mode_sw=0 sps=129 Δl/Δg=0.12/0.28
+  [bamor_ns] step=   8000 ep=   8 avg_r=[ 4.0000e+00 -4.0656e+03] mode_sw=0 sps=99 Δl/Δg=0.10/0.32
+  [bamor_ns] step=   9000 ep=   9 avg_r=[    3.9 -3216.2] mode_sw=0 sps=85 Δl/Δg=0.07/0.27
+  [bamor_ns] step=  10000 ep=  10 avg_r=[    4.3 -2380.8] mode_sw=0 sps=76 Δl/Δg=0.11/0.25
+  [bamor_ns] step=  11000 ep=  11 avg_r=[    3.8 -1713.4] mode_sw=0 sps=70 Δl/Δg=0.07/0.25
+  [bamor_ns] step=  12000 ep=  12 avg_r=[    5.  -1794.5] mode_sw=0 sps=66 Δl/Δg=0.13/0.31
+  [bamor_ns] step=  13000 ep=  13 avg_r=[    7.9 -1954. ] mode_sw=0 sps=61 Δl/Δg=0.14/0.41
+  [bamor_ns] step=  14000 ep=  14 avg_r=[    9.3 -2024.3] mode_sw=0 sps=59 Δl/Δg=0.21/0.55
+  [bamor_ns] step=  15000 ep=  15 avg_r=[    9.1 -2095. ] mode_sw=0 sps=57 Δl/Δg=0.22/0.61
+  [bamor_ns] step=  16000 ep=  16 avg_r=[    9.2 -2147.1] mode_sw=0 sps=56 Δl/Δg=0.30/0.79
+  [bamor_ns] step=  17000 ep=  17 avg_r=[    9.5 -2173.8] mode_sw=0 sps=55 Δl/Δg=0.39/1.03
+  [bamor_ns] step=  18000 ep=  18 avg_r=[    8.1 -2208.7] mode_sw=0 sps=53 Δl/Δg=0.32/1.11
+  [bamor_ns] step=  19000 ep=  19 avg_r=[    7.9 -2272.6] mode_sw=0 sps=52 Δl/Δg=0.55/1.28
+  [bamor_ns] step=  20000 ep=  20 avg_r=[    9.3 -2270.2] mode_sw=0 sps=52 Δl/Δg=0.54/1.41
+  [bamor_ns] EVAL step=20000: Pareto range obj0=[-0.5, 1.1] obj1=[-1684.8, -257.7]
+  [bamor_ns] step=  21000 ep=  21 avg_r=[   10.9 -2300.5] mode_sw=0 sps=45 Δl/Δg=0.52/1.60
+  [bamor_ns] step=  22000 ep=  22 avg_r=[   11.6 -2319.6] mode_sw=0 sps=44 Δl/Δg=0.63/1.68
+  [bamor_ns] step=  23000 ep=  23 avg_r=[   12.2 -2332.9] mode_sw=0 sps=44 Δl/Δg=0.71/1.83
+  [bamor_ns] step=  24000 ep=  24 avg_r=[   13.8 -2343. ] mode_sw=0 sps=44 Δl/Δg=0.79/2.03
+  [bamor_ns] step=  25000 ep=  25 avg_r=[   12.  -2086.9] mode_sw=0 sps=44 Δl/Δg=1.23/2.21
+  [bamor_ns] step=  26000 ep=  26 avg_r=[   13.4 -2087.6] mode_sw=0 sps=43 Δl/Δg=0.98/2.50
+  [bamor_ns] step=  27000 ep=  27 avg_r=[   12.3 -1872.3] mode_sw=0 sps=43 Δl/Δg=1.34/2.62
+  [bamor_ns] step=  28000 ep=  28 avg_r=[   12.3 -1707.2] mode_sw=0 sps=43 Δl/Δg=1.86/3.01
+  [bamor_ns] step=  29000 ep=  29 avg_r=[   11.5 -1676.2] mode_sw=0 sps=43 Δl/Δg=1.28/2.98
+  [bamor_ns] step=  30000 ep=  30 avg_r=[   11.8 -1913.5] mode_sw=0 sps=43 Δl/Δg=1.34/3.08
+  [bamor_ns] step=  31000 ep=  31 avg_r=[    9.6 -1892.1] mode_sw=0 sps=43 Δl/Δg=1.29/3.18
+  [bamor_ns] step=  32000 ep=  32 avg_r=[   11.  -2071.2] mode_sw=0 sps=43 Δl/Δg=1.25/3.04
+  [bamor_ns] step=  33000 ep=  33 avg_r=[   11.4 -2174.3] mode_sw=0 sps=42 Δl/Δg=1.46/3.16
+  [bamor_ns] step=  34000 ep=  34 avg_r=[   11.  -2163.1] mode_sw=0 sps=42 Δl/Δg=1.14/3.10
+  [bamor_ns] step=  35000 ep=  35 avg_r=[   11.9 -2164.6] mode_sw=0 sps=42 Δl/Δg=1.74/3.06
+  [bamor_ns] step=  36000 ep=  36 avg_r=[   11.3 -2117.7] mode_sw=0 sps=42 Δl/Δg=1.36/3.16
+  [bamor_ns] step=  37000 ep=  37 avg_r=[   10.9 -2084.4] mode_sw=0 sps=42 Δl/Δg=1.45/3.10
+  [bamor_ns] step=  38000 ep=  38 avg_r=[   10.2 -2083.7] mode_sw=0 sps=42 Δl/Δg=1.09/3.28
+  [bamor_ns] step=  39000 ep=  39 avg_r=[    9.4 -2050.7] mode_sw=0 sps=42 Δl/Δg=1.23/3.26
+  [bamor_ns] step=  40000 ep=  40 avg_r=[   10.7 -2020.1] mode_sw=0 sps=42 Δl/Δg=1.52/3.22
+  [bamor_ns] EVAL step=40000: Pareto range obj0=[-1.9, 2.2] obj1=[-979.5, -25.6]
+  [bamor_ns] step=  41000 ep=  41 avg_r=[   11.5 -2008.3] mode_sw=0 sps=40 Δl/Δg=1.43/3.25
+  [bamor_ns] step=  42000 ep=  42 avg_r=[   11.2 -2003.7] mode_sw=0 sps=40 Δl/Δg=1.13/3.22
+  [bamor_ns] step=  43000 ep=  43 avg_r=[   11.  -2000.7] mode_sw=0 sps=40 Δl/Δg=1.29/3.34
+  [bamor_ns] step=  44000 ep=  44 avg_r=[   12.2 -1978.8] mode_sw=0 sps=40 Δl/Δg=1.59/3.58
+  [bamor_ns] step=  45000 ep=  45 avg_r=[   11.4 -1994.4] mode_sw=0 sps=40 Δl/Δg=1.91/3.47
+  [bamor_ns] step=  46000 ep=  46 avg_r=[   10.1 -2001.3] mode_sw=0 sps=40 Δl/Δg=1.54/3.42
+  [bamor_ns] step=  47000 ep=  47 avg_r=[   10.7 -2002.8] mode_sw=0 sps=40 Δl/Δg=1.56/3.50
+  [bamor_ns] step=  48000 ep=  48 avg_r=[   11.3 -1985.6] mode_sw=0 sps=40 Δl/Δg=1.52/3.38
+  [bamor_ns] step=  49000 ep=  49 avg_r=[   11.3 -2011.8] mode_sw=0 sps=40 Δl/Δg=1.72/3.42
+  [bamor_ns] step=  50000 ep=  50 avg_r=[   10.3 -1994.5] mode_sw=0 sps=40 Δl/Δg=1.75/3.67
+  [bamor_ns] step=  51000 ep=  51 avg_r=[   10.9 -2005. ] mode_sw=0 sps=40 Δl/Δg=1.53/3.25
+  [bamor_ns] step=  52000 ep=  52 avg_r=[   11.2 -2012. ] mode_sw=0 sps=40 Δl/Δg=1.61/3.59
+  [bamor_ns] step=  53000 ep=  53 avg_r=[   47.4 -1814. ] mode_sw=1 sps=40 Δl/Δg=0.81/3.73
+  [bamor_ns] step=  54000 ep=  54 avg_r=[  123.7 -1483.9] mode_sw=1 sps=40 Δl/Δg=0.80/4.05
+  [bamor_ns] step=  55000 ep=  55 avg_r=[  198.  -1186.4] mode_sw=1 sps=40 Δl/Δg=0.78/4.10
+  [bamor_ns] step=  56000 ep=  56 avg_r=[ 261.8 -892.2] mode_sw=1 sps=40 Δl/Δg=0.84/4.39
+  [bamor_ns] step=  57000 ep=  57 avg_r=[ 342.4 -608.2] mode_sw=1 sps=40 Δl/Δg=0.76/4.30
+  [bamor_ns] step=  58000 ep=  58 avg_r=[ 427.6 -540.4] mode_sw=1 sps=40 Δl/Δg=0.87/4.51
+  [bamor_ns] step=  59000 ep=  59 avg_r=[ 488.6 -584.4] mode_sw=1 sps=40 Δl/Δg=0.79/4.58
+  [bamor_ns] step=  60000 ep=  60 avg_r=[ 537.1 -613.4] mode_sw=1 sps=40 Δl/Δg=0.94/4.85
+  [bamor_ns] EVAL step=60000: Pareto range obj0=[-172.3, 162.6] obj1=[-686.7, -51.0]
+  [bamor_ns] step=  61000 ep=  61 avg_r=[ 609.  -632.2] mode_sw=1 sps=38 Δl/Δg=0.91/5.03
+  [bamor_ns] step=  62000 ep=  62 avg_r=[ 660.1 -639.8] mode_sw=1 sps=38 Δl/Δg=1.11/5.60
+  [bamor_ns] step=  63000 ep=  63 avg_r=[ 701.9 -644.2] mode_sw=1 sps=38 Δl/Δg=0.92/5.24
+  [bamor_ns] step=  64000 ep=  64 avg_r=[ 680.2 -646. ] mode_sw=1 sps=38 Δl/Δg=1.00/5.78
+  [bamor_ns] step=  65000 ep=  65 avg_r=[ 684.5 -645.9] mode_sw=1 sps=38 Δl/Δg=0.86/5.33
+  [bamor_ns] step=  66000 ep=  66 avg_r=[ 721.3 -644.4] mode_sw=1 sps=38 Δl/Δg=1.08/6.32
+  [bamor_ns] step=  67000 ep=  67 avg_r=[ 732.9 -641.1] mode_sw=1 sps=38 Δl/Δg=0.96/5.80
+  [bamor_ns] step=  68000 ep=  68 avg_r=[ 739.6 -639.4] mode_sw=1 sps=38 Δl/Δg=1.01/5.90
+  [bamor_ns] step=  69000 ep=  69 avg_r=[ 848.9 -643.6] mode_sw=1 sps=38 Δl/Δg=1.02/6.50
+  [bamor_ns] step=  70000 ep=  70 avg_r=[ 962.4 -645.1] mode_sw=1 sps=38 Δl/Δg=1.16/6.81
+  [bamor_ns] step=  71000 ep=  71 avg_r=[1061.8 -647.5] mode_sw=1 sps=38 Δl/Δg=1.06/6.66
+  [bamor_ns] step=  72000 ep=  72 avg_r=[1295.5 -660.6] mode_sw=1 sps=38 Δl/Δg=1.14/7.38
+  [bamor_ns] step=  73000 ep=  73 avg_r=[1554.8 -678. ] mode_sw=1 sps=38 Δl/Δg=1.20/7.84
+  [bamor_ns] step=  74000 ep=  74 avg_r=[1913.7 -703.9] mode_sw=1 sps=38 Δl/Δg=1.20/7.51
+  [bamor_ns] step=  75000 ep=  75 avg_r=[2418.1 -750.3] mode_sw=1 sps=38 Δl/Δg=1.49/8.80
+  [bamor_ns] step=  76000 ep=  76 avg_r=[2316.5 -761.6] mode_sw=1 sps=38 Δl/Δg=1.47/8.26
+  [bamor_ns] step=  77000 ep=  77 avg_r=[2706.3 -813.2] mode_sw=1 sps=38 Δl/Δg=1.58/9.10
+  [bamor_ns] step=  78000 ep=  78 avg_r=[3106.4 -869.2] mode_sw=1 sps=38 Δl/Δg=1.77/10.17
+  [bamor_ns] step=  79000 ep=  79 avg_r=[3538.3 -921.7] mode_sw=1 sps=38 Δl/Δg=1.97/10.53
+  [bamor_ns] step=  80000 ep=  80 avg_r=[3167.7 -925. ] mode_sw=1 sps=38 Δl/Δg=2.82/11.06
+  [bamor_ns] EVAL step=80000: Pareto range obj0=[-15.0, 304.8] obj1=[-2670.3, -652.8]
+  [bamor_ns] step=  81000 ep=  81 avg_r=[3062.1 -952.7] mode_sw=1 sps=37 Δl/Δg=2.68/11.75
+  [bamor_ns] step=  82000 ep=  82 avg_r=[2377.6 -941.2] mode_sw=1 sps=37 Δl/Δg=2.54/12.22
+  [bamor_ns] step=  83000 ep=  83 avg_r=[2037.4 -947.3] mode_sw=1 sps=37 Δl/Δg=2.95/12.74
+  [bamor_ns] step=  84000 ep=  84 avg_r=[1226.8 -925.1] mode_sw=1 sps=37 Δl/Δg=3.24/13.99
+  [bamor_ns] step=  85000 ep=  85 avg_r=[ 976.8 -919.5] mode_sw=1 sps=37 Δl/Δg=3.20/13.41
+  [bamor_ns] step=  86000 ep=  86 avg_r=[1052.5 -922.3] mode_sw=1 sps=37 Δl/Δg=3.41/12.78
+  [bamor_ns] step=  87000 ep=  87 avg_r=[1242.9 -912.3] mode_sw=1 sps=37 Δl/Δg=3.65/14.06
+  [bamor_ns] step=  88000 ep=  88 avg_r=[1266.6 -888.4] mode_sw=1 sps=37 Δl/Δg=3.61/12.87
+  [bamor_ns] step=  89000 ep=  89 avg_r=[2039.8 -907.7] mode_sw=1 sps=38 Δl/Δg=4.19/14.53
+  [bamor_ns] step=  90000 ep=  90 avg_r=[3133.7 -935.8] mode_sw=1 sps=38 Δl/Δg=4.25/13.62
+  [bamor_ns] step=  91000 ep=  91 avg_r=[4176.5 -961.4] mode_sw=1 sps=38 Δl/Δg=4.65/15.27
+  [bamor_ns] step=  92000 ep=  92 avg_r=[5186.7 -986.3] mode_sw=1 sps=38 Δl/Δg=4.55/14.86
+  [bamor_ns] step=  93000 ep=  93 avg_r=[6045.  -996.9] mode_sw=1 sps=38 Δl/Δg=5.45/16.16
+  [bamor_ns] step=  94000 ep=  94 avg_r=[6419.4 -981. ] mode_sw=1 sps=38 Δl/Δg=5.93/17.04
+  [bamor_ns] step=  95000 ep=  95 avg_r=[6665.5 -966.2] mode_sw=1 sps=38 Δl/Δg=6.04/17.86
+  [bamor_ns] step=  96000 ep=  96 avg_r=[6988.7 -955.3] mode_sw=1 sps=38 Δl/Δg=6.29/18.31
+  [bamor_ns] step=  97000 ep=  97 avg_r=[7179.3 -947. ] mode_sw=1 sps=38 Δl/Δg=6.84/18.89
+  [bamor_ns] step=  98000 ep=  98 avg_r=[7343.9 -940.9] mode_sw=1 sps=38 Δl/Δg=7.35/19.08
+  [bamor_ns] step=  99000 ep=  99 avg_r=[6421.3 -871.7] mode_sw=1 sps=38 Δl/Δg=7.39/20.14
+  [bamor_ns] step= 100000 ep= 100 avg_r=[6328.8 -896. ] mode_sw=2 sps=38 Δl/Δg=8.69/18.15
+  [bamor_ns] EVAL step=100000: Pareto range obj0=[-433.0, 422.9] obj1=[-9791.8, -2338.6]
+  [bamor_ns] step= 101000 ep= 101 avg_r=[ 4805.3 -1190.7] mode_sw=2 sps=37 Δl/Δg=19.63/20.17
+  [bamor_ns] step= 102000 ep= 102 avg_r=[ 3333.7 -1334.1] mode_sw=2 sps=37 Δl/Δg=17.64/20.48
+  [bamor_ns] step= 103000 ep= 103 avg_r=[ 1821.6 -1395.9] mode_sw=2 sps=37 Δl/Δg=19.23/20.45
+  [bamor_ns] step= 104000 ep= 104 avg_r=[ 1408.5 -1498.3] mode_sw=2 sps=37 Δl/Δg=19.97/21.59
+  [bamor_ns] step= 105000 ep= 105 avg_r=[   44.1 -1456.6] mode_sw=2 sps=37 Δl/Δg=20.11/22.30
+  [bamor_ns] step= 106000 ep= 106 avg_r=[   53.9 -1077.1] mode_sw=2 sps=37 Δl/Δg=21.64/23.91
+  [bamor_ns] step= 107000 ep= 107 avg_r=[  45.3 -819.9] mode_sw=2 sps=37 Δl/Δg=19.08/23.22
+  [bamor_ns] step= 108000 ep= 108 avg_r=[  14.5 -637.1] mode_sw=2 sps=37 Δl/Δg=21.71/24.94
+  [bamor_ns] step= 109000 ep= 109 avg_r=[  -8.8 -478.2] mode_sw=2 sps=37 Δl/Δg=21.37/23.98
+  [bamor_ns] step= 110000 ep= 110 avg_r=[ -19.4 -383.7] mode_sw=2 sps=37 Δl/Δg=18.96/23.82
+  [bamor_ns] step= 111000 ep= 111 avg_r=[  -9.4 -414.2] mode_sw=2 sps=37 Δl/Δg=24.81/25.65
+  [bamor_ns] step= 112000 ep= 112 avg_r=[   0.9 -495.7] mode_sw=2 sps=37 Δl/Δg=23.23/24.39
+  [bamor_ns] step= 113000 ep= 113 avg_r=[  16.5 -618.5] mode_sw=2 sps=37 Δl/Δg=23.48/24.16
+  [bamor_ns] step= 114000 ep= 114 avg_r=[  30.8 -761.4] mode_sw=2 sps=38 Δl/Δg=24.85/25.45
+  [bamor_ns] step= 115000 ep= 115 avg_r=[  43.2 -895.8] mode_sw=2 sps=38 Δl/Δg=23.13/25.31
+  [bamor_ns] step= 116000 ep= 116 avg_r=[  50.4 -977.3] mode_sw=2 sps=38 Δl/Δg=24.35/26.40
+  [bamor_ns] step= 117000 ep= 117 avg_r=[   53.  -1002.6] mode_sw=2 sps=38 Δl/Δg=25.37/26.13
+  [bamor_ns] step= 118000 ep= 118 avg_r=[  52.8 -984.3] mode_sw=2 sps=38 Δl/Δg=24.63/25.74
+  [bamor_ns] step= 119000 ep= 119 avg_r=[  52.2 -967.7] mode_sw=2 sps=38 Δl/Δg=26.42/27.70
+  [bamor_ns] step= 120000 ep= 120 avg_r=[  49.4 -943.4] mode_sw=2 sps=38 Δl/Δg=25.17/27.52
+  [bamor_ns] EVAL step=120000: Pareto range obj0=[-0.6, 458.5] obj1=[-10417.5, -1029.4]
+  [bamor_ns] step= 121000 ep= 121 avg_r=[  44.7 -908.3] mode_sw=2 sps=38 Δl/Δg=24.78/27.53
+  [bamor_ns] step= 122000 ep= 122 avg_r=[  41.9 -885. ] mode_sw=2 sps=38 Δl/Δg=27.68/29.55
+  [bamor_ns] step= 123000 ep= 123 avg_r=[  32.4 -877.7] mode_sw=2 sps=38 Δl/Δg=27.14/29.02
+  [bamor_ns] step= 124000 ep= 124 avg_r=[  29.2 -860.7] mode_sw=2 sps=38 Δl/Δg=27.73/31.02
+  [bamor_ns] step= 125000 ep= 125 avg_r=[  26.9 -872.7] mode_sw=2 sps=38 Δl/Δg=27.83/30.01
+  [bamor_ns] step= 126000 ep= 126 avg_r=[  28.5 -889.8] mode_sw=2 sps=38 Δl/Δg=30.11/32.09
+  [bamor_ns] step= 127000 ep= 127 avg_r=[  30.3 -913.4] mode_sw=2 sps=38 Δl/Δg=28.99/31.76
+  [bamor_ns] step= 128000 ep= 128 avg_r=[  23.7 -899.6] mode_sw=2 sps=38 Δl/Δg=29.10/31.77
+  [bamor_ns] step= 129000 ep= 129 avg_r=[  14.2 -885.8] mode_sw=2 sps=38 Δl/Δg=30.67/33.78
+  [bamor_ns] step= 130000 ep= 130 avg_r=[  20.5 -887.7] mode_sw=2 sps=38 Δl/Δg=31.02/31.75
+  [bamor_ns] step= 131000 ep= 131 avg_r=[  23.6 -886.7] mode_sw=2 sps=38 Δl/Δg=30.72/31.63
+  [bamor_ns] step= 132000 ep= 132 avg_r=[  18.6 -856.9] mode_sw=2 sps=38 Δl/Δg=31.45/33.21
+  [bamor_ns] step= 133000 ep= 133 avg_r=[  29.2 -864.8] mode_sw=2 sps=38 Δl/Δg=28.70/32.98
+  [bamor_ns] step= 134000 ep= 134 avg_r=[  38.7 -894.4] mode_sw=2 sps=38 Δl/Δg=32.39/33.43
+  [bamor_ns] step= 135000 ep= 135 avg_r=[  44.2 -903.7] mode_sw=2 sps=39 Δl/Δg=32.60/34.16
+  [bamor_ns] step= 136000 ep= 136 avg_r=[  33.9 -872.5] mode_sw=2 sps=39 Δl/Δg=29.00/32.77
+  [bamor_ns] step= 137000 ep= 137 avg_r=[  25.1 -902.4] mode_sw=2 sps=39 Δl/Δg=27.72/29.90
+  [bamor_ns] step= 138000 ep= 138 avg_r=[  24.1 -979.7] mode_sw=2 sps=39 Δl/Δg=34.40/34.68
+  [bamor_ns] step= 139000 ep= 139 avg_r=[   29.5 -1076.1] mode_sw=2 sps=39 Δl/Δg=34.80/35.93
+  [bamor_ns] step= 140000 ep= 140 avg_r=[   30.1 -1134.5] mode_sw=2 sps=39 Δl/Δg=33.61/34.20
+  [bamor_ns] EVAL step=140000: Pareto range obj0=[-1240.4, 10230.3] obj1=[-1187.9, -169.5]
+  [bamor_ns] step= 141000 ep= 141 avg_r=[   41.6 -1174.5] mode_sw=2 sps=38 Δl/Δg=34.88/37.62
+  [bamor_ns] step= 142000 ep= 142 avg_r=[   59.4 -1702.3] mode_sw=2 sps=38 Δl/Δg=35.40/35.74
+  [bamor_ns] step= 143000 ep= 143 avg_r=[   64.  -1725.2] mode_sw=2 sps=39 Δl/Δg=35.49/37.19
+  [bamor_ns] step= 144000 ep= 144 avg_r=[   74.2 -1672.3] mode_sw=2 sps=39 Δl/Δg=33.03/34.36
+  [bamor_ns] step= 145000 ep= 145 avg_r=[   71.4 -1655.5] mode_sw=2 sps=39 Δl/Δg=35.40/36.76
+  [bamor_ns] step= 146000 ep= 146 avg_r=[   71.  -1739.8] mode_sw=2 sps=39 Δl/Δg=36.05/36.42
+  [bamor_ns] step= 147000 ep= 147 avg_r=[   65.  -1335.5] mode_sw=2 sps=39 Δl/Δg=35.02/35.97
+  [bamor_ns] step= 148000 ep= 148 avg_r=[   52.8 -1423.2] mode_sw=2 sps=39 Δl/Δg=40.18/40.88
+  [bamor_ns] step= 149000 ep= 149 avg_r=[   26.2 -1526.5] mode_sw=2 sps=39 Δl/Δg=36.12/36.88
+  [bamor_ns] step= 150000 ep= 150 avg_r=[   12.8 -1601.9] mode_sw=2 sps=39 Δl/Δg=39.31/40.28
+  [bamor_ns] step= 151000 ep= 151 avg_r=[   -4.4 -1598.4] mode_sw=2 sps=39 Δl/Δg=36.56/37.16
+  [bamor_ns] step= 152000 ep= 152 avg_r=[  -10.4 -1744.3] mode_sw=3 sps=39 Δl/Δg=38.62/38.66
+  [bamor_ns] step= 153000 ep= 153 avg_r=[   -6.3 -2312.6] mode_sw=3 sps=39 Δl/Δg=38.35/38.54
+  [bamor_ns] step= 154000 ep= 154 avg_r=[-1.0000e+00 -2.7802e+03] mode_sw=3 sps=39 Δl/Δg=40.15/40.17
+  [bamor_ns] step= 155000 ep= 155 avg_r=[-4.0000e-01 -3.1446e+03] mode_sw=3 sps=39 Δl/Δg=39.39/39.59
+  [bamor_ns] step= 156000 ep= 156 avg_r=[    6.1 -3535. ] mode_sw=3 sps=39 Δl/Δg=41.19/41.29
+  [bamor_ns] step= 157000 ep= 157 avg_r=[    8.7 -3675.7] mode_sw=3 sps=39 Δl/Δg=40.58/40.68
+  [bamor_ns] step= 158000 ep= 158 avg_r=[   10.2 -3327.3] mode_sw=3 sps=39 Δl/Δg=41.03/41.62
+  [bamor_ns] step= 159000 ep= 159 avg_r=[   11.6 -3094.1] mode_sw=3 sps=39 Δl/Δg=39.90/40.16
+  [bamor_ns] step= 160000 ep= 160 avg_r=[   11.8 -2904.6] mode_sw=3 sps=39 Δl/Δg=41.93/42.01
+  [bamor_ns] EVAL step=160000: Pareto range obj0=[-87.4, 3244.4] obj1=[-3454.2, -133.9]
+  [bamor_ns] step= 161000 ep= 161 avg_r=[   10.9 -2679.5] mode_sw=3 sps=39 Δl/Δg=41.82/42.16
+  [bamor_ns] step= 162000 ep= 162 avg_r=[   10.3 -2488.5] mode_sw=3 sps=39 Δl/Δg=40.95/41.26
+  [bamor_ns] step= 163000 ep= 163 avg_r=[   10.2 -2331.2] mode_sw=3 sps=39 Δl/Δg=37.92/38.17
+  [bamor_ns] step= 164000 ep= 164 avg_r=[    8.9 -2135.8] mode_sw=3 sps=39 Δl/Δg=41.62/41.86
+  [bamor_ns] step= 165000 ep= 165 avg_r=[    8.7 -1977.6] mode_sw=3 sps=39 Δl/Δg=39.95/40.08
+  [bamor_ns] step= 166000 ep= 166 avg_r=[    9.2 -1868.1] mode_sw=3 sps=39 Δl/Δg=39.02/39.29
+  [bamor_ns] step= 167000 ep= 167 avg_r=[   10.1 -1819.8] mode_sw=3 sps=39 Δl/Δg=39.78/40.26
+  [bamor_ns] step= 168000 ep= 168 avg_r=[   10.7 -1730.1] mode_sw=3 sps=39 Δl/Δg=40.12/40.23
+  [bamor_ns] step= 169000 ep= 169 avg_r=[   11. -1677.] mode_sw=3 sps=39 Δl/Δg=43.00/43.43
+  [bamor_ns] step= 170000 ep= 170 avg_r=[   11.5 -1676.5] mode_sw=3 sps=39 Δl/Δg=41.77/41.90
+  [bamor_ns] step= 171000 ep= 171 avg_r=[   12.1 -1681.7] mode_sw=3 sps=40 Δl/Δg=41.67/41.74
+  [bamor_ns] step= 172000 ep= 172 avg_r=[   11.4 -1631.2] mode_sw=3 sps=40 Δl/Δg=42.60/43.02
+  [bamor_ns] step= 173000 ep= 173 avg_r=[   11.2 -1610.4] mode_sw=3 sps=40 Δl/Δg=43.12/43.25
+  [bamor_ns] step= 174000 ep= 174 avg_r=[   10.8 -1568.7] mode_sw=3 sps=40 Δl/Δg=42.56/42.82
+  [bamor_ns] step= 175000 ep= 175 avg_r=[    9.3 -1482.7] mode_sw=3 sps=40 Δl/Δg=43.75/44.08
+  [bamor_ns] step= 176000 ep= 176 avg_r=[    7.5 -1361.4] mode_sw=3 sps=40 Δl/Δg=42.95/42.98
+  [bamor_ns] step= 177000 ep= 177 avg_r=[    6.6 -1288.7] mode_sw=3 sps=40 Δl/Δg=40.21/40.35
+  [bamor_ns] step= 178000 ep= 178 avg_r=[    5.5 -1220.2] mode_sw=3 sps=40 Δl/Δg=42.56/42.88
+  [bamor_ns] step= 179000 ep= 179 avg_r=[    4.9 -1145. ] mode_sw=3 sps=40 Δl/Δg=44.10/44.16
+  [bamor_ns] step= 180000 ep= 180 avg_r=[    4.4 -1109.4] mode_sw=3 sps=40 Δl/Δg=43.47/43.90
+  [bamor_ns] EVAL step=180000: Pareto range obj0=[-122.2, 3184.4] obj1=[-3768.4, -96.8]
+  [bamor_ns] step= 181000 ep= 181 avg_r=[    4.6 -1104.7] mode_sw=3 sps=40 Δl/Δg=45.94/46.15
+  [bamor_ns] step= 182000 ep= 182 avg_r=[    4.4 -1099.8] mode_sw=3 sps=40 Δl/Δg=41.23/41.95
+  [bamor_ns] step= 183000 ep= 183 avg_r=[    4. -1094.] mode_sw=3 sps=40 Δl/Δg=42.75/43.07
+  [bamor_ns] step= 184000 ep= 184 avg_r=[    4.  -1126.4] mode_sw=3 sps=40 Δl/Δg=46.28/46.64
+  [bamor_ns] step= 185000 ep= 185 avg_r=[    4.  -1134.2] mode_sw=3 sps=40 Δl/Δg=42.99/43.26
+  [bamor_ns] step= 186000 ep= 186 avg_r=[    3.6 -1157.5] mode_sw=3 sps=40 Δl/Δg=44.79/45.29
+  [bamor_ns] step= 187000 ep= 187 avg_r=[    3.4 -1174.6] mode_sw=3 sps=40 Δl/Δg=48.21/48.63
+  [bamor_ns] step= 188000 ep= 188 avg_r=[    3.3 -1191.1] mode_sw=3 sps=40 Δl/Δg=48.69/48.98
+  [bamor_ns] step= 189000 ep= 189 avg_r=[    2.7 -1205.3] mode_sw=3 sps=40 Δl/Δg=45.53/45.64
+  [bamor_ns] step= 190000 ep= 190 avg_r=[    2.  -1230.6] mode_sw=3 sps=40 Δl/Δg=48.41/48.47
+  [bamor_ns] step= 191000 ep= 191 avg_r=[    1.8 -1247.6] mode_sw=3 sps=40 Δl/Δg=47.32/47.47
+  [bamor_ns] step= 192000 ep= 192 avg_r=[    1.9 -1267.6] mode_sw=3 sps=40 Δl/Δg=46.81/47.01
+  [bamor_ns] step= 193000 ep= 193 avg_r=[    1.5 -1293.1] mode_sw=3 sps=40 Δl/Δg=50.53/50.68
+  [bamor_ns] step= 194000 ep= 194 avg_r=[    1.8 -1304.5] mode_sw=3 sps=40 Δl/Δg=48.47/48.61
+  [bamor_ns] step= 195000 ep= 195 avg_r=[    2.1 -1315.3] mode_sw=3 sps=40 Δl/Δg=50.25/51.32
+  [bamor_ns] step= 196000 ep= 196 avg_r=[    2.2 -1323.9] mode_sw=3 sps=40 Δl/Δg=52.06/52.33
+  [bamor_ns] step= 197000 ep= 197 avg_r=[    2.6 -1334.9] mode_sw=3 sps=40 Δl/Δg=47.64/48.00
+  [bamor_ns] step= 198000 ep= 198 avg_r=[    3.2 -1349.3] mode_sw=3 sps=40 Δl/Δg=51.28/51.87
+  [bamor_ns] step= 199000 ep= 199 avg_r=[    3.4 -1356.5] mode_sw=3 sps=41 Δl/Δg=50.72/51.08
+  [bamor_ns] step= 200000 ep= 200 avg_r=[ 1253.2 -1282.9] mode_sw=4 sps=41 Δl/Δg=19.56/52.13
+  [bamor_ns] EVAL step=200000: Pareto range obj0=[-2.5, 431.6] obj1=[-11135.3, -147.3]
+[bamor_ns] Saved to results/bamor_mujoco/mo_halfcheetah_v5/bamor_ns_seed2.json
+
+✅ All experiments complete. Results in results/bamor_mujoco/mo_halfcheetah_v5/

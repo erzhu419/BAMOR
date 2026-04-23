@@ -1,0 +1,227 @@
+
+============================================================
+  bamor  seed=0
+============================================================
+  [bamor] ep=  20 step=  4000 avg_r=[-782.2,+680.0] corr=-0.99 Δl/Δg=0.0/0.0(0.00) switches=59
+  [bamor] ep=  40 step=  8000 avg_r=[-480.2,+917.2] corr=-0.98 Δl/Δg=0.0/0.0(0.00) switches=119
+  [bamor] ep=  60 step= 12000 avg_r=[-298.1,+683.5] corr=-0.99 Δl/Δg=0.0/0.0(0.00) switches=179
+  [bamor] ep=  80 step= 16000 avg_r=[-295.5,+699.3] corr=-0.99 Δl/Δg=0.0/0.0(0.00) switches=239
+  [bamor] ep= 100 step= 20000 avg_r=[-385.8,+744.3] corr=-0.98 Δl/Δg=0.0/0.0(0.00) switches=299
+
+  [bamor] Final per-mode Pareto:
+    Mode 0: safety=[-5228.48,+393.80] progress=[+13.95,+120.06] corr=-0.90
+    Mode 1: safety=[-993.98,-34.77] progress=[+102.49,+2387.28] corr=-1.00
+    Mode 2: safety=[-2754.17,+157.39] progress=[+52.49,+793.25] corr=-0.97
+  [bamor] Saved to results/synthetic_v2/bamor_seed0.json
+
+============================================================
+  bamor_nc  seed=0
+============================================================
+  [bamor_nc] ep=  20 step=  4000 avg_r=[-471.2,+945.6] corr=-0.96 Δl/Δg=0.0/0.0(0.00) switches=59
+  [bamor_nc] ep=  40 step=  8000 avg_r=[-539.2,+914.8] corr=-0.97 Δl/Δg=0.0/0.0(0.00) switches=119
+  [bamor_nc] ep=  60 step= 12000 avg_r=[-423.8,+962.2] corr=-0.98 Δl/Δg=0.0/0.0(0.00) switches=179
+  [bamor_nc] ep=  80 step= 16000 avg_r=[-544.2,+1049.8] corr=-0.98 Δl/Δg=0.0/0.0(0.00) switches=239
+  [bamor_nc] ep= 100 step= 20000 avg_r=[-386.0,+1009.8] corr=-0.97 Δl/Δg=0.0/0.0(0.00) switches=299
+
+  [bamor_nc] Final per-mode Pareto:
+    Mode 0: safety=[-5218.06,+397.73] progress=[+0.56,+120.02] corr=-0.95
+    Mode 1: safety=[-993.96,-17.29] progress=[-0.02,+2387.24] corr=-1.00
+    Mode 2: safety=[-2753.95,+160.19] progress=[-37.42,+793.14] corr=-0.98
+  [bamor_nc] Saved to results/synthetic_v2/bamor_nc_seed0.json
+
+============================================================
+  bamor_ns  seed=0
+============================================================
+  [bamor_ns] ep=  20 step=  4000 avg_r=[-1237.9,+1041.5] corr=-0.91 Δl/Δg=0.0/0.0(0.00) switches=59
+  [bamor_ns] ep=  40 step=  8000 avg_r=[-1096.6,+1111.4] corr=-0.85 Δl/Δg=0.0/0.0(0.00) switches=119
+  [bamor_ns] ep=  60 step= 12000 avg_r=[-1311.8,+1009.6] corr=-0.90 Δl/Δg=0.0/0.0(0.00) switches=179
+  [bamor_ns] ep=  80 step= 16000 avg_r=[-15.1,+177.2] corr=-0.91 Δl/Δg=0.0/0.0(0.00) switches=239
+  [bamor_ns] ep= 100 step= 20000 avg_r=[-450.8,+577.4] corr=-0.93 Δl/Δg=0.0/0.0(0.00) switches=299
+
+  [bamor_ns] Final per-mode Pareto:
+    Mode 0: safety=[-5238.87,+384.30] progress=[+21.21,+120.08] corr=-0.84
+    Mode 1: safety=[-994.00,-53.22] progress=[+157.85,+2387.44] corr=-1.00
+    Mode 2: safety=[-2754.50,+152.66] progress=[+81.06,+793.30] corr=-0.98
+  [bamor_ns] Saved to results/synthetic_v2/bamor_ns_seed0.json
+
+============================================================
+  uniform  seed=0
+============================================================
+  [uniform] ep=  20 step=  4000 avg_r=[-265.2,+803.0] corr=-0.99 Δl/Δg=0.0/0.0(0.00) switches=59
+  [uniform] ep=  40 step=  8000 avg_r=[-452.1,+911.9] corr=-0.94 Δl/Δg=0.0/0.0(0.00) switches=119
+  [uniform] ep=  60 step= 12000 avg_r=[-769.9,+973.7] corr=-0.99 Δl/Δg=0.0/0.0(0.00) switches=179
+  [uniform] ep=  80 step= 16000 avg_r=[-827.0,+973.4] corr=-0.93 Δl/Δg=0.0/0.0(0.00) switches=239
+  [uniform] ep= 100 step= 20000 avg_r=[-584.6,+938.3] corr=-0.87 Δl/Δg=0.0/0.0(0.00) switches=299
+
+  [uniform] Final per-mode Pareto:
+    Mode 0: safety=[-5239.06,+389.76] progress=[-1.50,+120.06] corr=-0.90
+    Mode 1: safety=[-993.96,-66.16] progress=[-0.62,+2387.24] corr=-1.00
+    Mode 2: safety=[-2754.06,+156.32] progress=[-151.49,+793.23] corr=-0.95
+  [uniform] Saved to results/synthetic_v2/uniform_seed0.json
+
+============================================================
+  fixed  seed=0
+============================================================
+  [fixed] ep=  20 step=  4000 avg_r=[-1194.5,+1208.2] corr=-0.91 Δl/Δg=0.0/0.0(0.00) switches=59
+  [fixed] ep=  40 step=  8000 avg_r=[-288.5,+1172.6] corr=-0.82 Δl/Δg=0.0/0.0(0.00) switches=119
+  [fixed] ep=  60 step= 12000 avg_r=[-292.0,+1177.3] corr=-0.34 Δl/Δg=0.0/0.0(0.00) switches=179
+  [fixed] ep=  80 step= 16000 avg_r=[-295.4,+1177.8] corr=+0.07 Δl/Δg=0.0/0.0(0.00) switches=239
+  [fixed] ep= 100 step= 20000 avg_r=[-297.0,+1178.8] corr=-0.44 Δl/Δg=0.0/0.0(0.00) switches=299
+
+  [fixed] Final per-mode Pareto:
+    Mode 0: safety=[+365.72,+401.18] progress=[-1.50,+3.31] corr=+0.37
+    Mode 1: safety=[-986.98,-982.45] progress=[+2357.08,+2372.14] corr=-0.86
+    Mode 2: safety=[-2147.17,-718.10] progress=[+678.94,+787.32] corr=-0.49
+  [fixed] Saved to results/synthetic_v2/fixed_seed0.json
+
+============================================================
+  bamor  seed=1
+============================================================
+  [bamor] ep=  20 step=  4000 avg_r=[-498.6,+858.9] corr=-0.95 Δl/Δg=0.0/0.0(0.00) switches=59
+  [bamor] ep=  40 step=  8000 avg_r=[-649.2,+804.0] corr=-0.99 Δl/Δg=0.0/0.0(0.00) switches=119
+  [bamor] ep=  60 step= 12000 avg_r=[-445.6,+658.4] corr=-0.96 Δl/Δg=0.0/0.0(0.00) switches=179
+  [bamor] ep=  80 step= 16000 avg_r=[-401.9,+637.2] corr=-0.95 Δl/Δg=0.0/0.0(0.00) switches=239
+  [bamor] ep= 100 step= 20000 avg_r=[-292.0,+538.4] corr=-0.95 Δl/Δg=0.0/0.0(0.00) switches=299
+
+  [bamor] Final per-mode Pareto:
+    Mode 0: safety=[-5267.11,+399.62] progress=[+4.43,+121.13] corr=-0.83
+    Mode 1: safety=[-992.94,-9.55] progress=[+26.55,+2390.32] corr=-1.00
+    Mode 2: safety=[-2756.47,+160.29] progress=[+14.29,+793.40] corr=-0.91
+  [bamor] Saved to results/synthetic_v2/bamor_seed1.json
+
+============================================================
+  bamor_nc  seed=1
+============================================================
+  [bamor_nc] ep=  20 step=  4000 avg_r=[-441.2,+881.3] corr=-0.96 Δl/Δg=0.0/0.0(0.00) switches=59
+  [bamor_nc] ep=  40 step=  8000 avg_r=[-671.0,+900.1] corr=-0.98 Δl/Δg=0.0/0.0(0.00) switches=119
+  [bamor_nc] ep=  60 step= 12000 avg_r=[-437.2,+994.1] corr=-0.98 Δl/Δg=0.0/0.0(0.00) switches=179
+  [bamor_nc] ep=  80 step= 16000 avg_r=[-611.7,+883.5] corr=-0.99 Δl/Δg=0.0/0.0(0.00) switches=239
+  [bamor_nc] ep= 100 step= 20000 avg_r=[-464.3,+899.7] corr=-0.99 Δl/Δg=0.0/0.0(0.00) switches=299
+
+  [bamor_nc] Final per-mode Pareto:
+    Mode 0: safety=[-5265.04,+399.35] progress=[+4.18,+121.12] corr=-0.98
+    Mode 1: safety=[-992.62,-8.06] progress=[+22.59,+2390.24] corr=-1.00
+    Mode 2: safety=[-2754.48,+159.48] progress=[+11.27,+793.18] corr=-0.99
+  [bamor_nc] Saved to results/synthetic_v2/bamor_nc_seed1.json
+
+============================================================
+  bamor_ns  seed=1
+============================================================
+  [bamor_ns] ep=  20 step=  4000 avg_r=[-1278.0,+872.8] corr=-0.95 Δl/Δg=0.0/0.0(0.00) switches=59
+  [bamor_ns] ep=  40 step=  8000 avg_r=[-839.9,+1073.1] corr=-0.81 Δl/Δg=0.0/0.0(0.00) switches=119
+  [bamor_ns] ep=  60 step= 12000 avg_r=[-1142.2,+1230.7] corr=-0.81 Δl/Δg=0.0/0.0(0.00) switches=179
+  [bamor_ns] ep=  80 step= 16000 avg_r=[-1042.6,+1209.2] corr=-0.89 Δl/Δg=0.0/0.0(0.00) switches=239
+  [bamor_ns] ep= 100 step= 20000 avg_r=[-908.2,+1201.0] corr=-0.86 Δl/Δg=0.0/0.0(0.00) switches=299
+
+  [bamor_ns] Final per-mode Pareto:
+    Mode 0: safety=[-5267.18,+380.55] progress=[-0.46,+121.13] corr=-0.98
+    Mode 1: safety=[-992.32,-46.49] progress=[-1.06,+2390.34] corr=-1.00
+    Mode 2: safety=[-2744.83,+150.21] progress=[-286.58,+793.17] corr=-0.96
+  [bamor_ns] Saved to results/synthetic_v2/bamor_ns_seed1.json
+
+============================================================
+  uniform  seed=1
+============================================================
+  [uniform] ep=  20 step=  4000 avg_r=[-898.3,+984.5] corr=-0.95 Δl/Δg=0.0/0.0(0.00) switches=59
+  [uniform] ep=  40 step=  8000 avg_r=[-783.5,+916.9] corr=-0.99 Δl/Δg=0.0/0.0(0.00) switches=119
+  [uniform] ep=  60 step= 12000 avg_r=[-911.4,+982.7] corr=-0.98 Δl/Δg=0.0/0.0(0.00) switches=179
+  [uniform] ep=  80 step= 16000 avg_r=[-575.4,+966.2] corr=-0.95 Δl/Δg=0.0/0.0(0.00) switches=239
+  [uniform] ep= 100 step= 20000 avg_r=[-425.4,+869.4] corr=-0.88 Δl/Δg=0.0/0.0(0.00) switches=299
+
+  [uniform] Final per-mode Pareto:
+    Mode 0: safety=[-5265.75,+392.61] progress=[-0.07,+121.12] corr=-1.00
+    Mode 1: safety=[-992.28,-39.72] progress=[-1.19,+2390.25] corr=-1.00
+    Mode 2: safety=[-2754.22,+156.58] progress=[-313.13,+793.11] corr=-0.99
+  [uniform] Saved to results/synthetic_v2/uniform_seed1.json
+
+============================================================
+  fixed  seed=1
+============================================================
+  [fixed] ep=  20 step=  4000 avg_r=[-2596.9,+1254.0] corr=-0.57 Δl/Δg=0.0/0.0(0.00) switches=59
+  [fixed] ep=  40 step=  8000 avg_r=[-291.8,+1163.1] corr=-0.98 Δl/Δg=0.0/0.0(0.00) switches=119
+  [fixed] ep=  60 step= 12000 avg_r=[-286.4,+1158.7] corr=-1.00 Δl/Δg=0.0/0.0(0.00) switches=179
+  [fixed] ep=  80 step= 16000 avg_r=[-280.9,+1154.8] corr=-1.00 Δl/Δg=0.0/0.0(0.00) switches=239
+  [fixed] ep= 100 step= 20000 avg_r=[-286.1,+1164.9] corr=-0.99 Δl/Δg=0.0/0.0(0.00) switches=299
+
+  [fixed] Final per-mode Pareto:
+    Mode 0: safety=[+285.48,+399.46] progress=[-0.78,+55.70] corr=-0.98
+    Mode 1: safety=[-987.42,-824.62] progress=[+1996.32,+2374.54] corr=-1.00
+    Mode 2: safety=[-1500.49,+160.38] progress=[-26.33,+785.36] corr=-0.98
+  [fixed] Saved to results/synthetic_v2/fixed_seed1.json
+
+============================================================
+  bamor  seed=2
+============================================================
+  [bamor] ep=  20 step=  4000 avg_r=[-487.3,+965.7] corr=-0.98 Δl/Δg=0.0/0.0(0.00) switches=59
+  [bamor] ep=  40 step=  8000 avg_r=[-508.5,+693.8] corr=-0.99 Δl/Δg=0.0/0.0(0.00) switches=119
+  [bamor] ep=  60 step= 12000 avg_r=[-384.8,+658.4] corr=-0.98 Δl/Δg=0.0/0.0(0.00) switches=179
+  [bamor] ep=  80 step= 16000 avg_r=[-346.3,+628.7] corr=-0.97 Δl/Δg=0.0/0.0(0.00) switches=239
+  [bamor] ep= 100 step= 20000 avg_r=[-424.2,+597.4] corr=-0.96 Δl/Δg=0.0/0.0(0.00) switches=299
+
+  [bamor] Final per-mode Pareto:
+    Mode 0: safety=[-5228.02,+399.09] progress=[+1.56,+119.79] corr=-0.83
+    Mode 1: safety=[-993.48,-5.81] progress=[+14.66,+2387.36] corr=-1.00
+    Mode 2: safety=[-2747.60,+160.22] progress=[+7.99,+792.54] corr=-0.91
+  [bamor] Saved to results/synthetic_v2/bamor_seed2.json
+
+============================================================
+  bamor_nc  seed=2
+============================================================
+  [bamor_nc] ep=  20 step=  4000 avg_r=[-434.6,+979.0] corr=-0.95 Δl/Δg=0.0/0.0(0.00) switches=59
+  [bamor_nc] ep=  40 step=  8000 avg_r=[-465.6,+1048.9] corr=-0.95 Δl/Δg=0.0/0.0(0.00) switches=119
+  [bamor_nc] ep=  60 step= 12000 avg_r=[-330.3,+967.0] corr=-0.96 Δl/Δg=0.0/0.0(0.00) switches=179
+  [bamor_nc] ep=  80 step= 16000 avg_r=[-357.0,+904.6] corr=-0.97 Δl/Δg=0.0/0.0(0.00) switches=239
+  [bamor_nc] ep= 100 step= 20000 avg_r=[-554.1,+995.1] corr=-0.99 Δl/Δg=0.0/0.0(0.00) switches=299
+
+  [bamor_nc] Final per-mode Pareto:
+    Mode 0: safety=[-5226.03,+362.12] progress=[+31.94,+119.78] corr=-0.99
+    Mode 1: safety=[-993.42,-81.04] progress=[+241.46,+2387.25] corr=-1.00
+    Mode 2: safety=[-2748.87,+139.92] progress=[+126.80,+792.48] corr=-1.00
+  [bamor_nc] Saved to results/synthetic_v2/bamor_nc_seed2.json
+
+============================================================
+  bamor_ns  seed=2
+============================================================
+  [bamor_ns] ep=  20 step=  4000 avg_r=[-1421.7,+938.7] corr=-0.97 Δl/Δg=0.0/0.0(0.00) switches=59
+  [bamor_ns] ep=  40 step=  8000 avg_r=[-938.5,+883.2] corr=-0.95 Δl/Δg=0.0/0.0(0.00) switches=119
+  [bamor_ns] ep=  60 step= 12000 avg_r=[-885.9,+848.9] corr=-0.90 Δl/Δg=0.0/0.0(0.00) switches=179
+  [bamor_ns] ep=  80 step= 16000 avg_r=[-858.0,+725.9] corr=-0.95 Δl/Δg=0.0/0.0(0.00) switches=239
+  [bamor_ns] ep= 100 step= 20000 avg_r=[-675.9,+617.6] corr=-0.94 Δl/Δg=0.0/0.0(0.00) switches=299
+
+  [bamor_ns] Final per-mode Pareto:
+    Mode 0: safety=[-5228.73,+376.28] progress=[+24.76,+119.79] corr=-0.92
+    Mode 1: safety=[-993.46,-65.94] progress=[+194.99,+2387.35] corr=-1.00
+    Mode 2: safety=[-2745.38,+147.01] progress=[+101.65,+792.59] corr=-0.99
+  [bamor_ns] Saved to results/synthetic_v2/bamor_ns_seed2.json
+
+============================================================
+  uniform  seed=2
+============================================================
+  [uniform] ep=  20 step=  4000 avg_r=[-550.2,+795.3] corr=-0.99 Δl/Δg=0.0/0.0(0.00) switches=59
+  [uniform] ep=  40 step=  8000 avg_r=[-578.8,+865.8] corr=-0.98 Δl/Δg=0.0/0.0(0.00) switches=119
+  [uniform] ep=  60 step= 12000 avg_r=[-814.3,+1037.7] corr=-0.99 Δl/Δg=0.0/0.0(0.00) switches=179
+  [uniform] ep=  80 step= 16000 avg_r=[-1164.5,+999.4] corr=-1.00 Δl/Δg=0.0/0.0(0.00) switches=239
+  [uniform] ep= 100 step= 20000 avg_r=[-760.5,+877.6] corr=-0.99 Δl/Δg=0.0/0.0(0.00) switches=299
+
+  [uniform] Final per-mode Pareto:
+    Mode 0: safety=[-5226.92,+398.75] progress=[-0.08,+119.78] corr=-0.90
+    Mode 1: safety=[-993.47,-28.66] progress=[+5.29,+2387.42] corr=-1.00
+    Mode 2: safety=[-2751.24,+158.54] progress=[-135.79,+792.68] corr=-0.95
+  [uniform] Saved to results/synthetic_v2/uniform_seed2.json
+
+============================================================
+  fixed  seed=2
+============================================================
+  [fixed] ep=  20 step=  4000 avg_r=[-253.3,+630.2] corr=-0.96 Δl/Δg=0.0/0.0(0.00) switches=59
+  [fixed] ep=  40 step=  8000 avg_r=[-175.8,+994.2] corr=-0.98 Δl/Δg=0.0/0.0(0.00) switches=119
+  [fixed] ep=  60 step= 12000 avg_r=[-407.0,+1199.9] corr=-0.38 Δl/Δg=0.0/0.0(0.00) switches=179
+  [fixed] ep=  80 step= 16000 avg_r=[-548.4,+1221.0] corr=-0.21 Δl/Δg=0.0/0.0(0.00) switches=239
+  [fixed] ep= 100 step= 20000 avg_r=[-610.1,+1217.2] corr=-0.20 Δl/Δg=0.0/0.0(0.00) switches=299
+
+  [fixed] Final per-mode Pareto:
+    Mode 0: safety=[-691.53,-273.98] progress=[+116.02,+119.71] corr=-0.27
+    Mode 1: safety=[-916.15,-867.27] progress=[+2315.16,+2383.57] corr=-0.77
+    Mode 2: safety=[-1026.56,-754.90] progress=[+785.20,+793.00] corr=-0.43
+  [fixed] Saved to results/synthetic_v2/fixed_seed2.json
+
+✅ All done. Results in results/synthetic_v2/

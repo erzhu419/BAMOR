@@ -1,0 +1,654 @@
+
+============================================================
+  Method: uniform  Env: mo-halfcheetah-v5  Seed: 0
+============================================================
+/home/erzhu419/.local/lib/python3.10/site-packages/gymnasium/utils/passive_env_checker.py:245: UserWarning: [33mWARN: The reward returned by `step()` must be a float, int, np.integer or np.floating, actual type: <class 'numpy.ndarray'>[0m
+  logger.warn(
+[uniform] env=mo-halfcheetah-v5, obs=17, act=6, rew=2, modes=3
+  [uniform] step=   1000 ep=   1 avg_r=[-3.0000e+00 -6.0032e+03] mode_sw=0 sps=1000
+  [uniform] step=   2000 ep=   2 avg_r=[-4.0000e+00 -6.0131e+03] mode_sw=0 sps=2000
+  [uniform] step=   3000 ep=   3 avg_r=[   -6.7 -6022.4] mode_sw=0 sps=3000
+  [uniform] step=   4000 ep=   4 avg_r=[-5.0000e+00 -6.0119e+03] mode_sw=0 sps=4000
+  [uniform] step=   5000 ep=   5 avg_r=[-3.5000e+00 -6.0217e+03] mode_sw=0 sps=1747
+  [uniform] step=   6000 ep=   6 avg_r=[-9.000e-01 -6.007e+03] mode_sw=0 sps=75
+  [uniform] step=   7000 ep=   7 avg_r=[-6.0000e-01 -5.4803e+03] mode_sw=0 sps=45
+  [uniform] step=   8000 ep=   8 avg_r=[ 2.0000e+00 -4.6625e+03] mode_sw=0 sps=35
+  [uniform] step=   9000 ep=   9 avg_r=[ 2.1000e+00 -3.7807e+03] mode_sw=0 sps=25
+  [uniform] step=  10000 ep=  10 avg_r=[ 1.7000e+00 -2.8675e+03] mode_sw=0 sps=20
+  [uniform] step=  11000 ep=  11 avg_r=[ 4.0000e-01 -1.9655e+03] mode_sw=0 sps=18
+  [uniform] step=  12000 ep=  12 avg_r=[    2.  -1575.5] mode_sw=0 sps=19
+  [uniform] step=  13000 ep=  13 avg_r=[    2.9 -1456.5] mode_sw=0 sps=20
+  [uniform] step=  14000 ep=  14 avg_r=[    3.6 -1424.5] mode_sw=0 sps=21
+  [uniform] step=  15000 ep=  15 avg_r=[    4.3 -1414.4] mode_sw=0 sps=21
+  [uniform] step=  16000 ep=  16 avg_r=[    4.  -1410.1] mode_sw=0 sps=22
+  [uniform] step=  17000 ep=  17 avg_r=[    3.5 -1415.4] mode_sw=0 sps=22
+  [uniform] step=  18000 ep=  18 avg_r=[    3.3 -1435. ] mode_sw=0 sps=22
+  [uniform] step=  19000 ep=  19 avg_r=[    3.7 -1446.3] mode_sw=0 sps=22
+  [uniform] step=  20000 ep=  20 avg_r=[    4.2 -1467.9] mode_sw=0 sps=22
+  [uniform] EVAL step=20000: Pareto range obj0=[-0.3, 0.2] obj1=[-1968.2, -62.4]
+  [uniform] step=  21000 ep=  21 avg_r=[    4.4 -1479.7] mode_sw=0 sps=18
+  [uniform] step=  22000 ep=  22 avg_r=[    4.9 -1481.6] mode_sw=0 sps=18
+  [uniform] step=  23000 ep=  23 avg_r=[    5.2 -1507.7] mode_sw=0 sps=17
+  [uniform] step=  24000 ep=  24 avg_r=[    4.8 -1556.4] mode_sw=0 sps=16
+  [uniform] step=  25000 ep=  25 avg_r=[    4.6 -1550.1] mode_sw=0 sps=16
+  [uniform] step=  26000 ep=  26 avg_r=[    5. -1564.] mode_sw=0 sps=15
+  [uniform] step=  27000 ep=  27 avg_r=[    5.5 -1583.7] mode_sw=0 sps=15
+  [uniform] step=  28000 ep=  28 avg_r=[    4.8 -1575.3] mode_sw=0 sps=14
+  [uniform] step=  29000 ep=  29 avg_r=[    5.2 -1544.1] mode_sw=0 sps=14
+  [uniform] step=  30000 ep=  30 avg_r=[    5.5 -1572.8] mode_sw=0 sps=14
+  [uniform] step=  31000 ep=  31 avg_r=[    6.3 -1572.8] mode_sw=0 sps=13
+  [uniform] step=  32000 ep=  32 avg_r=[    5.9 -1574.1] mode_sw=0 sps=13
+  [uniform] step=  33000 ep=  33 avg_r=[    6.2 -1580.2] mode_sw=0 sps=13
+  [uniform] step=  34000 ep=  34 avg_r=[    6.9 -1594.6] mode_sw=0 sps=13
+  [uniform] step=  35000 ep=  35 avg_r=[    6.6 -1559. ] mode_sw=0 sps=13
+  [uniform] step=  36000 ep=  36 avg_r=[    7.1 -1562.7] mode_sw=0 sps=12
+  [uniform] step=  37000 ep=  37 avg_r=[    7.5 -1571.8] mode_sw=0 sps=12
+  [uniform] step=  38000 ep=  38 avg_r=[    7.6 -1581.6] mode_sw=0 sps=12
+  [uniform] step=  39000 ep=  39 avg_r=[    7.6 -1566.5] mode_sw=0 sps=12
+  [uniform] step=  40000 ep=  40 avg_r=[    7.8 -1585.7] mode_sw=0 sps=12
+  [uniform] EVAL step=40000: Pareto range obj0=[-1.8, 4.6] obj1=[-132.9, -5.3]
+  [uniform] step=  41000 ep=  41 avg_r=[    6.7 -1595. ] mode_sw=0 sps=11
+  [uniform] step=  42000 ep=  42 avg_r=[    7.3 -1596.2] mode_sw=0 sps=11
+  [uniform] step=  43000 ep=  43 avg_r=[    7.4 -1571.8] mode_sw=0 sps=11
+  [uniform] step=  44000 ep=  44 avg_r=[    7.  -1585.1] mode_sw=0 sps=11
+  [uniform] step=  45000 ep=  45 avg_r=[    6.9 -1562.5] mode_sw=0 sps=11
+  [uniform] step=  46000 ep=  46 avg_r=[    6.8 -1538.2] mode_sw=0 sps=11
+  [uniform] step=  47000 ep=  47 avg_r=[    6.7 -1519. ] mode_sw=0 sps=11
+  [uniform] step=  48000 ep=  48 avg_r=[    5.3 -1454.1] mode_sw=1 sps=11
+  [uniform] step=  49000 ep=  49 avg_r=[   45.8 -1163.4] mode_sw=1 sps=11
+  [uniform] step=  50000 ep=  50 avg_r=[  80.8 -904.4] mode_sw=1 sps=11
+  [uniform] step=  51000 ep=  51 avg_r=[ 106.4 -644.7] mode_sw=1 sps=10
+  [uniform] step=  52000 ep=  52 avg_r=[ 150.6 -372. ] mode_sw=1 sps=10
+  [uniform] step=  53000 ep=  53 avg_r=[ 185.  -169.8] mode_sw=1 sps=10
+  [uniform] step=  54000 ep=  54 avg_r=[ 178.8 -171.3] mode_sw=1 sps=10
+  [uniform] step=  55000 ep=  55 avg_r=[ 194.7 -169.6] mode_sw=1 sps=10
+  [uniform] step=  56000 ep=  56 avg_r=[ 206.9 -169.7] mode_sw=1 sps=10
+  [uniform] step=  57000 ep=  57 avg_r=[ 193.9 -170.9] mode_sw=1 sps=10
+  [uniform] step=  58000 ep=  58 avg_r=[ 190.6 -172.7] mode_sw=1 sps=10
+  [uniform] step=  59000 ep=  59 avg_r=[ 197.8 -173.4] mode_sw=1 sps=10
+  [uniform] step=  60000 ep=  60 avg_r=[ 192.4 -175.9] mode_sw=1 sps=10
+  [uniform] EVAL step=60000: Pareto range obj0=[-12.9, 508.7] obj1=[-185.7, -13.8]
+  [uniform] step=  61000 ep=  61 avg_r=[ 214.4 -179.1] mode_sw=1 sps=10
+  [uniform] step=  62000 ep=  62 avg_r=[ 244.3 -179.7] mode_sw=1 sps=10
+  [uniform] step=  63000 ep=  63 avg_r=[ 277.3 -183.7] mode_sw=1 sps=10
+  [uniform] step=  64000 ep=  64 avg_r=[ 288.3 -187.5] mode_sw=1 sps=10
+  [uniform] step=  65000 ep=  65 avg_r=[ 324.3 -189.8] mode_sw=1 sps=10
+  [uniform] step=  66000 ep=  66 avg_r=[ 314.7 -190.4] mode_sw=1 sps=10
+  [uniform] step=  67000 ep=  67 avg_r=[ 345.5 -195.5] mode_sw=1 sps=10
+  [uniform] step=  68000 ep=  68 avg_r=[ 341.  -197.3] mode_sw=1 sps=10
+  [uniform] step=  69000 ep=  69 avg_r=[ 336.8 -201.5] mode_sw=1 sps=10
+  [uniform] step=  70000 ep=  70 avg_r=[ 347.9 -211.1] mode_sw=1 sps=10
+  [uniform] step=  71000 ep=  71 avg_r=[ 421.8 -221.2] mode_sw=1 sps=10
+  [uniform] step=  72000 ep=  72 avg_r=[ 432.7 -227.2] mode_sw=1 sps=10
+  [uniform] step=  73000 ep=  73 avg_r=[ 507.8 -237.4] mode_sw=1 sps=10
+  [uniform] step=  74000 ep=  74 avg_r=[ 624.4 -245.1] mode_sw=1 sps=10
+  [uniform] step=  75000 ep=  75 avg_r=[ 708.8 -253.1] mode_sw=1 sps=10
+  [uniform] step=  76000 ep=  76 avg_r=[ 697.7 -257.7] mode_sw=1 sps=10
+  [uniform] step=  77000 ep=  77 avg_r=[ 759.8 -267.5] mode_sw=1 sps=10
+  [uniform] step=  78000 ep=  78 avg_r=[ 792.1 -273.1] mode_sw=1 sps=10
+  [uniform] step=  79000 ep=  79 avg_r=[ 806.3 -282.1] mode_sw=1 sps=10
+  [uniform] step=  80000 ep=  80 avg_r=[ 789.2 -284.3] mode_sw=1 sps=10
+  [uniform] EVAL step=80000: Pareto range obj0=[-44.8, 72.2] obj1=[-2624.7, -11.0]
+  [uniform] step=  81000 ep=  81 avg_r=[ 910.4 -292.9] mode_sw=1 sps=10
+  [uniform] step=  82000 ep=  82 avg_r=[1024.6 -304.8] mode_sw=1 sps=10
+  [uniform] step=  83000 ep=  83 avg_r=[1114.8 -317.2] mode_sw=1 sps=10
+  [uniform] step=  84000 ep=  84 avg_r=[1180.4 -320.9] mode_sw=1 sps=10
+  [uniform] step=  85000 ep=  85 avg_r=[1302.7 -333.2] mode_sw=1 sps=10
+  [uniform] step=  86000 ep=  86 avg_r=[1373.6 -348.5] mode_sw=1 sps=10
+  [uniform] step=  87000 ep=  87 avg_r=[1128.1 -436.7] mode_sw=1 sps=10
+  [uniform] step=  88000 ep=  88 avg_r=[1229.6 -447.3] mode_sw=1 sps=10
+  [uniform] step=  89000 ep=  89 avg_r=[1205.8 -463. ] mode_sw=1 sps=10
+  [uniform] step=  90000 ep=  90 avg_r=[1097.  -484.1] mode_sw=1 sps=10
+  [uniform] step=  91000 ep=  91 avg_r=[ 958.6 -546.5] mode_sw=1 sps=10
+  [uniform] step=  92000 ep=  92 avg_r=[ 995.3 -574.3] mode_sw=1 sps=10
+  [uniform] step=  93000 ep=  93 avg_r=[ 977.3 -567.4] mode_sw=1 sps=10
+  [uniform] step=  94000 ep=  94 avg_r=[1027.2 -560.4] mode_sw=1 sps=10
+  [uniform] step=  95000 ep=  95 avg_r=[ 916.7 -615.9] mode_sw=1 sps=10
+  [uniform] step=  96000 ep=  96 avg_r=[1107.5 -548.4] mode_sw=1 sps=10
+  [uniform] step=  97000 ep=  97 avg_r=[1418.4 -438.3] mode_sw=1 sps=9
+  [uniform] step=  98000 ep=  98 avg_r=[1456.5 -443.2] mode_sw=1 sps=9
+  [uniform] step=  99000 ep=  99 avg_r=[1569.6 -443.7] mode_sw=1 sps=9
+  [uniform] step= 100000 ep= 100 avg_r=[1870.  -371.5] mode_sw=1 sps=9
+  [uniform] EVAL step=100000: Pareto range obj0=[-0.1, 356.1] obj1=[-6292.4, -85.5]
+  [uniform] step= 101000 ep= 101 avg_r=[1980.1 -376.2] mode_sw=1 sps=9
+  [uniform] step= 102000 ep= 102 avg_r=[2025.8 -376.9] mode_sw=1 sps=9
+  [uniform] step= 103000 ep= 103 avg_r=[1967.6 -455.8] mode_sw=2 sps=9
+  [uniform] step= 104000 ep= 104 avg_r=[1687.6 -632.5] mode_sw=2 sps=9
+  [uniform] step= 105000 ep= 105 avg_r=[1453.3 -804. ] mode_sw=2 sps=9
+  [uniform] step= 106000 ep= 106 avg_r=[1128.3 -968.2] mode_sw=2 sps=9
+  [uniform] step= 107000 ep= 107 avg_r=[  843.1 -1135. ] mode_sw=2 sps=9
+  [uniform] step= 108000 ep= 108 avg_r=[  565.7 -1410.4] mode_sw=2 sps=9
+  [uniform] step= 109000 ep= 109 avg_r=[  601.3 -1396.8] mode_sw=2 sps=9
+  [uniform] step= 110000 ep= 110 avg_r=[  612.2 -1379.4] mode_sw=2 sps=9
+  [uniform] step= 111000 ep= 111 avg_r=[  600.7 -1356.3] mode_sw=2 sps=9
+  [uniform] step= 112000 ep= 112 avg_r=[  572.  -1326.1] mode_sw=2 sps=9
+  [uniform] step= 113000 ep= 113 avg_r=[  659.2 -1127.7] mode_sw=2 sps=9
+  [uniform] step= 114000 ep= 114 avg_r=[  657.3 -1120.3] mode_sw=2 sps=9
+  [uniform] step= 115000 ep= 115 avg_r=[  663.5 -1125.4] mode_sw=2 sps=9
+  [uniform] step= 116000 ep= 116 avg_r=[  659.7 -1134.2] mode_sw=2 sps=9
+  [uniform] step= 117000 ep= 117 avg_r=[  681.8 -1141.2] mode_sw=2 sps=9
+  [uniform] step= 118000 ep= 118 avg_r=[  692.  -1125.3] mode_sw=2 sps=9
+  [uniform] step= 119000 ep= 119 avg_r=[  705.6 -1121.3] mode_sw=2 sps=9
+  [uniform] step= 120000 ep= 120 avg_r=[  616.3 -1143.2] mode_sw=2 sps=9
+  [uniform] EVAL step=120000: Pareto range obj0=[-0.0, 291.3] obj1=[-7975.0, -457.3]
+  [uniform] step= 121000 ep= 121 avg_r=[  646.8 -1148.7] mode_sw=2 sps=9
+  [uniform] step= 122000 ep= 122 avg_r=[  645.1 -1148. ] mode_sw=2 sps=9
+  [uniform] step= 123000 ep= 123 avg_r=[  633.4 -1148.4] mode_sw=2 sps=9
+  [uniform] step= 124000 ep= 124 avg_r=[  605.3 -1137. ] mode_sw=2 sps=9
+  [uniform] step= 125000 ep= 125 avg_r=[  698.9 -1102.9] mode_sw=2 sps=9
+  [uniform] step= 126000 ep= 126 avg_r=[  656.9 -1104.3] mode_sw=2 sps=9
+  [uniform] step= 127000 ep= 127 avg_r=[  665.7 -1108.5] mode_sw=2 sps=9
+  [uniform] step= 128000 ep= 128 avg_r=[  679.6 -1101.9] mode_sw=2 sps=9
+  [uniform] step= 129000 ep= 129 avg_r=[  688.3 -1099.9] mode_sw=2 sps=9
+  [uniform] step= 130000 ep= 130 avg_r=[  674.9 -1087.5] mode_sw=2 sps=9
+  [uniform] step= 131000 ep= 131 avg_r=[  688. -1069.] mode_sw=2 sps=9
+  [uniform] step= 132000 ep= 132 avg_r=[  658.1 -1052.2] mode_sw=2 sps=9
+  [uniform] step= 133000 ep= 133 avg_r=[  630.4 -1048.7] mode_sw=2 sps=9
+  [uniform] step= 134000 ep= 134 avg_r=[  613.4 -1052.9] mode_sw=2 sps=9
+  [uniform] step= 135000 ep= 135 avg_r=[  578.5 -1051.1] mode_sw=2 sps=9
+  [uniform] step= 136000 ep= 136 avg_r=[  565. -1045.] mode_sw=2 sps=9
+  [uniform] step= 137000 ep= 137 avg_r=[  557.2 -1044.4] mode_sw=2 sps=9
+  [uniform] step= 138000 ep= 138 avg_r=[  544.1 -1036. ] mode_sw=2 sps=9
+  [uniform] step= 139000 ep= 139 avg_r=[  538.2 -1031.8] mode_sw=2 sps=9
+  [uniform] step= 140000 ep= 140 avg_r=[  547.1 -1036.1] mode_sw=2 sps=9
+  [uniform] EVAL step=140000: Pareto range obj0=[-0.0, 6671.0] obj1=[-627.6, -53.7]
+  [uniform] step= 141000 ep= 141 avg_r=[  536.1 -1043.6] mode_sw=2 sps=9
+  [uniform] step= 142000 ep= 142 avg_r=[  535.4 -1047.4] mode_sw=2 sps=9
+  [uniform] step= 143000 ep= 143 avg_r=[  543.6 -1064.1] mode_sw=2 sps=9
+  [uniform] step= 144000 ep= 144 avg_r=[  524.9 -1055.5] mode_sw=2 sps=9
+  [uniform] step= 145000 ep= 145 avg_r=[  520.8 -1055.2] mode_sw=2 sps=9
+  [uniform] step= 146000 ep= 146 avg_r=[  530.2 -1057.1] mode_sw=2 sps=9
+  [uniform] step= 147000 ep= 147 avg_r=[  536.  -1062.3] mode_sw=2 sps=9
+  [uniform] step= 148000 ep= 148 avg_r=[  539.5 -1065.8] mode_sw=2 sps=9
+  [uniform] step= 149000 ep= 149 avg_r=[  573.7 -1088.3] mode_sw=2 sps=9
+  [uniform] step= 150000 ep= 150 avg_r=[  582.8 -1099.6] mode_sw=2 sps=9
+  [uniform] step= 151000 ep= 151 avg_r=[  563.4 -1170.6] mode_sw=3 sps=9
+  [uniform] step= 152000 ep= 152 avg_r=[  463.5 -1595.8] mode_sw=3 sps=9
+  [uniform] step= 153000 ep= 153 avg_r=[  363.4 -2067.1] mode_sw=3 sps=9
+  [uniform] step= 154000 ep= 154 avg_r=[  250.8 -2523.9] mode_sw=3 sps=9
+  [uniform] step= 155000 ep= 155 avg_r=[  147.2 -2999. ] mode_sw=3 sps=9
+  [uniform] step= 156000 ep= 156 avg_r=[   65.1 -3373.4] mode_sw=3 sps=9
+  [uniform] step= 157000 ep= 157 avg_r=[   67.5 -3391.7] mode_sw=3 sps=9
+  [uniform] step= 158000 ep= 158 avg_r=[   67.1 -3334.2] mode_sw=3 sps=9
+  [uniform] step= 159000 ep= 159 avg_r=[   66.  -3284.4] mode_sw=3 sps=9
+  [uniform] step= 160000 ep= 160 avg_r=[   65.5 -3229.3] mode_sw=3 sps=9
+  [uniform] EVAL step=160000: Pareto range obj0=[-4.4, 1122.7] obj1=[-2824.3, -21.3]
+  [uniform] step= 161000 ep= 161 avg_r=[   67.9 -3234. ] mode_sw=3 sps=9
+  [uniform] step= 162000 ep= 162 avg_r=[   67.2 -3231.1] mode_sw=3 sps=9
+  [uniform] step= 163000 ep= 163 avg_r=[   69.1 -3263.7] mode_sw=3 sps=9
+  [uniform] step= 164000 ep= 164 avg_r=[   73.6 -3315.2] mode_sw=3 sps=9
+  [uniform] step= 165000 ep= 165 avg_r=[   76.4 -3356.4] mode_sw=3 sps=9
+  [uniform] step= 166000 ep= 166 avg_r=[   75.  -3317.2] mode_sw=3 sps=9
+  [uniform] step= 167000 ep= 167 avg_r=[   76.  -3347.2] mode_sw=3 sps=9
+  [uniform] step= 168000 ep= 168 avg_r=[   73.3 -3330.1] mode_sw=3 sps=9
+  [uniform] step= 169000 ep= 169 avg_r=[   68.8 -3308.8] mode_sw=3 sps=9
+  [uniform] step= 170000 ep= 170 avg_r=[   65.4 -3276.8] mode_sw=3 sps=9
+  [uniform] step= 171000 ep= 171 avg_r=[   66.  -3333.9] mode_sw=3 sps=9
+  [uniform] step= 172000 ep= 172 avg_r=[   64.6 -3296.9] mode_sw=3 sps=9
+  [uniform] step= 173000 ep= 173 avg_r=[   64.8 -3266. ] mode_sw=3 sps=9
+  [uniform] step= 174000 ep= 174 avg_r=[   63.  -3233.9] mode_sw=3 sps=9
+  [uniform] step= 175000 ep= 175 avg_r=[   61.7 -3206.4] mode_sw=3 sps=9
+  [uniform] step= 176000 ep= 176 avg_r=[   58.6 -3176.9] mode_sw=3 sps=9
+  [uniform] step= 177000 ep= 177 avg_r=[   59.5 -3181. ] mode_sw=3 sps=9
+  [uniform] step= 178000 ep= 178 avg_r=[   58.8 -3208.4] mode_sw=3 sps=9
+  [uniform] step= 179000 ep= 179 avg_r=[   60.9 -3248.9] mode_sw=3 sps=9
+  [uniform] step= 180000 ep= 180 avg_r=[   62.5 -3358.9] mode_sw=3 sps=9
+  [uniform] EVAL step=180000: Pareto range obj0=[-1.1, 1097.2] obj1=[-2930.6, -68.4]
+  [uniform] step= 181000 ep= 181 avg_r=[   62.8 -3447.5] mode_sw=3 sps=9
+  [uniform] step= 182000 ep= 182 avg_r=[   62.8 -3501.2] mode_sw=3 sps=9
+  [uniform] step= 183000 ep= 183 avg_r=[   61.5 -3488.5] mode_sw=3 sps=9
+  [uniform] step= 184000 ep= 184 avg_r=[   58.4 -3462.1] mode_sw=3 sps=9
+  [uniform] step= 185000 ep= 185 avg_r=[   56.8 -3399.8] mode_sw=3 sps=9
+  [uniform] step= 186000 ep= 186 avg_r=[   54.1 -3263.5] mode_sw=3 sps=9
+  [uniform] step= 187000 ep= 187 avg_r=[   49.8 -3190.4] mode_sw=3 sps=9
+  [uniform] step= 188000 ep= 188 avg_r=[   47.1 -3161.7] mode_sw=3 sps=9
+  [uniform] step= 189000 ep= 189 avg_r=[   44.6 -3133.5] mode_sw=3 sps=9
+  [uniform] step= 190000 ep= 190 avg_r=[   42.7 -3139.2] mode_sw=3 sps=9
+  [uniform] step= 191000 ep= 191 avg_r=[   45.6 -3275.3] mode_sw=3 sps=9
+  [uniform] step= 192000 ep= 192 avg_r=[   45.3 -3342.5] mode_sw=3 sps=9
+  [uniform] step= 193000 ep= 193 avg_r=[   45.3 -3419.2] mode_sw=3 sps=9
+  [uniform] step= 194000 ep= 194 avg_r=[   48.  -3561.2] mode_sw=3 sps=9
+  [uniform] step= 195000 ep= 195 avg_r=[   46.7 -3674.6] mode_sw=3 sps=9
+  [uniform] step= 196000 ep= 196 avg_r=[   40.7 -3708.4] mode_sw=3 sps=9
+  [uniform] step= 197000 ep= 197 avg_r=[   36.8 -3824. ] mode_sw=3 sps=9
+  [uniform] step= 198000 ep= 198 avg_r=[   38.6 -4016.2] mode_sw=3 sps=9
+  [uniform] step= 199000 ep= 199 avg_r=[   35.1 -4136.8] mode_sw=3 sps=9
+  [uniform] step= 200000 ep= 200 avg_r=[   30.7 -4267.9] mode_sw=3 sps=9
+  [uniform] EVAL step=200000: Pareto range obj0=[-101.3, 129.3] obj1=[-10883.7, -906.1]
+[uniform] Saved to results/bamor_mujoco/mo_halfcheetah_v5/uniform_seed0.json
+
+============================================================
+  Method: uniform  Env: mo-halfcheetah-v5  Seed: 1
+============================================================
+/home/erzhu419/.local/lib/python3.10/site-packages/gymnasium/utils/passive_env_checker.py:245: UserWarning: [33mWARN: The reward returned by `step()` must be a float, int, np.integer or np.floating, actual type: <class 'numpy.ndarray'>[0m
+  logger.warn(
+[uniform] env=mo-halfcheetah-v5, obs=17, act=6, rew=2, modes=3
+  [uniform] step=   1000 ep=   1 avg_r=[ 5.2000e+00 -5.8078e+03] mode_sw=0 sps=1000
+  [uniform] step=   2000 ep=   2 avg_r=[    8.8 -5835.1] mode_sw=0 sps=2000
+  [uniform] step=   3000 ep=   3 avg_r=[    9.7 -5895.8] mode_sw=0 sps=3000
+  [uniform] step=   4000 ep=   4 avg_r=[    9.6 -5944.9] mode_sw=0 sps=4000
+  [uniform] step=   5000 ep=   5 avg_r=[    8.9 -5969.5] mode_sw=0 sps=3912
+  [uniform] step=   6000 ep=   6 avg_r=[    8.7 -5975.3] mode_sw=0 sps=86
+  [uniform] step=   7000 ep=   7 avg_r=[    7.  -5487.6] mode_sw=0 sps=52
+  [uniform] step=   8000 ep=   8 avg_r=[    4.8 -4651.5] mode_sw=0 sps=39
+  [uniform] step=   9000 ep=   9 avg_r=[ 3.0000e+00 -3.7433e+03] mode_sw=0 sps=36
+  [uniform] step=  10000 ep=  10 avg_r=[ 1.8000e+00 -2.8292e+03] mode_sw=0 sps=32
+  [uniform] step=  11000 ep=  11 avg_r=[ 1.2000e+00 -1.9545e+03] mode_sw=0 sps=29
+  [uniform] step=  12000 ep=  12 avg_r=[ 9.0000e-01 -1.5609e+03] mode_sw=0 sps=27
+  [uniform] step=  13000 ep=  13 avg_r=[    1.5 -1466.1] mode_sw=0 sps=25
+  [uniform] step=  14000 ep=  14 avg_r=[    2.3 -1448.7] mode_sw=0 sps=24
+  [uniform] step=  15000 ep=  15 avg_r=[    3.2 -1420.4] mode_sw=0 sps=24
+  [uniform] step=  16000 ep=  16 avg_r=[    3.9 -1395.9] mode_sw=0 sps=23
+  [uniform] step=  17000 ep=  17 avg_r=[    3.4 -1398.3] mode_sw=0 sps=23
+  [uniform] step=  18000 ep=  18 avg_r=[    3.2 -1411. ] mode_sw=0 sps=22
+  [uniform] step=  19000 ep=  19 avg_r=[    2.9 -1397.4] mode_sw=0 sps=21
+  [uniform] step=  20000 ep=  20 avg_r=[    2.7 -1413.3] mode_sw=0 sps=21
+  [uniform] EVAL step=20000: Pareto range obj0=[-0.2, 0.2] obj1=[-407.4, -38.0]
+  [uniform] step=  21000 ep=  21 avg_r=[    2.9 -1423.3] mode_sw=0 sps=19
+  [uniform] step=  22000 ep=  22 avg_r=[    3.5 -1423.5] mode_sw=0 sps=19
+  [uniform] step=  23000 ep=  23 avg_r=[    3.6 -1437.8] mode_sw=0 sps=20
+  [uniform] step=  24000 ep=  24 avg_r=[    4.4 -1461.6] mode_sw=0 sps=20
+  [uniform] step=  25000 ep=  25 avg_r=[    4.9 -1478.1] mode_sw=0 sps=21
+  [uniform] step=  26000 ep=  26 avg_r=[    5.3 -1484. ] mode_sw=0 sps=21
+  [uniform] step=  27000 ep=  27 avg_r=[    6.6 -1472.8] mode_sw=0 sps=22
+  [uniform] step=  28000 ep=  28 avg_r=[    6.2 -1463. ] mode_sw=0 sps=22
+  [uniform] step=  29000 ep=  29 avg_r=[    6.3 -1474.3] mode_sw=0 sps=22
+  [uniform] step=  30000 ep=  30 avg_r=[    6.1 -1463.5] mode_sw=0 sps=23
+  [uniform] step=  31000 ep=  31 avg_r=[    5.1 -1479.1] mode_sw=0 sps=23
+  [uniform] step=  32000 ep=  32 avg_r=[    4.8 -1482.5] mode_sw=0 sps=23
+  [uniform] step=  33000 ep=  33 avg_r=[    5.2 -1479.4] mode_sw=0 sps=24
+  [uniform] step=  34000 ep=  34 avg_r=[    5.1 -1462.5] mode_sw=0 sps=24
+  [uniform] step=  35000 ep=  35 avg_r=[    4.9 -1454.2] mode_sw=0 sps=24
+  [uniform] step=  36000 ep=  36 avg_r=[    4.7 -1452.8] mode_sw=0 sps=24
+  [uniform] step=  37000 ep=  37 avg_r=[    4.  -1479.9] mode_sw=0 sps=25
+  [uniform] step=  38000 ep=  38 avg_r=[    4.4 -1483.6] mode_sw=0 sps=25
+  [uniform] step=  39000 ep=  39 avg_r=[    5.5 -1496. ] mode_sw=0 sps=25
+  [uniform] step=  40000 ep=  40 avg_r=[    5.5 -1515.4] mode_sw=0 sps=25
+  [uniform] EVAL step=40000: Pareto range obj0=[-2.2, 0.8] obj1=[-270.1, -19.0]
+  [uniform] step=  41000 ep=  41 avg_r=[    6.5 -1531.4] mode_sw=0 sps=25
+  [uniform] step=  42000 ep=  42 avg_r=[    6.3 -1507.8] mode_sw=0 sps=25
+  [uniform] step=  43000 ep=  43 avg_r=[    6.1 -1505.4] mode_sw=0 sps=25
+  [uniform] step=  44000 ep=  44 avg_r=[    4.5 -1496.9] mode_sw=0 sps=25
+  [uniform] step=  45000 ep=  45 avg_r=[    4.8 -1506.5] mode_sw=0 sps=26
+  [uniform] step=  46000 ep=  46 avg_r=[    8.5 -1295.9] mode_sw=1 sps=26
+  [uniform] step=  47000 ep=  47 avg_r=[    6.7 -1051.3] mode_sw=1 sps=26
+  [uniform] step=  48000 ep=  48 avg_r=[  10.6 -872.5] mode_sw=1 sps=26
+  [uniform] step=  49000 ep=  49 avg_r=[ -26.4 -709.2] mode_sw=1 sps=26
+  [uniform] step=  50000 ep=  50 avg_r=[ -46.3 -510.8] mode_sw=1 sps=27
+  [uniform] step=  51000 ep=  51 avg_r=[  18.9 -496.8] mode_sw=1 sps=27
+  [uniform] step=  52000 ep=  52 avg_r=[  31.7 -554.9] mode_sw=1 sps=27
+  [uniform] step=  53000 ep=  53 avg_r=[  88.2 -505.9] mode_sw=1 sps=27
+  [uniform] step=  54000 ep=  54 avg_r=[ 142.4 -431.2] mode_sw=1 sps=27
+  [uniform] step=  55000 ep=  55 avg_r=[ 180.8 -383.2] mode_sw=1 sps=27
+  [uniform] step=  56000 ep=  56 avg_r=[ 121.3 -355.7] mode_sw=1 sps=28
+  [uniform] step=  57000 ep=  57 avg_r=[ 113.  -311.3] mode_sw=1 sps=28
+  [uniform] step=  58000 ep=  58 avg_r=[  73.2 -339.8] mode_sw=1 sps=28
+  [uniform] step=  59000 ep=  59 avg_r=[  64.2 -336. ] mode_sw=1 sps=28
+  [uniform] step=  60000 ep=  60 avg_r=[  66.1 -329.3] mode_sw=1 sps=28
+  [uniform] EVAL step=60000: Pareto range obj0=[1.0, 91.8] obj1=[-1592.6, -192.0]
+  [uniform] step=  61000 ep=  61 avg_r=[  71.3 -330.2] mode_sw=1 sps=28
+  [uniform] step=  62000 ep=  62 avg_r=[  51.8 -368.9] mode_sw=1 sps=28
+  [uniform] step=  63000 ep=  63 avg_r=[   6.7 -376.2] mode_sw=1 sps=28
+  [uniform] step=  64000 ep=  64 avg_r=[  37.5 -377.4] mode_sw=1 sps=28
+  [uniform] step=  65000 ep=  65 avg_r=[  11.2 -399.1] mode_sw=1 sps=28
+  [uniform] step=  66000 ep=  66 avg_r=[  29.1 -406.2] mode_sw=1 sps=28
+  [uniform] step=  67000 ep=  67 avg_r=[  51.6 -392.3] mode_sw=1 sps=28
+  [uniform] step=  68000 ep=  68 avg_r=[  99.4 -358.2] mode_sw=1 sps=28
+  [uniform] step=  69000 ep=  69 avg_r=[ 102.6 -364.5] mode_sw=1 sps=29
+  [uniform] step=  70000 ep=  70 avg_r=[ 120.4 -361.9] mode_sw=1 sps=29
+  [uniform] step=  71000 ep=  71 avg_r=[  98.1 -369. ] mode_sw=1 sps=29
+  [uniform] step=  72000 ep=  72 avg_r=[ 113.8 -347.6] mode_sw=1 sps=29
+  [uniform] step=  73000 ep=  73 avg_r=[ 122.2 -356.5] mode_sw=1 sps=29
+  [uniform] step=  74000 ep=  74 avg_r=[  86.6 -369.5] mode_sw=1 sps=29
+  [uniform] step=  75000 ep=  75 avg_r=[ 103.6 -362.2] mode_sw=1 sps=29
+  [uniform] step=  76000 ep=  76 avg_r=[  93.9 -365.8] mode_sw=1 sps=29
+  [uniform] step=  77000 ep=  77 avg_r=[ 122.  -368.8] mode_sw=1 sps=29
+  [uniform] step=  78000 ep=  78 avg_r=[ 113.8 -371.3] mode_sw=1 sps=29
+  [uniform] step=  79000 ep=  79 avg_r=[ 136.6 -364.6] mode_sw=1 sps=30
+  [uniform] step=  80000 ep=  80 avg_r=[ 128.  -366.8] mode_sw=1 sps=30
+  [uniform] EVAL step=80000: Pareto range obj0=[-1.1, 28.9] obj1=[-976.5, -161.4]
+  [uniform] step=  81000 ep=  81 avg_r=[ 131.1 -358.8] mode_sw=1 sps=29
+  [uniform] step=  82000 ep=  82 avg_r=[ 178.3 -362.2] mode_sw=1 sps=29
+  [uniform] step=  83000 ep=  83 avg_r=[ 161.  -362.5] mode_sw=1 sps=29
+  [uniform] step=  84000 ep=  84 avg_r=[ 181.2 -355.1] mode_sw=1 sps=29
+  [uniform] step=  85000 ep=  85 avg_r=[ 200.6 -354.9] mode_sw=1 sps=30
+  [uniform] step=  86000 ep=  86 avg_r=[ 221.6 -354.8] mode_sw=1 sps=30
+  [uniform] step=  87000 ep=  87 avg_r=[ 137.6 -357.6] mode_sw=1 sps=30
+  [uniform] step=  88000 ep=  88 avg_r=[ 181.8 -355.2] mode_sw=1 sps=30
+  [uniform] step=  89000 ep=  89 avg_r=[ 170.4 -362.1] mode_sw=1 sps=30
+  [uniform] step=  90000 ep=  90 avg_r=[ 201.7 -354.5] mode_sw=1 sps=30
+  [uniform] step=  91000 ep=  91 avg_r=[ 209.6 -353.6] mode_sw=1 sps=30
+  [uniform] step=  92000 ep=  92 avg_r=[ 256.6 -351.2] mode_sw=1 sps=30
+  [uniform] step=  93000 ep=  93 avg_r=[ 283.3 -347.2] mode_sw=1 sps=30
+  [uniform] step=  94000 ep=  94 avg_r=[ 307.9 -343.2] mode_sw=1 sps=30
+  [uniform] step=  95000 ep=  95 avg_r=[ 292.5 -347.1] mode_sw=1 sps=30
+  [uniform] step=  96000 ep=  96 avg_r=[ 265.4 -446.2] mode_sw=2 sps=30
+  [uniform] step=  97000 ep=  97 avg_r=[ 219.8 -602.5] mode_sw=2 sps=30
+  [uniform] step=  98000 ep=  98 avg_r=[ 148.2 -780.7] mode_sw=2 sps=31
+  [uniform] step=  99000 ep=  99 avg_r=[ 101.3 -928.8] mode_sw=2 sps=31
+  [uniform] step= 100000 ep= 100 avg_r=[   54.9 -1094.4] mode_sw=2 sps=31
+  [uniform] EVAL step=100000: Pareto range obj0=[0.6, 10.1] obj1=[-4828.2, -122.3]
+  [uniform] step= 101000 ep= 101 avg_r=[   57.5 -1153.4] mode_sw=2 sps=30
+  [uniform] step= 102000 ep= 102 avg_r=[   46.9 -1162.8] mode_sw=2 sps=30
+  [uniform] step= 103000 ep= 103 avg_r=[   50.  -1155.3] mode_sw=2 sps=30
+  [uniform] step= 104000 ep= 104 avg_r=[   33.3 -1180.5] mode_sw=2 sps=30
+  [uniform] step= 105000 ep= 105 avg_r=[   26.2 -1191.1] mode_sw=2 sps=31
+  [uniform] step= 106000 ep= 106 avg_r=[   21.4 -1201.7] mode_sw=2 sps=31
+  [uniform] step= 107000 ep= 107 avg_r=[   18.3 -1209.3] mode_sw=2 sps=31
+  [uniform] step= 108000 ep= 108 avg_r=[    9.4 -1209.7] mode_sw=2 sps=31
+  [uniform] step= 109000 ep= 109 avg_r=[   12.9 -1203.6] mode_sw=2 sps=31
+  [uniform] step= 110000 ep= 110 avg_r=[   14.3 -1197.2] mode_sw=2 sps=31
+  [uniform] step= 111000 ep= 111 avg_r=[    5.4 -1197.8] mode_sw=2 sps=31
+  [uniform] step= 112000 ep= 112 avg_r=[    6.5 -1192.1] mode_sw=2 sps=31
+  [uniform] step= 113000 ep= 113 avg_r=[    7.2 -1192.1] mode_sw=2 sps=31
+  [uniform] step= 114000 ep= 114 avg_r=[    9.  -1189.7] mode_sw=2 sps=31
+  [uniform] step= 115000 ep= 115 avg_r=[    7.2 -1179.6] mode_sw=2 sps=31
+  [uniform] step= 116000 ep= 116 avg_r=[   18.1 -1169.9] mode_sw=2 sps=31
+  [uniform] step= 117000 ep= 117 avg_r=[   22.6 -1162.8] mode_sw=2 sps=31
+  [uniform] step= 118000 ep= 118 avg_r=[   25.3 -1156.9] mode_sw=2 sps=31
+  [uniform] step= 119000 ep= 119 avg_r=[   31.8 -1152.6] mode_sw=2 sps=31
+  [uniform] step= 120000 ep= 120 avg_r=[   35.7 -1159.7] mode_sw=2 sps=31
+  [uniform] EVAL step=120000: Pareto range obj0=[-139.0, 68.4] obj1=[-1544.7, -143.4]
+  [uniform] step= 121000 ep= 121 avg_r=[   39.6 -1164.6] mode_sw=2 sps=31
+  [uniform] step= 122000 ep= 122 avg_r=[   40.9 -1164.6] mode_sw=2 sps=31
+  [uniform] step= 123000 ep= 123 avg_r=[   45.4 -1162.7] mode_sw=2 sps=31
+  [uniform] step= 124000 ep= 124 avg_r=[   42.4 -1163.4] mode_sw=2 sps=31
+  [uniform] step= 125000 ep= 125 avg_r=[   41.1 -1168.1] mode_sw=2 sps=31
+  [uniform] step= 126000 ep= 126 avg_r=[   38.4 -1167.6] mode_sw=2 sps=31
+  [uniform] step= 127000 ep= 127 avg_r=[   33.9 -1178.5] mode_sw=2 sps=31
+  [uniform] step= 128000 ep= 128 avg_r=[   31.9 -1152.5] mode_sw=2 sps=31
+  [uniform] step= 129000 ep= 129 avg_r=[   30.2 -1159.9] mode_sw=2 sps=31
+  [uniform] step= 130000 ep= 130 avg_r=[   36.6 -1154. ] mode_sw=2 sps=31
+  [uniform] step= 131000 ep= 131 avg_r=[   37.4 -1157.1] mode_sw=2 sps=32
+  [uniform] step= 132000 ep= 132 avg_r=[   47.7 -1134.9] mode_sw=2 sps=32
+  [uniform] step= 133000 ep= 133 avg_r=[   47.2 -1167.7] mode_sw=2 sps=32
+  [uniform] step= 134000 ep= 134 avg_r=[   52.7 -1151.2] mode_sw=2 sps=32
+  [uniform] step= 135000 ep= 135 avg_r=[   51.2 -1132.9] mode_sw=2 sps=32
+  [uniform] step= 136000 ep= 136 avg_r=[   53.3 -1127.5] mode_sw=2 sps=32
+  [uniform] step= 137000 ep= 137 avg_r=[   48.  -1130.6] mode_sw=2 sps=32
+  [uniform] step= 138000 ep= 138 avg_r=[   50.8 -1106.1] mode_sw=2 sps=32
+  [uniform] step= 139000 ep= 139 avg_r=[   48.9 -1089.5] mode_sw=2 sps=32
+  [uniform] step= 140000 ep= 140 avg_r=[   45.3 -1103.6] mode_sw=2 sps=32
+  [uniform] EVAL step=140000: Pareto range obj0=[20.4, 353.2] obj1=[-91.9, -21.3]
+  [uniform] step= 141000 ep= 141 avg_r=[   45.3 -1069.5] mode_sw=2 sps=32
+  [uniform] step= 142000 ep= 142 avg_r=[   45.5 -1386.6] mode_sw=3 sps=32
+  [uniform] step= 143000 ep= 143 avg_r=[   37.2 -1463. ] mode_sw=3 sps=32
+  [uniform] step= 144000 ep= 144 avg_r=[   27. -1562.] mode_sw=3 sps=32
+  [uniform] step= 145000 ep= 145 avg_r=[   21.4 -1651.5] mode_sw=3 sps=32
+  [uniform] step= 146000 ep= 146 avg_r=[   11.3 -1810.2] mode_sw=3 sps=32
+  [uniform] step= 147000 ep= 147 avg_r=[    3.9 -1711.7] mode_sw=3 sps=32
+  [uniform] step= 148000 ep= 148 avg_r=[    4.2 -1864.5] mode_sw=3 sps=32
+  [uniform] step= 149000 ep= 149 avg_r=[    4.6 -2040.3] mode_sw=3 sps=32
+  [uniform] step= 150000 ep= 150 avg_r=[    4.8 -2214.6] mode_sw=3 sps=32
+  [uniform] step= 151000 ep= 151 avg_r=[    5. -2352.] mode_sw=3 sps=32
+  [uniform] step= 152000 ep= 152 avg_r=[    4.8 -2423. ] mode_sw=3 sps=32
+  [uniform] step= 153000 ep= 153 avg_r=[    5.1 -2519.8] mode_sw=3 sps=32
+  [uniform] step= 154000 ep= 154 avg_r=[    5.3 -2612.8] mode_sw=3 sps=32
+  [uniform] step= 155000 ep= 155 avg_r=[    5.3 -2686.9] mode_sw=3 sps=32
+  [uniform] step= 156000 ep= 156 avg_r=[    5.4 -2781.8] mode_sw=3 sps=32
+  [uniform] step= 157000 ep= 157 avg_r=[    5.1 -2877.2] mode_sw=3 sps=32
+  [uniform] step= 158000 ep= 158 avg_r=[    4.8 -2974.7] mode_sw=3 sps=32
+  [uniform] step= 159000 ep= 159 avg_r=[    4.3 -3061.1] mode_sw=3 sps=32
+  [uniform] step= 160000 ep= 160 avg_r=[    4.5 -3171.5] mode_sw=3 sps=32
+  [uniform] EVAL step=160000: Pareto range obj0=[-38.1, 21.2] obj1=[-634.3, -136.3]
+  [uniform] step= 161000 ep= 161 avg_r=[    4.1 -3320.5] mode_sw=3 sps=32
+  [uniform] step= 162000 ep= 162 avg_r=[    4.4 -3466. ] mode_sw=3 sps=32
+  [uniform] step= 163000 ep= 163 avg_r=[    4.2 -3580.9] mode_sw=3 sps=32
+  [uniform] step= 164000 ep= 164 avg_r=[    4.2 -3695.9] mode_sw=3 sps=32
+  [uniform] step= 165000 ep= 165 avg_r=[    4.  -3811.3] mode_sw=3 sps=32
+  [uniform] step= 166000 ep= 166 avg_r=[    4.5 -3845.7] mode_sw=3 sps=32
+  [uniform] step= 167000 ep= 167 avg_r=[    4.1 -3882.4] mode_sw=3 sps=32
+  [uniform] step= 168000 ep= 168 avg_r=[ 3.6000e+00 -3.8687e+03] mode_sw=3 sps=32
+  [uniform] step= 169000 ep= 169 avg_r=[ 3.1000e+00 -3.8591e+03] mode_sw=3 sps=32
+  [uniform] step= 170000 ep= 170 avg_r=[ 3.2000e+00 -3.8027e+03] mode_sw=3 sps=32
+  [uniform] step= 171000 ep= 171 avg_r=[ 2.1000e+00 -3.7355e+03] mode_sw=3 sps=32
+  [uniform] step= 172000 ep= 172 avg_r=[ 1.8000e+00 -3.6228e+03] mode_sw=3 sps=32
+  [uniform] step= 173000 ep= 173 avg_r=[ 2.3000e+00 -3.5059e+03] mode_sw=3 sps=32
+  [uniform] step= 174000 ep= 174 avg_r=[ 2.6000e+00 -3.3261e+03] mode_sw=3 sps=32
+  [uniform] step= 175000 ep= 175 avg_r=[ 2.3000e+00 -3.1619e+03] mode_sw=3 sps=32
+  [uniform] step= 176000 ep= 176 avg_r=[    4.4 -2881.9] mode_sw=3 sps=32
+  [uniform] step= 177000 ep= 177 avg_r=[    5.5 -2589.4] mode_sw=3 sps=32
+  [uniform] step= 178000 ep= 178 avg_r=[    5.5 -2314.7] mode_sw=3 sps=32
+  [uniform] step= 179000 ep= 179 avg_r=[    5.5 -2081.4] mode_sw=3 sps=32
+  [uniform] step= 180000 ep= 180 avg_r=[    5.8 -2121.6] mode_sw=3 sps=32
+  [uniform] EVAL step=180000: Pareto range obj0=[-9.0, 3.3] obj1=[-3927.1, -160.7]
+  [uniform] step= 181000 ep= 181 avg_r=[    4.7 -2302.4] mode_sw=3 sps=32
+  [uniform] step= 182000 ep= 182 avg_r=[    4.8 -2513.7] mode_sw=3 sps=32
+  [uniform] step= 183000 ep= 183 avg_r=[    4.8 -2787.9] mode_sw=3 sps=32
+  [uniform] step= 184000 ep= 184 avg_r=[    4.9 -3042. ] mode_sw=3 sps=32
+  [uniform] step= 185000 ep= 185 avg_r=[    4.3 -3028. ] mode_sw=3 sps=32
+  [uniform] step= 186000 ep= 186 avg_r=[    3.5 -3034.9] mode_sw=3 sps=32
+  [uniform] step= 187000 ep= 187 avg_r=[ 2.5000e+00 -3.0135e+03] mode_sw=3 sps=32
+  [uniform] step= 188000 ep= 188 avg_r=[ 2.3000e+00 -2.9693e+03] mode_sw=3 sps=32
+  [uniform] step= 189000 ep= 189 avg_r=[ 1.4000e+00 -2.9889e+03] mode_sw=3 sps=32
+  [uniform] step= 190000 ep= 190 avg_r=[ 9.0000e-01 -2.9972e+03] mode_sw=3 sps=32
+  [uniform] step= 191000 ep= 191 avg_r=[ 7.0000e-01 -3.0144e+03] mode_sw=3 sps=32
+  [uniform] step= 192000 ep= 192 avg_r=[ 5.000e-01 -3.038e+03] mode_sw=3 sps=32
+  [uniform] step= 193000 ep= 193 avg_r=[ 4.0000e-01 -3.0789e+03] mode_sw=3 sps=32
+  [uniform] step= 194000 ep= 194 avg_r=[ 9.0000e-01 -3.0922e+03] mode_sw=3 sps=32
+  [uniform] step= 195000 ep= 195 avg_r=[   21.2 -2646.9] mode_sw=4 sps=32
+  [uniform] step= 196000 ep= 196 avg_r=[   26.8 -2113.7] mode_sw=4 sps=32
+  [uniform] step= 197000 ep= 197 avg_r=[   27.3 -1611.6] mode_sw=4 sps=32
+  [uniform] step= 198000 ep= 198 avg_r=[    6.6 -1086. ] mode_sw=4 sps=32
+  [uniform] step= 199000 ep= 199 avg_r=[  38.1 -538.1] mode_sw=4 sps=32
+  [uniform] step= 200000 ep= 200 avg_r=[  55.  -453.3] mode_sw=4 sps=32
+  [uniform] EVAL step=200000: Pareto range obj0=[-5.8, 58.3] obj1=[-4158.5, -327.0]
+[uniform] Saved to results/bamor_mujoco/mo_halfcheetah_v5/uniform_seed1.json
+
+============================================================
+  Method: uniform  Env: mo-halfcheetah-v5  Seed: 2
+============================================================
+[uniform] env=mo-halfcheetah-v5, obs=17, act=6, rew=2, modes=3
+  [uniform] step=   1000 ep=   1 avg_r=[   -9.4 -5908. ] mode_sw=0 sps=1000
+  [uniform] step=   2000 ep=   2 avg_r=[ 4.0000e+00 -5.9936e+03] mode_sw=0 sps=2000
+  [uniform] step=   3000 ep=   3 avg_r=[-2.0000e+00 -6.0254e+03] mode_sw=0 sps=3000
+  [uniform] step=   4000 ep=   4 avg_r=[ 2.4000e+00 -6.0193e+03] mode_sw=0 sps=4000
+  [uniform] step=   5000 ep=   5 avg_r=[ 3.0000e-01 -6.0192e+03] mode_sw=0 sps=4423
+  [uniform] step=   6000 ep=   6 avg_r=[ 2.4000e+00 -5.9817e+03] mode_sw=0 sps=210
+  [uniform] step=   7000 ep=   7 avg_r=[ 4.0000e-01 -5.4109e+03] mode_sw=0 sps=122
+  [uniform] step=   8000 ep=   8 avg_r=[ 3.500e+00 -4.508e+03] mode_sw=0 sps=91
+  [uniform] step=   9000 ep=   9 avg_r=[ 6.0000e-01 -3.6066e+03] mode_sw=0 sps=80
+  [uniform] step=  10000 ep=  10 avg_r=[    3.4 -2685.3] mode_sw=0 sps=74
+  [uniform] step=  11000 ep=  11 avg_r=[    4.6 -1834.4] mode_sw=0 sps=69
+  [uniform] step=  12000 ep=  12 avg_r=[    3.9 -1454.6] mode_sw=0 sps=65
+  [uniform] step=  13000 ep=  13 avg_r=[    5.2 -1423.2] mode_sw=0 sps=61
+  [uniform] step=  14000 ep=  14 avg_r=[    6.3 -1403.4] mode_sw=0 sps=59
+  [uniform] step=  15000 ep=  15 avg_r=[    5.9 -1403. ] mode_sw=0 sps=57
+  [uniform] step=  16000 ep=  16 avg_r=[    5.8 -1401.4] mode_sw=0 sps=55
+  [uniform] step=  17000 ep=  17 avg_r=[    5.8 -1434.5] mode_sw=0 sps=54
+  [uniform] step=  18000 ep=  18 avg_r=[    5.1 -1466.9] mode_sw=0 sps=53
+  [uniform] step=  19000 ep=  19 avg_r=[    5.  -1494.4] mode_sw=0 sps=52
+  [uniform] step=  20000 ep=  20 avg_r=[    5.4 -1524.7] mode_sw=0 sps=51
+  [uniform] EVAL step=20000: Pareto range obj0=[-0.3, 0.1] obj1=[-255.6, -69.2]
+  [uniform] step=  21000 ep=  21 avg_r=[    6.  -1556.6] mode_sw=0 sps=44
+  [uniform] step=  22000 ep=  22 avg_r=[    6.1 -1585.4] mode_sw=0 sps=44
+  [uniform] step=  23000 ep=  23 avg_r=[    5.8 -1578.3] mode_sw=0 sps=44
+  [uniform] step=  24000 ep=  24 avg_r=[    5.9 -1586.5] mode_sw=0 sps=44
+  [uniform] step=  25000 ep=  25 avg_r=[    6.2 -1604.2] mode_sw=0 sps=44
+  [uniform] step=  26000 ep=  26 avg_r=[    5.7 -1609.7] mode_sw=0 sps=44
+  [uniform] step=  27000 ep=  27 avg_r=[    5.6 -1633.9] mode_sw=0 sps=43
+  [uniform] step=  28000 ep=  28 avg_r=[    6.4 -1642.5] mode_sw=0 sps=43
+  [uniform] step=  29000 ep=  29 avg_r=[    5.7 -1632.8] mode_sw=0 sps=43
+  [uniform] step=  30000 ep=  30 avg_r=[    5.1 -1629.7] mode_sw=0 sps=43
+  [uniform] step=  31000 ep=  31 avg_r=[    4.8 -1631. ] mode_sw=0 sps=43
+  [uniform] step=  32000 ep=  32 avg_r=[    4.5 -1601. ] mode_sw=0 sps=43
+  [uniform] step=  33000 ep=  33 avg_r=[    4.  -1604.3] mode_sw=0 sps=42
+  [uniform] step=  34000 ep=  34 avg_r=[    4.3 -1638.4] mode_sw=0 sps=42
+  [uniform] step=  35000 ep=  35 avg_r=[    3.8 -1640.7] mode_sw=0 sps=42
+  [uniform] step=  36000 ep=  36 avg_r=[    3.  -1637.7] mode_sw=0 sps=42
+  [uniform] step=  37000 ep=  37 avg_r=[    3.3 -1647.4] mode_sw=0 sps=42
+  [uniform] step=  38000 ep=  38 avg_r=[    3.5 -1654. ] mode_sw=0 sps=42
+  [uniform] step=  39000 ep=  39 avg_r=[    2.9 -1646.8] mode_sw=0 sps=42
+  [uniform] step=  40000 ep=  40 avg_r=[    3.2 -1655.6] mode_sw=0 sps=42
+  [uniform] EVAL step=40000: Pareto range obj0=[-1.2, 1.6] obj1=[-337.7, -15.5]
+  [uniform] step=  41000 ep=  41 avg_r=[    3.5 -1643.2] mode_sw=0 sps=39
+  [uniform] step=  42000 ep=  42 avg_r=[    2.9 -1643.9] mode_sw=0 sps=39
+  [uniform] step=  43000 ep=  43 avg_r=[    2.  -1638.5] mode_sw=0 sps=40
+  [uniform] step=  44000 ep=  44 avg_r=[    2.6 -1621.3] mode_sw=0 sps=40
+  [uniform] step=  45000 ep=  45 avg_r=[    2.3 -1604.6] mode_sw=0 sps=40
+  [uniform] step=  46000 ep=  46 avg_r=[    2.2 -1605.7] mode_sw=0 sps=40
+  [uniform] step=  47000 ep=  47 avg_r=[    2.8 -1587.3] mode_sw=0 sps=40
+  [uniform] step=  48000 ep=  48 avg_r=[    3.  -1575.1] mode_sw=0 sps=40
+  [uniform] step=  49000 ep=  49 avg_r=[    2.5 -1592.5] mode_sw=0 sps=40
+  [uniform] step=  50000 ep=  50 avg_r=[    2.3 -1569.8] mode_sw=0 sps=40
+  [uniform] step=  51000 ep=  51 avg_r=[    2.3 -1589.4] mode_sw=0 sps=40
+  [uniform] step=  52000 ep=  52 avg_r=[    2. -1605.] mode_sw=0 sps=40
+  [uniform] step=  53000 ep=  53 avg_r=[   20.2 -1424.4] mode_sw=1 sps=40
+  [uniform] step=  54000 ep=  54 avg_r=[   39.9 -1126. ] mode_sw=1 sps=40
+  [uniform] step=  55000 ep=  55 avg_r=[  30.2 -862.2] mode_sw=1 sps=40
+  [uniform] step=  56000 ep=  56 avg_r=[  43.9 -561.1] mode_sw=1 sps=40
+  [uniform] step=  57000 ep=  57 avg_r=[  27.5 -267.3] mode_sw=1 sps=40
+  [uniform] step=  58000 ep=  58 avg_r=[  -1.1 -173.4] mode_sw=1 sps=40
+  [uniform] step=  59000 ep=  59 avg_r=[ -21.5 -176. ] mode_sw=1 sps=40
+  [uniform] step=  60000 ep=  60 avg_r=[  -3.7 -176.6] mode_sw=1 sps=40
+  [uniform] EVAL step=60000: Pareto range obj0=[-9.2, 5.3] obj1=[-97.9, -16.0]
+  [uniform] step=  61000 ep=  61 avg_r=[  -7.9 -179. ] mode_sw=1 sps=38
+  [uniform] step=  62000 ep=  62 avg_r=[  10.3 -178.4] mode_sw=1 sps=38
+  [uniform] step=  63000 ep=  63 avg_r=[  20.  -179.3] mode_sw=1 sps=38
+  [uniform] step=  64000 ep=  64 avg_r=[  20.9 -178.7] mode_sw=1 sps=38
+  [uniform] step=  65000 ep=  65 avg_r=[  17.5 -181.5] mode_sw=1 sps=38
+  [uniform] step=  66000 ep=  66 avg_r=[  28.1 -185. ] mode_sw=1 sps=38
+  [uniform] step=  67000 ep=  67 avg_r=[  68.3 -186.4] mode_sw=1 sps=39
+  [uniform] step=  68000 ep=  68 avg_r=[  74.7 -188.4] mode_sw=1 sps=39
+  [uniform] step=  69000 ep=  69 avg_r=[  97.4 -192.5] mode_sw=1 sps=39
+  [uniform] step=  70000 ep=  70 avg_r=[ 171.7 -195.9] mode_sw=1 sps=39
+  [uniform] step=  71000 ep=  71 avg_r=[ 249.  -196.8] mode_sw=1 sps=39
+  [uniform] step=  72000 ep=  72 avg_r=[ 245.2 -203.7] mode_sw=1 sps=39
+  [uniform] step=  73000 ep=  73 avg_r=[ 303.9 -207. ] mode_sw=1 sps=39
+  [uniform] step=  74000 ep=  74 avg_r=[ 333.9 -207.5] mode_sw=1 sps=39
+  [uniform] step=  75000 ep=  75 avg_r=[ 316.7 -206.5] mode_sw=1 sps=39
+  [uniform] step=  76000 ep=  76 avg_r=[ 288.6 -209.9] mode_sw=1 sps=39
+  [uniform] step=  77000 ep=  77 avg_r=[ 317.8 -207.9] mode_sw=1 sps=39
+  [uniform] step=  78000 ep=  78 avg_r=[ 362.1 -207.5] mode_sw=1 sps=39
+  [uniform] step=  79000 ep=  79 avg_r=[ 363.  -216.7] mode_sw=1 sps=39
+  [uniform] step=  80000 ep=  80 avg_r=[ 401.6 -220.9] mode_sw=1 sps=39
+  [uniform] EVAL step=80000: Pareto range obj0=[-26.9, 55.0] obj1=[-941.7, -50.8]
+  [uniform] step=  81000 ep=  81 avg_r=[ 398.3 -221.4] mode_sw=1 sps=38
+  [uniform] step=  82000 ep=  82 avg_r=[ 454.2 -223.5] mode_sw=1 sps=38
+  [uniform] step=  83000 ep=  83 avg_r=[ 432.5 -227.9] mode_sw=1 sps=38
+  [uniform] step=  84000 ep=  84 avg_r=[ 403.1 -228.9] mode_sw=1 sps=38
+  [uniform] step=  85000 ep=  85 avg_r=[ 333.3 -236. ] mode_sw=1 sps=38
+  [uniform] step=  86000 ep=  86 avg_r=[ 304. -246.] mode_sw=1 sps=38
+  [uniform] step=  87000 ep=  87 avg_r=[ 219.4 -258.7] mode_sw=1 sps=38
+  [uniform] step=  88000 ep=  88 avg_r=[ 212.6 -271.3] mode_sw=1 sps=38
+  [uniform] step=  89000 ep=  89 avg_r=[ 237.7 -277.2] mode_sw=1 sps=38
+  [uniform] step=  90000 ep=  90 avg_r=[ 297.  -272.8] mode_sw=1 sps=38
+  [uniform] step=  91000 ep=  91 avg_r=[ 335.  -278.5] mode_sw=1 sps=38
+  [uniform] step=  92000 ep=  92 avg_r=[ 343.3 -287.9] mode_sw=1 sps=38
+  [uniform] step=  93000 ep=  93 avg_r=[ 313.7 -296.6] mode_sw=1 sps=38
+  [uniform] step=  94000 ep=  94 avg_r=[ 311.5 -301.2] mode_sw=1 sps=38
+  [uniform] step=  95000 ep=  95 avg_r=[ 316.6 -307.8] mode_sw=1 sps=38
+  [uniform] step=  96000 ep=  96 avg_r=[ 286.  -309.7] mode_sw=1 sps=38
+  [uniform] step=  97000 ep=  97 avg_r=[ 297.5 -302.5] mode_sw=1 sps=38
+  [uniform] step=  98000 ep=  98 avg_r=[ 333.2 -297.4] mode_sw=1 sps=38
+  [uniform] step=  99000 ep=  99 avg_r=[ 405.5 -286. ] mode_sw=1 sps=38
+  [uniform] step= 100000 ep= 100 avg_r=[ 403.6 -309.8] mode_sw=2 sps=38
+  [uniform] EVAL step=100000: Pareto range obj0=[-3.3, 9.5] obj1=[-5005.3, -133.3]
+  [uniform] step= 101000 ep= 101 avg_r=[ 365.1 -395.2] mode_sw=2 sps=37
+  [uniform] step= 102000 ep= 102 avg_r=[ 315.  -479.1] mode_sw=2 sps=37
+  [uniform] step= 103000 ep= 103 avg_r=[ 243.4 -560.7] mode_sw=2 sps=37
+  [uniform] step= 104000 ep= 104 avg_r=[ 144.3 -684.4] mode_sw=2 sps=37
+  [uniform] step= 105000 ep= 105 avg_r=[  71.  -747.1] mode_sw=2 sps=37
+  [uniform] step= 106000 ep= 106 avg_r=[  80.9 -741.6] mode_sw=2 sps=38
+  [uniform] step= 107000 ep= 107 avg_r=[  98.4 -743.7] mode_sw=2 sps=38
+  [uniform] step= 108000 ep= 108 avg_r=[ 125.7 -743.5] mode_sw=2 sps=38
+  [uniform] step= 109000 ep= 109 avg_r=[ 142.1 -708. ] mode_sw=2 sps=38
+  [uniform] step= 110000 ep= 110 avg_r=[ 156.1 -748.7] mode_sw=2 sps=38
+  [uniform] step= 111000 ep= 111 avg_r=[ 178.5 -748.9] mode_sw=2 sps=38
+  [uniform] step= 112000 ep= 112 avg_r=[ 185.  -754.4] mode_sw=2 sps=38
+  [uniform] step= 113000 ep= 113 avg_r=[ 166.8 -937.6] mode_sw=2 sps=38
+  [uniform] step= 114000 ep= 114 avg_r=[ 159.  -986.6] mode_sw=2 sps=38
+  [uniform] step= 115000 ep= 115 avg_r=[ 139.1 -968.8] mode_sw=2 sps=38
+  [uniform] step= 116000 ep= 116 avg_r=[  117.1 -1117.7] mode_sw=2 sps=38
+  [uniform] step= 117000 ep= 117 avg_r=[   99.2 -1135. ] mode_sw=2 sps=38
+  [uniform] step= 118000 ep= 118 avg_r=[ 110.4 -991.2] mode_sw=2 sps=38
+  [uniform] step= 119000 ep= 119 avg_r=[ 104.1 -954.6] mode_sw=2 sps=38
+  [uniform] step= 120000 ep= 120 avg_r=[ 125.1 -982.2] mode_sw=2 sps=38
+  [uniform] EVAL step=120000: Pareto range obj0=[-0.4, 4.4] obj1=[-5165.6, -149.9]
+  [uniform] step= 121000 ep= 121 avg_r=[ 151.2 -841.6] mode_sw=2 sps=38
+  [uniform] step= 122000 ep= 122 avg_r=[ 171.6 -858.4] mode_sw=2 sps=38
+  [uniform] step= 123000 ep= 123 avg_r=[ 176.7 -851.3] mode_sw=2 sps=38
+  [uniform] step= 124000 ep= 124 avg_r=[ 177.  -854.6] mode_sw=2 sps=38
+  [uniform] step= 125000 ep= 125 avg_r=[ 171.2 -808.7] mode_sw=2 sps=38
+  [uniform] step= 126000 ep= 126 avg_r=[ 148.8 -796.8] mode_sw=2 sps=38
+  [uniform] step= 127000 ep= 127 avg_r=[ 142.8 -754.5] mode_sw=2 sps=38
+  [uniform] step= 128000 ep= 128 avg_r=[ 131.5 -709.8] mode_sw=2 sps=38
+  [uniform] step= 129000 ep= 129 avg_r=[ 133.3 -692.3] mode_sw=2 sps=38
+  [uniform] step= 130000 ep= 130 avg_r=[ 124.8 -679.7] mode_sw=2 sps=38
+  [uniform] step= 131000 ep= 131 avg_r=[ 136.2 -674.8] mode_sw=2 sps=38
+  [uniform] step= 132000 ep= 132 avg_r=[ 128.7 -669.4] mode_sw=2 sps=38
+  [uniform] step= 133000 ep= 133 avg_r=[ 137.7 -673.8] mode_sw=2 sps=38
+  [uniform] step= 134000 ep= 134 avg_r=[ 143.5 -671.6] mode_sw=2 sps=39
+  [uniform] step= 135000 ep= 135 avg_r=[ 157.9 -676.4] mode_sw=2 sps=39
+  [uniform] step= 136000 ep= 136 avg_r=[ 162.  -680.8] mode_sw=2 sps=39
+  [uniform] step= 137000 ep= 137 avg_r=[ 173.4 -681.3] mode_sw=2 sps=39
+  [uniform] step= 138000 ep= 138 avg_r=[ 163.2 -688. ] mode_sw=2 sps=39
+  [uniform] step= 139000 ep= 139 avg_r=[ 163.4 -689.6] mode_sw=2 sps=39
+  [uniform] step= 140000 ep= 140 avg_r=[ 149.6 -697. ] mode_sw=2 sps=39
+  [uniform] EVAL step=140000: Pareto range obj0=[-229.3, 298.7] obj1=[-90.2, -10.0]
+  [uniform] step= 141000 ep= 141 avg_r=[ 138.2 -700.3] mode_sw=2 sps=39
+  [uniform] step= 142000 ep= 142 avg_r=[ 144.9 -699.5] mode_sw=2 sps=39
+  [uniform] step= 143000 ep= 143 avg_r=[ 154.  -695.7] mode_sw=2 sps=39
+  [uniform] step= 144000 ep= 144 avg_r=[ 158.6 -693.5] mode_sw=2 sps=39
+  [uniform] step= 145000 ep= 145 avg_r=[ 172.8 -681.2] mode_sw=2 sps=39
+  [uniform] step= 146000 ep= 146 avg_r=[ 191.6 -677.1] mode_sw=2 sps=39
+  [uniform] step= 147000 ep= 147 avg_r=[ 192.4 -673.9] mode_sw=2 sps=39
+  [uniform] step= 148000 ep= 148 avg_r=[ 190.2 -675.6] mode_sw=2 sps=39
+  [uniform] step= 149000 ep= 149 avg_r=[ 195.3 -679.8] mode_sw=2 sps=39
+  [uniform] step= 150000 ep= 150 avg_r=[ 198.3 -686.4] mode_sw=2 sps=39
+  [uniform] step= 151000 ep= 151 avg_r=[ 192.4 -693. ] mode_sw=2 sps=39
+  [uniform] step= 152000 ep= 152 avg_r=[ 179.1 -843.1] mode_sw=3 sps=39
+  [uniform] step= 153000 ep= 153 avg_r=[  149.8 -1180.3] mode_sw=3 sps=39
+  [uniform] step= 154000 ep= 154 avg_r=[  113.2 -1522.5] mode_sw=3 sps=39
+  [uniform] step= 155000 ep= 155 avg_r=[   79.1 -1841.7] mode_sw=3 sps=39
+  [uniform] step= 156000 ep= 156 avg_r=[   47.  -2148.1] mode_sw=3 sps=39
+  [uniform] step= 157000 ep= 157 avg_r=[   25.1 -2339.6] mode_sw=3 sps=39
+  [uniform] step= 158000 ep= 158 avg_r=[   24.6 -2325.3] mode_sw=3 sps=39
+  [uniform] step= 159000 ep= 159 avg_r=[   24.7 -2295.9] mode_sw=3 sps=40
+  [uniform] step= 160000 ep= 160 avg_r=[   24.2 -2296.4] mode_sw=3 sps=40
+  [uniform] EVAL step=160000: Pareto range obj0=[-44.5, 77.7] obj1=[-254.7, -33.9]
+  [uniform] step= 161000 ep= 161 avg_r=[   24.4 -2298.2] mode_sw=3 sps=39
+  [uniform] step= 162000 ep= 162 avg_r=[   24.1 -2286.9] mode_sw=3 sps=39
+  [uniform] step= 163000 ep= 163 avg_r=[   23.8 -2286. ] mode_sw=3 sps=39
+  [uniform] step= 164000 ep= 164 avg_r=[   21.  -2390.5] mode_sw=3 sps=39
+  [uniform] step= 165000 ep= 165 avg_r=[   20.8 -2395.9] mode_sw=3 sps=39
+  [uniform] step= 166000 ep= 166 avg_r=[   19.4 -2413. ] mode_sw=3 sps=40
+  [uniform] step= 167000 ep= 167 avg_r=[   18.4 -2403.7] mode_sw=3 sps=40
+  [uniform] step= 168000 ep= 168 avg_r=[   18.7 -2406.2] mode_sw=3 sps=40
+  [uniform] step= 169000 ep= 169 avg_r=[   21.2 -2308. ] mode_sw=3 sps=40
+  [uniform] step= 170000 ep= 170 avg_r=[   21.5 -2299.7] mode_sw=3 sps=40
+  [uniform] step= 171000 ep= 171 avg_r=[   21.1 -2277.3] mode_sw=3 sps=40
+  [uniform] step= 172000 ep= 172 avg_r=[   19.2 -2470. ] mode_sw=3 sps=40
+  [uniform] step= 173000 ep= 173 avg_r=[   18.9 -2450.6] mode_sw=3 sps=40
+  [uniform] step= 174000 ep= 174 avg_r=[   20.4 -2457.6] mode_sw=3 sps=40
+  [uniform] step= 175000 ep= 175 avg_r=[   21.  -2488.9] mode_sw=3 sps=40
+  [uniform] step= 176000 ep= 176 avg_r=[   21.8 -2497.6] mode_sw=3 sps=40
+  [uniform] step= 177000 ep= 177 avg_r=[   24.4 -2327.1] mode_sw=3 sps=40
+  [uniform] step= 178000 ep= 178 avg_r=[   25.  -2363.9] mode_sw=3 sps=40
+  [uniform] step= 179000 ep= 179 avg_r=[   23.8 -2358.6] mode_sw=3 sps=40
+  [uniform] step= 180000 ep= 180 avg_r=[   23.8 -2358.5] mode_sw=3 sps=40
+  [uniform] EVAL step=180000: Pareto range obj0=[-0.6, 33.6] obj1=[-438.5, -128.6]
+  [uniform] step= 181000 ep= 181 avg_r=[   24.2 -2375.8] mode_sw=3 sps=40
+  [uniform] step= 182000 ep= 182 avg_r=[   24.9 -2365.6] mode_sw=3 sps=40
+  [uniform] step= 183000 ep= 183 avg_r=[   25.9 -2358.9] mode_sw=3 sps=40
+  [uniform] step= 184000 ep= 184 avg_r=[   27.1 -2368.2] mode_sw=3 sps=40
+  [uniform] step= 185000 ep= 185 avg_r=[   27.7 -2343.4] mode_sw=3 sps=40
+  [uniform] step= 186000 ep= 186 avg_r=[   28.4 -2335.3] mode_sw=3 sps=40
+  [uniform] step= 187000 ep= 187 avg_r=[   27.6 -2349.6] mode_sw=3 sps=40
+  [uniform] step= 188000 ep= 188 avg_r=[   25.9 -2361. ] mode_sw=3 sps=40
+  [uniform] step= 189000 ep= 189 avg_r=[   23.8 -2366.7] mode_sw=3 sps=40
+  [uniform] step= 190000 ep= 190 avg_r=[   22.3 -2642.1] mode_sw=3 sps=40
+  [uniform] step= 191000 ep= 191 avg_r=[   21.6 -2786.1] mode_sw=3 sps=40
+  [uniform] step= 192000 ep= 192 avg_r=[   21.9 -2771.1] mode_sw=3 sps=40
+  [uniform] step= 193000 ep= 193 avg_r=[   22.  -3031.4] mode_sw=3 sps=40
+  [uniform] step= 194000 ep= 194 avg_r=[   23.9 -3034.3] mode_sw=3 sps=40
+  [uniform] step= 195000 ep= 195 avg_r=[   23.5 -2741.6] mode_sw=3 sps=40
+  [uniform] step= 196000 ep= 196 avg_r=[   23.6 -2601.1] mode_sw=3 sps=40
+  [uniform] step= 197000 ep= 197 avg_r=[   21.6 -2981. ] mode_sw=3 sps=40
+  [uniform] step= 198000 ep= 198 avg_r=[   21.  -2696.3] mode_sw=3 sps=40
+  [uniform] step= 199000 ep= 199 avg_r=[   20.3 -2712.4] mode_sw=3 sps=41
+  [uniform] step= 200000 ep= 200 avg_r=[  182.5 -2341.5] mode_sw=4 sps=41
+  [uniform] EVAL step=200000: Pareto range obj0=[-49.6, 4.7] obj1=[-4961.4, -92.6]
+[uniform] Saved to results/bamor_mujoco/mo_halfcheetah_v5/uniform_seed2.json
+
+✅ All experiments complete. Results in results/bamor_mujoco/mo_halfcheetah_v5/

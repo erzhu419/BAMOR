@@ -1,0 +1,35 @@
+
+============================================================
+  bamor  seed=0
+============================================================
+  [bamor] ep=  20 step=  4000 avg_r=[+44.3,+829.9] corr=-0.95 Δl/Δg=0.0/0.0(0.00) switches=59
+  [bamor] ep=  40 step=  8000 avg_r=[+34.2,+834.9] corr=-0.85 Δl/Δg=0.0/0.0(0.00) switches=119
+  [bamor] ep=  60 step= 12000 avg_r=[+283.5,+701.1] corr=-0.33 Δl/Δg=0.0/0.0(0.00) switches=179
+  [bamor] ep=  80 step= 16000 avg_r=[+287.3,+703.1] corr=+0.59 Δl/Δg=0.0/0.0(0.00) switches=239
+  [bamor] ep= 100 step= 20000 avg_r=[+293.0,+709.3] corr=+0.24 Δl/Δg=0.0/0.0(0.00) switches=299
+
+  [bamor] Final per-mode Pareto:
+    Mode 0: safety=[+481.96,+600.29] progress=[+6.50,+110.60] corr=-0.08
+    Mode 1: safety=[-0.48,+1.67] progress=[+1417.94,+1430.92] corr=-0.34
+    Mode 2: safety=[+51.31,+291.16] progress=[+22.87,+747.06] corr=-0.59
+  [bamor] Saved to results/synthetic_arc/bamor_seed0.json
+
+============================================================
+  bamor_nc  seed=0
+============================================================
+  [bamor_nc] ep=  20 step=  4000 avg_r=[+50.8,+820.9] corr=-0.95 Δl/Δg=0.0/0.0(0.00) switches=59
+  [bamor_nc] ep=  40 step=  8000 avg_r=[+78.9,+810.6] corr=-0.97 Δl/Δg=0.0/0.0(0.00) switches=119
+  [bamor_nc] ep=  60 step= 12000 avg_r=[+142.6,+767.9] corr=-0.97 Δl/Δg=0.0/0.0(0.00) switches=179
+  [bamor_nc] ep=  80 step= 16000 avg_r=[+281.8,+401.0] corr=-0.99 Δl/Δg=0.0/0.0(0.00) switches=239
+  [bamor_nc] ep= 100 step= 20000 avg_r=[+172.9,+540.0] corr=-0.99 Δl/Δg=0.0/0.0(0.00) switches=299
+
+  [bamor_nc] Final per-mode Pareto:
+    Mode 0: safety=[+29.16,+600.59] progress=[+8.65,+245.30] corr=-0.99
+    Mode 1: safety=[-0.63,+59.56] progress=[+4.86,+1433.15] corr=-0.99
+    Mode 2: safety=[+49.95,+283.34] progress=[+22.48,+749.41] corr=-0.98
+  [bamor_nc] Saved to results/synthetic_arc/bamor_nc_seed0.json
+
+============================================================
+  bamor_ns  seed=0
+============================================================
+  [bamor_ns] ep=  20 step=  4000 avg_r=[+56.3,+824.0] corr=-0.89 Δl/Δg=0.0/0.0(0.00) switches=59

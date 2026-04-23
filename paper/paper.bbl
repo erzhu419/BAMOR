@@ -1,0 +1,100 @@
+\begin{thebibliography}{14}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Adams and MacKay(2007)]{Adams2007BOCD}
+Ryan~P Adams and David~JC MacKay.
+\newblock Bayesian online changepoint detection.
+\newblock \emph{arXiv preprint arXiv:0710.3742}, 2007.
+
+\bibitem[Alegre et~al.(2023)Alegre, Bazzan, Roijers, Nowé, and
+  da~Silva]{Alegre2023GPILS}
+Lucas~N Alegre, Ana~LC Bazzan, Diederik~M Roijers, Ann Nowé, and Bruno~C
+  da~Silva.
+\newblock Sample-efficient multi-objective learning via generalized policy
+  improvement prioritization.
+\newblock In \emph{International Conference on Autonomous Agents and Multiagent
+  Systems}, 2023.
+
+\bibitem[Authors(2020)]{MOCMDP2020}
+Various Authors.
+\newblock Multi-objective contextual {Markov} decision processes.
+\newblock \emph{arXiv preprint}, 2020.
+
+\bibitem[Authors(2024)]{PRO2024}
+Various Authors.
+\newblock Preference orchestrator for {LLM} alignment.
+\newblock \emph{arXiv preprint}, 2024.
+\newblock Prompt-specific weight inference for multi-objective LLM alignment.
+
+\bibitem[Haarnoja et~al.(2018)Haarnoja, Zhou, Abbeel, and
+  Levine]{Haarnoja2018SAC}
+Tuomas Haarnoja, Aurick Zhou, Pieter Abbeel, and Sergey Levine.
+\newblock Soft actor-critic: Off-policy maximum entropy deep reinforcement
+  learning with a stochastic actor.
+\newblock In \emph{International Conference on Machine Learning}, 2018.
+
+\bibitem[Hayes et~al.(2022)Hayes, R{\u{a}}dulescu, Bargiacchi,
+  K{\"a}llstr{\"o}m, Macfarlane, Reymond, Verstraeten, Zintgraf, Dazeley,
+  Heintz, et~al.]{Hayes2022MORL}
+Conor~F Hayes, Roxana R{\u{a}}dulescu, Eugenio Bargiacchi, Johan
+  K{\"a}llstr{\"o}m, Matthew Macfarlane, Mathieu Reymond, Timothy Verstraeten,
+  Luisa~M Zintgraf, Richard Dazeley, Fredrik Heintz, et~al.
+\newblock A practical guide to multi-objective reinforcement learning and
+  planning.
+\newblock \emph{Autonomous Agents and Multi-Agent Systems}, 36\penalty0
+  (1):\penalty0 26, 2022.
+
+\bibitem[Lecarpentier and Rachelson(2019)]{Lecarpentier2019NonStationary}
+Erwan Lecarpentier and Emmanuel Rachelson.
+\newblock Non-stationary markov decision processes: A worst-case approach using
+  model-based reinforcement learning.
+\newblock In \emph{Advances in Neural Information Processing Systems}, 2019.
+
+\bibitem[Lu et~al.(2023)Lu, Herman, and Bhatt]{Lu2023CAPQL}
+Haoye Lu, Daniel Herman, and Yaoliang Bhatt.
+\newblock Multi-objective reinforcement learning: Convexity, stationarity and
+  pareto optimality.
+\newblock In \emph{International Conference on Learning Representations}, 2023.
+
+\bibitem[Padakandla(2020)]{Padakandla2020Survey}
+Sindhu Padakandla.
+\newblock A survey of reinforcement learning algorithms for dynamically varying
+  environments.
+\newblock \emph{ACM Computing Surveys}, 54\penalty0 (6):\penalty0 1--25, 2020.
+
+\bibitem[Trautmann et~al.(2013)Trautmann, Wagner, and Brockhoff]{R2EMOA2013}
+Heike Trautmann, Tobias Wagner, and Dimo Brockhoff.
+\newblock {R2-EMOA}: Focused multiobjective search using {R2}-indicator-based
+  selection.
+\newblock \emph{Learning and Intelligent Optimization}, pages 70--74, 2013.
+
+\bibitem[Wiesemann et~al.(2013)Wiesemann, Kuhn, and
+  Rustem]{Wiesemann2013RobustMDP}
+Wolfram Wiesemann, Daniel Kuhn, and Berç Rustem.
+\newblock Robust {Markov} decision processes.
+\newblock In \emph{Mathematics of Operations Research}, volume~38, pages
+  153--183, 2013.
+
+\bibitem[Yang et~al.(2019)Yang, Sun, and Narasimhan]{Yang2019Envelope}
+Runzhe Yang, Xingyuan Sun, and Karthik Narasimhan.
+\newblock A generalized algorithm for multi-objective reinforcement learning
+  and policy adaptation.
+\newblock In \emph{Advances in Neural Information Processing Systems}, 2019.
+
+\bibitem[Zhang and Zheng(2025{\natexlab{a}})]{Zhang2025BAPR}
+Yifan Zhang and Liang Zheng.
+\newblock {BAPR}: Bayesian amnesic piecewise-robust reinforcement learning for
+  non-stationary continuous control.
+\newblock \emph{arXiv preprint}, 2025{\natexlab{a}}.
+
+\bibitem[Zhang and Zheng(2025{\natexlab{b}})]{Zhang2025RESAC}
+Yifan Zhang and Liang Zheng.
+\newblock {RE-SAC}: Robust ensemble soft actor-critic with disentangled risk
+  quantification.
+\newblock \emph{arXiv preprint}, 2025{\natexlab{b}}.
+
+\end{thebibliography}
