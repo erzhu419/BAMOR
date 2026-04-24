@@ -205,8 +205,8 @@ def train_bamor_family(method, total_steps, switch_interval, seed, save_dir,
     bamor = None
     if method.startswith('bamor'):
         bamor = BAMORPipeline(num_modes=3, reward_dim=r_dim, gamma=gamma,
-                              surprise_threshold=5.0, concentration=20.0,
-                              switch_cooldown=250, warmup=150,
+                              surprise_threshold=7.0, concentration=20.0,
+                              switch_cooldown=290, warmup=150,
                               disable_surprise=(method == 'bamor_ns'),
                               disable_cone=(method == 'bamor_nc'))
 
@@ -314,6 +314,12 @@ def train_bamor_family(method, total_steps, switch_interval, seed, save_dir,
         log['pareto_per_mode'].append(pm)
         log['hv_per_mode'].append(hv_m)
         print(f'    Mode {m}: HV={hv_m:.2f}  corr={corr:+.2f}')
+
+    # Diagnostic: BAMOR's own detected-switch count (for comparison with env's true switches)
+    if bamor is not None:
+        log['bamor_switches_detected'] = int(getattr(bamor.belief_tracker, 'mode_switch_count', -1))
+        log['env_switches_true'] = len(log['mode_switches'])
+        print(f'    BAMOR detected {log["bamor_switches_detected"]} switches (env truth: {log["env_switches_true"]})')
 
     os.makedirs(save_dir, exist_ok=True)
     path = os.path.join(save_dir, f'{method}_seed{seed}.json')

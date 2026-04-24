@@ -24,7 +24,7 @@ MAX_CPU_PARALLEL=${MAX_CPU_PARALLEL:-$DEFAULT_CPU_PAR}
 read -ra METHODS <<< "${METHODS:-bamor bamor_nc bamor_ns uniform fixed}"
 read -ra SEEDS   <<< "${SEEDS:-0 1 2 3 4}"
 
-SAVE_DIR="bamor_experiments/server_$(date +%Y%m%d_%H%M%S)"
+SAVE_DIR="${SAVE_DIR:-bamor_experiments/server_$(date +%Y%m%d_%H%M%S)}"
 mkdir -p "$SAVE_DIR/logs"
 
 if $PY -c "import pymoo, morl_baselines" 2>/dev/null; then
@@ -44,9 +44,11 @@ echo "  max_cpu_parallel: $MAX_CPU_PARALLEL  (cpu cores = $NPROC)"
 echo "────────────────────────────────────────────────────────────────────────"
 
 pick_gpu() {
+    # Pick GPU with MOST free memory (≥ budget) — naturally load-balances across GPUs.
     local need=$(( MEM_PER_JOB_MB + SAFETY_MARGIN_MB ))
     nvidia-smi --query-gpu=index,memory.free --format=csv,noheader,nounits \
-        | tr -d ' ' | awk -F, -v need="$need" '$2 >= need {print $1; exit}'
+        | tr -d ' ' | awk -F, -v need="$need" '$2 >= need {print $2, $1}' \
+        | sort -rn | awk 'NR==1 {print $2}'
 }
 
 running_count() { jobs -rp | wc -l; }

@@ -30,7 +30,7 @@ MAX_CPU_PARALLEL=${MAX_CPU_PARALLEL:-$DEFAULT_CPU_PAR}
 read -ra METHODS <<< "${METHODS:-bamor bamor_nc bamor_ns uniform fixed}"
 read -ra SEEDS   <<< "${SEEDS:-0 1 2 3 4}"
 
-SAVE_DIR="../results/server_$(date +%Y%m%d_%H%M%S)"
+SAVE_DIR="${SAVE_DIR:-../results/server_$(date +%Y%m%d_%H%M%S)}"
 mkdir -p "$SAVE_DIR/logs"
 
 # Optional: include CAPQL if pymoo + morl-baselines are importable
@@ -52,10 +52,12 @@ echo "────────────────────────�
 
 # ── Helpers ────────────────────────────────────────────────────────────────
 pick_gpu() {
-    # Return the GPU index whose free memory ≥ required budget, or empty string.
+    # Return the GPU index with the MOST free memory (≥ required budget), or empty.
+    # Choosing max-free naturally load-balances across GPUs under parallel staggered launches.
     local need=$(( MEM_PER_JOB_MB + SAFETY_MARGIN_MB ))
     nvidia-smi --query-gpu=index,memory.free --format=csv,noheader,nounits \
-        | tr -d ' ' | awk -F, -v need="$need" '$2 >= need {print $1; exit}'
+        | tr -d ' ' | awk -F, -v need="$need" '$2 >= need {print $2, $1}' \
+        | sort -rn | awk 'NR==1 {print $2}'
 }
 
 running_count() { jobs -rp | wc -l; }
