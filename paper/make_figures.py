@@ -16,7 +16,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 HERE = Path(__file__).resolve().parent
-RESULTS_DIR = HERE.parent / 'results' / 'server_tuned20'
+RESULTS_DIR = HERE.parent / 'results' / 'server_curved20'
 
 PRETTY = {
     'bamor_ns': ('BAMOR-TC (ours)',     'tab:blue',   '-'),

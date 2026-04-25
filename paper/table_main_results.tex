@@ -1,16 +1,16 @@
 \begin{table}[t]
 \centering\small
-\caption{Final hypervolume on the synthetic non-stationary MO benchmark (20 seeds). ``BAMOR-TC (ours)'' is the recommended (B2) variant: Target Cone with frozen-uniform belief. ``BAMOR $+$ surprise'' enables the (B3) Mahalanobis online belief update. Mode anchors are $w_0{=}[0.85,0.15]$, $w_1{=}[0.15,0.85]$, $w_2{=}[0.5,0.5]$. Reference point $(-5,-5)$. Bold = column best. BAMOR-TC wins all four columns.}
+\caption{Final hypervolume on the synthetic non-stationary MO benchmark (20 seeds, curved-Pareto reward design). ``BAMOR-TC (ours)\textquoteright\textquoteright{} is the recommended (B2) variant: Target Cone with frozen-uniform belief. ``BAMOR $+$ surprise\textquoteright\textquoteright{} enables the (B3) Mahalanobis online belief update. Mode anchors: $w_0{=}[0.85,0.15]$, $w_1{=}[0.15,0.85]$, $w_2{=}[0.5,0.5]$. Reference $(-5,-5)$. Bold = column best.}}
 \label{tab:main_results}
 \begin{tabular}{lcccc}
 \toprule
 Method & HV overall & HV Mode 0 & HV Mode 1 & HV Mode 2 \\
 \midrule
-BAMOR-TC (ours) & \textbf{$137.0{\pm}20.9$} & $19.8{\pm}3.1$ & \textbf{$41.7{\pm}10.0$} & \textbf{$127.9{\pm}19.3$} \\
-BAMOR + surprise & $103.1{\pm}46.6$ & $19.8{\pm}5.4$ & $37.2{\pm}14.5$ & $93.7{\pm}50.4$ \\
-BAMOR $-$ Cone & $91.3{\pm}41.3$ & \textbf{$20.1{\pm}4.3$} & $32.5{\pm}13.9$ & $94.8{\pm}40.1$ \\
-Uniform-sampling & $116.9{\pm}45.2$ & $19.5{\pm}5.5$ & $39.2{\pm}15.7$ & $117.9{\pm}43.3$ \\
-Fixed-weight & $97.0{\pm}52.2$ & $10.9{\pm}6.7$ & $29.7{\pm}11.9$ & $86.6{\pm}50.3$ \\
+BAMOR-TC (ours) & \textbf{$136.2{\pm}23.6$} & \textbf{$22.8{\pm}3.4$} & \textbf{$40.7{\pm}9.5$} & \textbf{$130.1{\pm}26.5$} \\
+BAMOR $+$ surprise & $96.9{\pm}43.8$ & $21.0{\pm}4.9$ & $32.8{\pm}14.8$ & $101.9{\pm}48.5$ \\
+BAMOR $-$ Cone & $97.8{\pm}35.5$ & $22.6{\pm}2.5$ & $35.6{\pm}11.1$ & $110.5{\pm}35.8$ \\
+Uniform-sampling & $121.1{\pm}50.5$ & $21.0{\pm}6.2$ & $38.6{\pm}16.3$ & $119.2{\pm}50.1$ \\
+Fixed-weight & $104.6{\pm}58.3$ & $12.9{\pm}5.3$ & $28.0{\pm}15.5$ & $86.2{\pm}49.4$ \\
 \bottomrule
 \multicolumn{5}{l}{\footnotesize HV values in units of $10^3$; $\pm$ = one standard deviation.}
 \end{tabular}
