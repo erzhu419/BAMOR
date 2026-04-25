@@ -317,13 +317,20 @@ The Mahalanobis likelihood is strictly positive, so the normalisation $Z = \sum_
 \subsection{Substrate constraints and Target Cone}
 \label{sec:target_cone}
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.78\linewidth]{fig_submfld_hero.pdf}
+\caption{The piecewise Pareto sub-manifold structure that BAMOR-TC is designed to exploit, here recovered empirically from $20$ seeds on the synthetic non-stationary MO benchmark.  Each mode's achievable trade-off is a \emph{disjoint, narrow arc}: Mode 0 (red) is horizontal because progress is collapsed (any preference weight that demands progress earns nothing); Mode 1 (green) is vertical because safety is collapsed; Mode 2 (blue) is the only mode admitting a full elbow.  The classical assumption that the Pareto front is one globally smooth surface fails by inspection.  BAMOR's \emph{Target Cone} restricts the weight sampler to the relevant arc per mode (\S\ref{sec:framework}).}
+\label{fig:submfld_hero}
+\end{figure}
+
 \begin{definition}[Substrate Constraint]
 \label{def:substrate}
 An environment mode $h$ imposes a \emph{substrate constraint} on objective $i$ if the physical dynamics under mode $h$ bound the achievable improvement in objective $i$ regardless of the policy:
 \begin{equation}
     \max_\pi V_i^\pi(s) \le B_{h,i} \quad \text{for all } s \in \mathcal{S},
 \end{equation}
-where $B_{h,i}$ is a mode-dependent physical ceiling that may be much lower than the ceiling under other modes.
+where $B_{h,i}$ is a mode-dependent physical ceiling that may be much lower than the ceiling under other modes.  Fig.~\ref{fig:submfld_hero} shows what this looks like in practice: each mode's achievable returns lie on a different arc.
 \end{definition}
 
 \begin{definition}[Target Cone --- Lean: \texttt{ModeConeConstraint}]
