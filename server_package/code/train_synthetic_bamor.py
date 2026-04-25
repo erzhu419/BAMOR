@@ -127,43 +127,54 @@ def create_env(switch_interval=300, max_steps=200, seed=0):
     #   responsive obj → high std (varies with position),
     #   collapsed obj  → low std  (varies only with action, small scale).
     # Non-overlapping arcs are preserved by different pos→reward mappings per mode.
+    # Design principle (revised): both objectives depend on `pos` in EVERY mode,
+    # but each mode caps one objective much lower than the other (substrate cap).
+    # This produces a curved Pareto arc per mode—policy can trade safety for
+    # progress *within* the mode's substrate envelope—rather than a flat line.
+    #
+    # Mode 0 (safety zone): big safety ceiling, small progress ceiling.
+    #   Trade-off: the agent can leave origin to gain progress, but loses safety.
+    # Mode 1 (speed zone):  small safety ceiling, big progress ceiling.
+    # Mode 2 (balanced):    moderate ceilings on both, full elbow.
     modes = [
         SynModeConfig(
             name='safety_zone',
             reward_scale=np.array([1.0, 1.0]),
-            speed_multiplier=0.8,           # moderate: can reach pos≈3-4
+            speed_multiplier=0.8,
             noise_std=0.02,
             true_anchor=np.array([0.85, 0.15]),
             reward_fns=[
-                # Safety: RESPONSIVE — high baseline near origin, varies with pos
+                # Safety: large ceiling, peaks at origin
                 lambda pos, act: 3.0 * math.exp(-0.04 * pos**2),
-                # Progress: COLLAPSED — depends on action, tiny scale
-                lambda pos, act: 0.3 * (act + 1.0) / 2.0,
+                # Progress: small ceiling, but trades against safety via |pos|
+                # 0.05 * |pos| → max ~0.5/step at |pos|=10, far below safety's 3.0
+                lambda pos, act: 0.05 * abs(pos),
             ],
         ),
         SynModeConfig(
             name='speed_zone',
             reward_scale=np.array([1.0, 1.0]),
-            speed_multiplier=1.2,           # moderate-fast: can reach pos≈5-7
+            speed_multiplier=1.2,
             noise_std=0.04,
             true_anchor=np.array([0.15, 0.85]),
             reward_fns=[
-                # Safety: COLLAPSED — depends on action, tiny scale
-                lambda pos, act: 0.5 * (1.0 - (act + 1.0) / 2.0),
-                # Progress: RESPONSIVE — strong log, varies with pos
+                # Safety: small ceiling, peaks at origin (so policy can earn a
+                # little safety by approaching origin, sacrificing progress)
+                lambda pos, act: 0.4 * math.exp(-0.04 * pos**2),
+                # Progress: large ceiling, log in pos
                 lambda pos, act: 2.0 * math.log(max(pos, 0.01) + 1),
             ],
         ),
         SynModeConfig(
             name='balanced',
             reward_scale=np.array([1.0, 1.0]),
-            speed_multiplier=1.0,           # normal speed
+            speed_multiplier=1.0,
             noise_std=0.03,
             true_anchor=np.array([0.50, 0.50]),
             reward_fns=[
-                # Safety: MODERATE — varies with pos
+                # Safety: moderate, peaks slightly off-origin
                 lambda pos, act: 1.5 * math.exp(-0.05 * (pos - 1.5)**2),
-                # Progress: MODERATE — varies with pos (both responsive)
+                # Progress: moderate, sqrt of pos
                 lambda pos, act: 1.2 * math.sqrt(max(pos, 0) + 0.01),
             ],
         ),

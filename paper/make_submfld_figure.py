@@ -13,7 +13,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 HERE = Path(__file__).resolve().parent
-RESULTS_DIR = HERE.parent / 'results' / 'server_tuned20'
+RESULTS_DIR = HERE.parent / 'results' / 'server_curved20'
 
 MODE_COLORS = ['#d62728', '#2ca02c', '#1f77b4']  # red, green, blue
 MODE_NAMES  = ['Mode 0: safety-zone (anchor [0.85, 0.15])',
