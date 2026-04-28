@@ -35,6 +35,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from piecewise_mo_env import PiecewiseStationaryMOEnv, make_piecewise_mo_env
 from bamor_core import BAMORPipeline
+from train_synthetic_bamor import compute_hv_2d
 
 
 # ================================================================
@@ -456,6 +457,34 @@ def train_method(
             print(f"  [{method}] EVAL step={step}: Pareto range "
                   f"obj0=[{returns[:,0].min():.1f}, {returns[:,0].max():.1f}] "
                   f"obj1=[{returns[:,1].min():.1f}, {returns[:,1].max():.1f}]")
+
+    # --- Final HV eval ----------------------------------------------------
+    # Overall HV: with mode switches active.
+    # Per-mode HV: lock env to each mode, eval Pareto, compute HV.
+    # Reference point must be dominated by ALL Pareto points (worse on every obj).
+    # For mo-halfcheetah-v5: obj0 = forward_vel (typically 0–1500),
+    # obj1 = -control_cost (typically -3000 to -50).  Pick conservative floor.
+    GLOBAL_REF = np.array([-50.0, -3000.0])
+    final_overall = evaluate_pareto(eval_env, trainer, num_weights=21,
+                                    num_episodes=3, device=dev)
+    log_data["pareto_overall"] = final_overall
+    log_data["hv_overall"] = compute_hv_2d(
+        np.array([p["return"] for p in final_overall]), GLOBAL_REF)
+
+    log_data["pareto_per_mode"] = []
+    log_data["hv_per_mode"] = []
+    for m in range(env.num_modes):
+        eval_env._lock_mode = True
+        eval_env.current_mode_idx = m
+        eval_env._apply_mode(m)
+        pm = evaluate_pareto(eval_env, trainer, num_weights=11,
+                             num_episodes=3, device=dev)
+        eval_env._lock_mode = False
+        hv_m = compute_hv_2d(np.array([p["return"] for p in pm]), GLOBAL_REF)
+        log_data["pareto_per_mode"].append(pm)
+        log_data["hv_per_mode"].append(hv_m)
+        print(f"  [{method}] Mode {m}: HV={hv_m:.1f}")
+    print(f"  [{method}] HV overall = {log_data['hv_overall']:.1f}")
 
     # --- Save ---
     os.makedirs(save_dir, exist_ok=True)

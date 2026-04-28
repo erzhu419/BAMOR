@@ -49,16 +49,17 @@ class ModeConfig:
     that also affect the reward landscape indirectly.
     """
     name: str
-    # === Reward scaling (PRIMARY substrate constraint) ===
+    # === Reward scaling (LEGACY — now optional) ===
     reward_scale: np.ndarray = None  # multiply each reward component; shape=(reward_dim,)
     reward_shift: np.ndarray = None  # additive shift per component (optional)
-    # === Physics perturbations (SECONDARY) ===
-    gravity_scale: float = 1.0       # multiply gravity magnitude
-    friction_scale: float = 1.0      # multiply all friction coefficients
-    mass_scale: float = 1.0          # multiply all body masses
-    # === Ground truth (for evaluation only) ===
-    true_anchor: np.ndarray = None   # ground-truth preference anchor (simplex)
-    cone_radius: float = 0.15        # how narrow the valid preference space is
+    # === Physics perturbations (PRIMARY in BAPR-style modes) ===
+    gravity_scale: float = 1.0           # multiply gravity magnitude
+    friction_scale: float = 1.0          # multiply all friction coefficients
+    mass_scale: float = 1.0              # multiply all body masses
+    dof_damping_scale: float = 1.0       # multiply joint damping (BAPR addition)
+    # === Ground truth (for evaluation only; None = let estimator discover) ===
+    true_anchor: np.ndarray = None
+    cone_radius: float = 0.15            # how narrow the valid preference space is
     description: str = ""
 
     def __post_init__(self):
@@ -80,43 +81,75 @@ class ModeConfig:
 def halfcheetah_modes() -> list[ModeConfig]:
     """HalfCheetah-v5: 2 objectives [x_velocity, -energy_cost].
 
-    reward_scale is the PRIMARY mechanism creating substrate constraints.
-    Physics perturbations are secondary (reinforce the narrative).
-
-    Mode A (Efficiency): reward_scale amplifies energy, suppresses speed
-      → an agent CAN save energy but CANNOT gain much speed reward
-      → optimal preference near [0.15, 0.85] (energy-dominated)
-    Mode B (Sprint): reward_scale amplifies speed, suppresses energy
-      → speed reward is highly responsive, energy doesn't matter much
-      → optimal preference near [0.85, 0.15] (speed-dominated)
-    Mode C (Balanced): both objectives equally responsive
-      → full trade-off available
-      → optimal preference near [0.5, 0.5]
+    LEGACY preset (reward_scale-driven).  Kept for backwards compatibility
+    with the original BAMOR experiments — see `halfcheetah_bapr_modes` for
+    the BAPR-style (physics-only) variant we now use as default.
     """
     return [
         ModeConfig(
             name="efficiency",
-            reward_scale=np.array([0.1, 5.0]),   # energy 50x more responsive than speed
-            mass_scale=2.5,                        # heavy → physically reinforces speed cap
+            reward_scale=np.array([0.1, 5.0]),
+            mass_scale=2.5,
             gravity_scale=1.5,
             true_anchor=np.array([0.10, 0.90]),
             cone_radius=0.08,
-            description="Energy-dominated: speed reward suppressed 50x, energy amplified"
+            description="Energy-dominated: speed reward suppressed 50x, energy amplified",
         ),
         ModeConfig(
             name="sprint",
-            reward_scale=np.array([5.0, 0.1]),   # speed 50x more responsive than energy
-            friction_scale=0.3,                    # slippery → physically reinforces speed
+            reward_scale=np.array([5.0, 0.1]),
+            friction_scale=0.3,
             true_anchor=np.array([0.90, 0.10]),
             cone_radius=0.08,
-            description="Speed-dominated: speed reward amplified 50x, energy suppressed"
+            description="Speed-dominated: speed reward amplified 50x, energy suppressed",
         ),
         ModeConfig(
             name="balanced",
-            reward_scale=np.array([1.0, 1.0]),   # both equally responsive
+            reward_scale=np.array([1.0, 1.0]),
             true_anchor=np.array([0.5, 0.5]),
             cone_radius=0.20,
-            description="Balanced: both objectives equally responsive"
+            description="Balanced: both objectives equally responsive",
+        ),
+    ]
+
+
+def halfcheetah_bapr_modes() -> list[ModeConfig]:
+    """HalfCheetah-v5 BAPR-style: 4 modes with **physics-only** perturbations.
+
+    Replicates BAPR's `MODE_DEFINITIONS['HalfCheetah-v2']` (BAPR_ENV_DESIGN.md):
+    each mode requires a *qualitatively different* optimal policy because the
+    physical substrate (mass × gravity × joint damping) shifts the dynamics.
+    No reward shaping — the MO reward [forward_velocity, -control_cost] from
+    mo-gymnasium is unmodified.  Anchors are intentionally *not* hard-coded;
+    the cone estimator must discover them from per-mode reward variance.
+
+    Modes:
+      - normal          : default physics
+      - heavy_low_g     : 2× body mass, 0.6× gravity → struggles, energy-dominated
+      - light_high_g    : 0.5× body mass, 1.5× gravity → snappy, speed-dominated
+      - stiff_joints    : 3× joint damping → restricted motion
+    """
+    return [
+        ModeConfig(
+            name="normal",
+            description="Baseline physics — full speed/energy trade-off available.",
+        ),
+        ModeConfig(
+            name="heavy_low_g",
+            mass_scale=2.0,
+            gravity_scale=0.6,
+            description="Heavy + weak gravity → high effort to gain forward velocity.",
+        ),
+        ModeConfig(
+            name="light_high_g",
+            mass_scale=0.5,
+            gravity_scale=1.5,
+            description="Light + strong gravity → easy to move; speed-dominated cone.",
+        ),
+        ModeConfig(
+            name="stiff_joints",
+            dof_damping_scale=3.0,
+            description="Rigid joints → restricted motion; conservative behaviour.",
         ),
     ]
 
@@ -229,15 +262,21 @@ def ant_modes() -> list[ModeConfig]:
 
 
 ENV_PRESETS = {
-    "mo-halfcheetah-v5": halfcheetah_modes,
+    "mo-halfcheetah-v5": halfcheetah_bapr_modes,   # default: BAPR-style physics-only
     "mo-hopper-v5": hopper_modes,
     "mo-walker2d-v5": walker2d_modes,
     "mo-ant-v5": ant_modes,
     # v4 aliases
-    "mo-halfcheetah-v4": halfcheetah_modes,
+    "mo-halfcheetah-v4": halfcheetah_bapr_modes,
     "mo-hopper-v4": hopper_modes,
     "mo-walker2d-v4": walker2d_modes,
     "mo-ant-v4": ant_modes,
+}
+
+# Legacy presets (reward-scale-driven) accessible by explicit lookup
+ENV_PRESETS_LEGACY = {
+    "mo-halfcheetah-v5": halfcheetah_modes,
+    "mo-halfcheetah-v4": halfcheetah_modes,
 }
 
 
@@ -263,7 +302,7 @@ class PiecewiseStationaryMOEnv(gym.Wrapper):
         mode_configs: Optional[Sequence[ModeConfig]] = None,
         switch_interval: int = 200_000,
         switch_jitter: float = 0.0,
-        mode_order: str = "sequential",   # "sequential" or "random"
+        mode_order: str = "sequential",   # "sequential", "random", or "exponential"
         seed: int = 0,
         **env_kwargs,
     ):
@@ -310,8 +349,14 @@ class PiecewiseStationaryMOEnv(gym.Wrapper):
             self._orig_gravity = model.opt.gravity.copy()
             self._orig_body_mass = model.body_mass.copy()
             self._orig_geom_friction = model.geom_friction.copy()
+            # dof_damping (BAPR addition) — shape (nv,)
+            if hasattr(model, 'dof_damping'):
+                self._orig_dof_damping = model.dof_damping.copy()
+            else:
+                self._orig_dof_damping = None
         else:
             self._orig_gravity = None
+            self._orig_dof_damping = None
 
         # Switching schedule
         self.switch_interval = switch_interval
@@ -325,6 +370,7 @@ class PiecewiseStationaryMOEnv(gym.Wrapper):
         self._next_switch = self._sample_next_switch()
         self.current_mode_idx = 0
         self.mode_history: list[tuple[int, int]] = [(0, 0)]  # (step, mode_idx)
+        self._lock_mode = False   # if True, _maybe_switch_mode is a no-op (eval)
 
         # Apply initial mode
         self._apply_mode(0)
@@ -334,7 +380,12 @@ class PiecewiseStationaryMOEnv(gym.Wrapper):
         return self.mode_configs[self.current_mode_idx]
 
     def _sample_next_switch(self) -> int:
-        """Sample next switch interval (possibly with jitter)."""
+        """Sample next switch interval (deterministic / jitter / exponential)."""
+        if self.mode_order == "exponential":
+            # BAPR-style: dwell ~ Exponential(mean=switch_interval).  Floor at
+            # 1000 steps to avoid degenerate near-zero dwells.
+            d = int(self._rng.exponential(self.switch_interval))
+            return max(d, 1000)
         if self.switch_jitter > 0:
             lo = int(self.switch_interval * (1 - self.switch_jitter))
             hi = int(self.switch_interval * (1 + self.switch_jitter))
@@ -349,17 +400,21 @@ class PiecewiseStationaryMOEnv(gym.Wrapper):
             model.opt.gravity[:] = self._orig_gravity * mc.gravity_scale
             model.body_mass[:] = self._orig_body_mass * mc.mass_scale
             model.geom_friction[:] = self._orig_geom_friction * mc.friction_scale
+            if self._orig_dof_damping is not None and hasattr(model, 'dof_damping'):
+                model.dof_damping[:] = self._orig_dof_damping * mc.dof_damping_scale
         self.current_mode_idx = mode_idx
 
     def _maybe_switch_mode(self):
         """Check if it's time to switch modes."""
+        if self._lock_mode:
+            return
         if self._steps_in_mode >= self._next_switch:
             # Determine next mode
             if self.mode_order == "sequential":
                 new_mode = (self.current_mode_idx + 1) % self.num_modes
-            else:  # random
+            else:  # random or exponential — both pick uniformly from non-current
                 candidates = [i for i in range(self.num_modes) if i != self.current_mode_idx]
-                new_mode = self._rng.choice(candidates)
+                new_mode = int(self._rng.choice(candidates))
 
             self._apply_mode(new_mode)
             self.mode_history.append((self._total_steps, new_mode))
@@ -439,12 +494,18 @@ class PiecewiseStationaryMOEnv(gym.Wrapper):
 
 def make_piecewise_mo_env(
     env_name: str = "mo-halfcheetah-v5",
-    switch_interval: int = 200_000,
-    switch_jitter: float = 0.1,
-    mode_order: str = "sequential",
+    switch_interval: int = 50_000,
+    switch_jitter: float = 0.0,
+    mode_order: str = "exponential",   # BAPR-style: random dwell + random next-mode
     seed: int = 0,
 ) -> PiecewiseStationaryMOEnv:
-    """Convenience factory for creating piecewise-stationary MO environments."""
+    """Convenience factory for creating piecewise-stationary MO environments.
+
+    Defaults match the BAPR-style sweet-spot env (BAPR_ENV_DESIGN.md):
+    - 4 discrete physics-only modes (see `halfcheetah_bapr_modes`)
+    - dwell time ~ Exponential(50K env steps), random next-mode
+    - no reward shaping; mo-gym's native MO reward unmodified
+    """
     return PiecewiseStationaryMOEnv(
         base_env_id=env_name,
         switch_interval=switch_interval,
