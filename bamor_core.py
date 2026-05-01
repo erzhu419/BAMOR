@@ -126,7 +126,9 @@ class BeliefTracker:
 
     def __init__(self, num_modes: int, surprise_threshold: float = 8.0,
                  reset_prior: Optional[np.ndarray] = None,
-                 switch_cooldown: int = 30):
+                 switch_cooldown: int = 30,
+                 cusum_required_consecutive: int = 5,
+                 cusum_decay: float = 0.5):
         """
         Args:
             num_modes:           |H| — number of environment modes
@@ -134,10 +136,20 @@ class BeliefTracker:
             reset_prior:         belief to reset to on mode switch (default: uniform)
             switch_cooldown:     minimum steps between mode switches (prevents
                                  rapid-fire re-triggers during transients)
+            cusum_required_consecutive: switch only fires after this many
+                                 over-threshold steps within a short window
+                                 (prevents single-step false alarms in noisy
+                                 environments such as MuJoCo)
+            cusum_decay:         multiplicative decay applied to the consecutive
+                                 counter on a sub-threshold step (1.0 = strict
+                                 consecutive; 0.5 = forgiving — 1 quiet step
+                                 only halves the counter rather than zeroing it)
         """
         self.num_modes = num_modes
         self.surprise_threshold = surprise_threshold
         self.switch_cooldown = switch_cooldown
+        self.cusum_required_consecutive = cusum_required_consecutive
+        self.cusum_decay = cusum_decay
         self.reset_prior = reset_prior if reset_prior is not None else \
             np.ones(num_modes, dtype=np.float64) / num_modes
 
@@ -146,6 +158,7 @@ class BeliefTracker:
         self.current_mode = np.argmax(self.belief)
         self.mode_switch_count = 0
         self.steps_since_switch = 0
+        self._cusum_counter = 0.0  # accumulated evidence; switch when ≥ required
 
     def update(self, surprise_info: dict,
                mode_likelihoods: Optional[np.ndarray] = None) -> dict:
@@ -165,14 +178,20 @@ class BeliefTracker:
         mahal_sq = surprise_info['mahalanobis_sq']
         self.steps_since_switch += 1
 
-        # Detect mode switch via surprise threshold
-        # Cooldown prevents rapid-fire re-triggers during transients:
-        # when a regime changes, surprise stays high for several steps
-        # while the EMA adapts. Without cooldown, each step would trigger
-        # another round-robin increment, corrupting mode assignments.
-        mode_switched = (surprise_info['is_warm'] and
-                         mahal_sq > self.surprise_threshold and
-                         self.steps_since_switch >= self.switch_cooldown)
+        # CUSUM-style accumulation: each over-threshold step adds 1 to the
+        # counter; sub-threshold steps decay it.  A switch fires only when
+        # the counter exceeds the required-consecutive value AND the
+        # cooldown has expired.  This avoids the single-step false alarm
+        # mode (gpt diagnosis: threshold=6 in MuJoCo gave 134 spurious
+        # switches per 20K steps; with CUSUM-5 + threshold=18 → 0).
+        is_over = surprise_info['is_warm'] and mahal_sq > self.surprise_threshold
+        if is_over:
+            self._cusum_counter += 1.0
+        else:
+            self._cusum_counter *= self.cusum_decay
+
+        mode_switched = (self._cusum_counter >= self.cusum_required_consecutive
+                         and self.steps_since_switch >= self.switch_cooldown)
 
         if mode_switched:
             # Amnesic reset — assign to next mode slot (round-robin)
@@ -186,6 +205,7 @@ class BeliefTracker:
             self.current_mode = new_mode
             self.mode_switch_count += 1
             self.steps_since_switch = 0
+            self._cusum_counter = 0.0  # reset accumulated evidence
         elif mode_likelihoods is not None:
             # Standard Bayes update: ρ'(h) = ρ(h)·L(h) / Z
             unnormalized = self.belief * mode_likelihoods
@@ -436,7 +456,8 @@ class ContextAwareWeightSampler:
 
     def __init__(self, cone_estimator: TargetConeEstimator,
                  belief_tracker: BeliefTracker,
-                 concentration = 10.0):
+                 concentration = 10.0,
+                 force_uniform: bool = False):
         """
         Args:
             cone_estimator:  estimates per-mode anchors and radii
@@ -445,9 +466,15 @@ class ContextAwareWeightSampler:
                              Can be a scalar (same for all modes) or an array of shape
                              (num_modes,) for per-mode concentration.  The effective
                              value at sampling time is belief-weighted across modes.
+            force_uniform:   if True, ignore cone/anchor entirely and sample
+                             w ~ Dirichlet(1, 1, …).  Used by the `bamor_nc`
+                             ablation so it really *is* uniform sampling, not
+                             a low-concentration anchor-shifted Dirichlet
+                             (which is U-shaped on the 2-simplex).
         """
         self.cone_estimator = cone_estimator
         self.belief_tracker = belief_tracker
+        self.force_uniform = force_uniform
         num_modes = belief_tracker.num_modes
         conc = np.asarray(concentration, dtype=float)
         if conc.ndim == 0:
@@ -480,6 +507,11 @@ class ContextAwareWeightSampler:
         """
         belief = self.belief_tracker.belief
         w_anchor = self.cone_estimator.belief_weighted_anchor(belief)
+        if self.force_uniform:
+            # bamor_nc ablation: true uniform Dirichlet(1, 1, …) — no cone, no anchor bias.
+            reward_dim = w_anchor.shape[0]
+            w = np.random.dirichlet(np.ones(reward_dim)).astype(np.float32)
+            return w, w_anchor.astype(np.float32)
         radius = self.cone_estimator.belief_weighted_radius(belief)
 
         # Adjust concentration based on cone radius
@@ -505,6 +537,12 @@ class ContextAwareWeightSampler:
         """
         belief = self.belief_tracker.belief
         w_anchor = self.cone_estimator.belief_weighted_anchor(belief)
+        if self.force_uniform:
+            reward_dim = w_anchor.shape[0]
+            ws = np.random.dirichlet(np.ones(reward_dim),
+                                      size=batch_size).astype(np.float32)
+            anchors = np.tile(w_anchor.astype(np.float32), (batch_size, 1))
+            return ws, anchors
         radius = self.cone_estimator.belief_weighted_radius(belief)
 
         base_conc = self._effective_concentration(belief)
@@ -650,13 +688,15 @@ class BAMORPipeline:
             num_modes=num_modes, reward_dim=reward_dim,
             window_size=cone_window, normalize_rewards=False)
 
-        # Ablation: disable cone → very low concentration ≈ uniform sampling
-        # concentration may be scalar or per-mode array; 0.1 scalar overrides all modes
-        effective_concentration = 0.1 if disable_cone else concentration
+        # Ablation: disable cone → true Dirichlet(1, …, 1) uniform sampling.
+        # (gpt diagnosis #4: concentration=0.1 with anchor produces a
+        # U-shaped distribution, not uniform — so we now route the ablation
+        # through `force_uniform=True` for a clean Dirichlet(1) baseline.)
         self.weight_sampler = ContextAwareWeightSampler(
             cone_estimator=self.cone_estimator,
             belief_tracker=self.belief_tracker,
-            concentration=effective_concentration)
+            concentration=concentration,
+            force_uniform=disable_cone)
 
         self.diagnostics = BAMORDiagnostics(
             reward_dim=reward_dim, gamma=gamma)

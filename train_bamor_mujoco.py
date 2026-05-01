@@ -35,6 +35,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from piecewise_mo_env import PiecewiseStationaryMOEnv, make_piecewise_mo_env
 from bamor_core import BAMORPipeline
+from train_synthetic_bamor import compute_hv_2d
 
 
 # ================================================================
@@ -207,10 +208,13 @@ class MOSACTrainer:
         q_scalar = (w * q_new).sum(dim=-1, keepdim=True)
         policy_loss = (self.alpha * log_prob - q_scalar).mean()
 
-        # Anchor regularization
-        if w_anchor is not None:
-            anchor_reg = anchor_eta * ((w - w_anchor) ** 2).sum(dim=-1).mean()
-            policy_loss = policy_loss + anchor_reg
+        # NOTE on anchor regularisation: the original ploss term was
+        #   eta * ||w - w_anchor||^2
+        # but neither w nor w_anchor depends on policy parameters, so it had
+        # zero gradient and was a no-op (gpt diagnosis #5).  The paper's
+        # "anchor-shifted regularisation" is a property of the *regularised
+        # scalarisation* (Pareto-front geometry, §3.5 Thm), not a policy-loss
+        # term.  Removing the no-op here for clarity.
 
         self.policy_opt.zero_grad()
         policy_loss.backward()
@@ -247,15 +251,9 @@ def sample_fixed_weight(reward_dim):
 # Evaluation
 # ================================================================
 
-def evaluate_pareto(env, trainer, num_weights=11, num_episodes=3, device="cpu"):
-    """Evaluate policy on a grid of weights → approximate Pareto front."""
-    if trainer.reward_dim == 2:
-        weight_grid = np.linspace(0, 1, num_weights)
-        weights = np.stack([weight_grid, 1 - weight_grid], axis=-1).astype(np.float32)
-    else:
-        # For 3+ objectives, sample uniformly
-        weights = np.random.dirichlet(np.ones(trainer.reward_dim), size=num_weights).astype(np.float32)
-
+def evaluate_pareto_with_weights(env, trainer, weights, num_episodes=3, device="cpu"):
+    """Evaluate policy on the *given* weight grid → approximate Pareto front."""
+    weights = np.asarray(weights, dtype=np.float32)
     results = []
     for w in weights:
         ep_returns = []
@@ -278,8 +276,19 @@ def evaluate_pareto(env, trainer, num_weights=11, num_episodes=3, device="cpu"):
             ep_returns.append(total_r)
         mean_return = np.mean(ep_returns, axis=0)
         results.append({"weight": w.tolist(), "return": mean_return.tolist()})
-
     return results
+
+
+def evaluate_pareto(env, trainer, num_weights=11, num_episodes=3, device="cpu"):
+    """Evaluate policy on a uniform-simplex grid of weights → Pareto front."""
+    if trainer.reward_dim == 2:
+        weight_grid = np.linspace(0, 1, num_weights)
+        weights = np.stack([weight_grid, 1 - weight_grid], axis=-1).astype(np.float32)
+    else:
+        weights = np.random.dirichlet(np.ones(trainer.reward_dim),
+                                       size=num_weights).astype(np.float32)
+    return evaluate_pareto_with_weights(env, trainer, weights,
+                                         num_episodes=num_episodes, device=device)
 
 
 # ================================================================
@@ -325,14 +334,22 @@ def train_method(
     dev = trainer.device
 
     # --- BAMOR Pipeline ---
+    # gpt diagnosis #1+#2: in MuJoCo, threshold=6 caused 134 spurious switches
+    # per 20K steps. We now use threshold=18 + CUSUM-style required_consecutive=5
+    # (defaults inside BeliefTracker), which empirically gave 0 spurious /
+    # correct detection at the real switch point.  switch_cooldown is also
+    # bumped from default 80 → 2000 because mujoco episodes are ~1000 steps
+    # and the policy reward drift is far slower than 1D-synthetic dynamics.
     bamor = None
     if method.startswith("bamor"):
         bamor = BAMORPipeline(
             num_modes=num_modes,
             reward_dim=reward_dim,
             gamma=gamma,
-            surprise_threshold=6.0,
+            surprise_threshold=18.0,
             concentration=15.0,
+            switch_cooldown=2000,
+            warmup=2000,
             disable_surprise=(method == "bamor_ns"),
             disable_cone=(method == "bamor_nc"),
         )
@@ -383,18 +400,33 @@ def train_method(
         # Store
         trainer.buffer.push(obs, action, w_np, reward, next_obs, done)
 
-        # BAMOR observe
+        # BAMOR observe — capture belief BEFORE / AFTER to detect its own switch
+        prev_bamor_mode = (bamor.belief_tracker.current_mode
+                           if bamor is not None else None)
         if bamor is not None:
             bamor.observe_reward(reward)
+        cur_bamor_mode = (bamor.belief_tracker.current_mode
+                          if bamor is not None else None)
 
-        # Track mode switches
+        # Track ENV mode switches (ground truth)
         cur_mode = info["mode_idx"]
         if cur_mode != last_mode:
             mode_switch_count += 1
             log_data["mode_switches"].append({
-                "step": step, "from": last_mode, "to": cur_mode
+                "step": step, "from": last_mode, "to": cur_mode,
+                "kind": "env_truth",
             })
             last_mode = cur_mode
+
+        # Track BAMOR's OWN belief switches (gpt diagnosis #3 — these were
+        # invisible before; spurious switches in the belief tracker cause
+        # the cone estimator to be trained on wrongly-labelled samples).
+        if (bamor is not None and prev_bamor_mode is not None
+                and cur_bamor_mode != prev_bamor_mode):
+            log_data["mode_switches"].append({
+                "step": step, "from": int(prev_bamor_mode),
+                "to": int(cur_bamor_mode), "kind": "bamor_belief",
+            })
 
         episode_reward += reward
         episode_steps += 1
@@ -456,6 +488,64 @@ def train_method(
             print(f"  [{method}] EVAL step={step}: Pareto range "
                   f"obj0=[{returns[:,0].min():.1f}, {returns[:,0].max():.1f}] "
                   f"obj1=[{returns[:,1].min():.1f}, {returns[:,1].max():.1f}]")
+
+    # --- Final HV eval ----------------------------------------------------
+    # Overall HV: with mode switches active.
+    # Per-mode HV: lock env to each mode, eval Pareto, compute HV.
+    # Reference point must be dominated by ALL Pareto points (worse on every obj).
+    # For mo-halfcheetah-v5: obj0 = forward_vel (typically 0–1500),
+    # obj1 = -control_cost (typically -3000 to -50).  Pick conservative floor.
+    GLOBAL_REF = np.array([-50.0, -3000.0])
+    final_overall = evaluate_pareto(eval_env, trainer, num_weights=21,
+                                    num_episodes=3, device=dev)
+    log_data["pareto_overall"] = final_overall
+    log_data["hv_overall"] = compute_hv_2d(
+        np.array([p["return"] for p in final_overall]), GLOBAL_REF)
+
+    # Per-mode evaluation uses CONE-RESTRICTED weights aligned with each
+    # mode's substrate-constrained anchor.  This is the in-scope evaluation
+    # — preferences outside the cone are physically unreachable under that
+    # mode's reward caps, so measuring HV on them would be meaningless.
+    log_data["pareto_per_mode"] = []
+    log_data["hv_per_mode"] = []
+    log_data["per_mode_cone"] = []
+    for m in range(env.num_modes):
+        mc = env.mode_configs[m]
+        anchor = (mc.true_anchor if mc.true_anchor is not None
+                  else np.full(reward_dim, 1.0 / reward_dim))
+        radius = mc.cone_radius
+        # Build a cone-restricted weight grid.  For 2-D reward, the simplex
+        # is parameterised by w[0]; clip to [anchor[0]±radius] ∩ [0.01, 0.99]
+        # and sweep linearly.
+        if reward_dim == 2:
+            w_lo = max(0.01, float(anchor[0]) - radius)
+            w_hi = min(0.99, float(anchor[0]) + radius)
+            wgrid = np.linspace(w_lo, w_hi, 11, dtype=np.float32)
+            cone_weights = np.stack([wgrid, 1.0 - wgrid], axis=-1)
+        else:
+            # Higher dim: sample Dirichlet around anchor with concentration
+            # commensurate with the cone radius (smaller radius → tighter).
+            kappa = 1.0 / max(radius, 0.01)
+            cone_weights = np.random.dirichlet(kappa * np.maximum(anchor, 1e-3),
+                                               size=11).astype(np.float32)
+
+        eval_env._lock_mode = True
+        eval_env.current_mode_idx = m
+        eval_env._apply_mode(m)
+        pm = evaluate_pareto_with_weights(eval_env, trainer, cone_weights,
+                                           num_episodes=3, device=dev)
+        eval_env._lock_mode = False
+        hv_m = compute_hv_2d(np.array([p["return"] for p in pm]), GLOBAL_REF)
+        log_data["pareto_per_mode"].append(pm)
+        log_data["hv_per_mode"].append(hv_m)
+        log_data["per_mode_cone"].append({
+            "name": mc.name,
+            "anchor": anchor.tolist(),
+            "radius": radius,
+            "weights": cone_weights.tolist(),
+        })
+        print(f"  [{method}] Mode {m} ({mc.name}): cone HV={hv_m:.1f}")
+    print(f"  [{method}] HV overall (full simplex) = {log_data['hv_overall']:.1f}")
 
     # --- Save ---
     os.makedirs(save_dir, exist_ok=True)

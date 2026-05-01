@@ -272,14 +272,27 @@ def train(method, max_episodes=500, switch_interval=300, seed=0,
             nobs, rew, term, trunc, info = env.step(action)
             done = term or trunc
             buf.push(obs, action, w_np, rew, nobs, done)
+            prev_bamor_mode = (bamor.belief_tracker.current_mode
+                               if bamor is not None else None)
             if bamor:
                 bamor.observe_reward(rew)
+            cur_bamor_mode = (bamor.belief_tracker.current_mode
+                              if bamor is not None else None)
 
-            # Mode switch tracking
+            # Mode switch tracking — env truth
             cur_mode = info.get('mode_idx', 0)
             if cur_mode != last_mode:
-                log['mode_switches'].append({'step': total_steps, 'from': last_mode, 'to': cur_mode})
+                log['mode_switches'].append({'step': total_steps,
+                                              'from': last_mode, 'to': cur_mode,
+                                              'kind': 'env_truth'})
                 last_mode = cur_mode
+            # BAMOR's own belief switches (gpt #3 — needed to spot spurious detection)
+            if (bamor is not None and prev_bamor_mode is not None
+                    and cur_bamor_mode != prev_bamor_mode):
+                log['mode_switches'].append({'step': total_steps,
+                                              'from': int(prev_bamor_mode),
+                                              'to': int(cur_bamor_mode),
+                                              'kind': 'bamor_belief'})
 
             ep_reward += rew
             ep_steps += 1
@@ -310,9 +323,11 @@ def train(method, max_episodes=500, switch_interval=300, seed=0,
                 q_new = torch.min(q1(s, na2, w), q2(s, na2, w))
                 q_s = (w * q_new).sum(-1, keepdim=True)
                 ploss = (alpha * lp2 - q_s).mean()
-                if w_anchor_np is not None and method == 'bamor':
-                    wa = torch.FloatTensor(w_anchor_np).unsqueeze(0).expand(bs, -1).to(dev)
-                    ploss = ploss + anchor_eta * ((w - wa)**2).sum(-1).mean()
+                # Removed no-op anchor regularisation — see gpt diagnosis #5.
+                # The "anchor-shifted regulariser" in the paper is a property
+                # of the regularised scalarisation function (Pareto-front
+                # geometry), not a policy-loss term — adding eta*||w - wa||^2
+                # had zero gradient because neither w nor wa depends on policy.
                 pi_opt.zero_grad(); ploss.backward(); pi_opt.step()
 
                 for p, pt in zip(q1.parameters(), q1t.parameters()):

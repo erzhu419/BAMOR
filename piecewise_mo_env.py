@@ -49,16 +49,23 @@ class ModeConfig:
     that also affect the reward landscape indirectly.
     """
     name: str
-    # === Reward scaling (PRIMARY substrate constraint) ===
+    # === Reward scaling (LEGACY — now optional) ===
     reward_scale: np.ndarray = None  # multiply each reward component; shape=(reward_dim,)
     reward_shift: np.ndarray = None  # additive shift per component (optional)
-    # === Physics perturbations (SECONDARY) ===
-    gravity_scale: float = 1.0       # multiply gravity magnitude
-    friction_scale: float = 1.0      # multiply all friction coefficients
-    mass_scale: float = 1.0          # multiply all body masses
-    # === Ground truth (for evaluation only) ===
-    true_anchor: np.ndarray = None   # ground-truth preference anchor (simplex)
-    cone_radius: float = 0.15        # how narrow the valid preference space is
+    # === Physics perturbations (PRIMARY in BAPR-style modes) ===
+    gravity_scale: float = 1.0           # multiply gravity magnitude
+    friction_scale: float = 1.0          # multiply all friction coefficients
+    mass_scale: float = 1.0              # multiply all body masses
+    dof_damping_scale: float = 1.0       # multiply joint damping (BAPR addition)
+    # === Hard substrate constraints (NEW) ===
+    # reward_cap[i] = per-step UPPER cap on objective i (np.inf = no cap).
+    # This is the *substrate-collapse* mechanism BAMOR's theory rests on:
+    # under this mode, no policy can earn more than reward_cap[i] on obj i,
+    # regardless of action — the cone of physically-feasible preferences shrinks.
+    reward_cap: np.ndarray = None
+    # === Ground truth (for evaluation only; None = let estimator discover) ===
+    true_anchor: np.ndarray = None
+    cone_radius: float = 0.15            # how narrow the valid preference space is
     description: str = ""
 
     def __post_init__(self):
@@ -71,57 +78,116 @@ class ModeConfig:
             assert np.all(self.reward_scale >= 0), "Reward scale must be non-negative"
         if self.reward_shift is not None:
             self.reward_shift = np.asarray(self.reward_shift, dtype=np.float64)
+        if self.reward_cap is not None:
+            self.reward_cap = np.asarray(self.reward_cap, dtype=np.float64)
 
 
 # ================================================================
 # Preset mode configurations for standard MO-MuJoCo environments
 # ================================================================
 
-def halfcheetah_modes() -> list[ModeConfig]:
+def halfcheetah_modes() -> "list[ModeConfig]":
     """HalfCheetah-v5: 2 objectives [x_velocity, -energy_cost].
 
-    reward_scale is the PRIMARY mechanism creating substrate constraints.
-    Physics perturbations are secondary (reinforce the narrative).
-
-    Mode A (Efficiency): reward_scale amplifies energy, suppresses speed
-      → an agent CAN save energy but CANNOT gain much speed reward
-      → optimal preference near [0.15, 0.85] (energy-dominated)
-    Mode B (Sprint): reward_scale amplifies speed, suppresses energy
-      → speed reward is highly responsive, energy doesn't matter much
-      → optimal preference near [0.85, 0.15] (speed-dominated)
-    Mode C (Balanced): both objectives equally responsive
-      → full trade-off available
-      → optimal preference near [0.5, 0.5]
+    LEGACY preset (reward_scale-driven).  Kept for backwards compatibility
+    with the original BAMOR experiments — see `halfcheetah_bapr_modes` for
+    the BAPR-style (physics-only) variant we now use as default.
     """
     return [
         ModeConfig(
             name="efficiency",
-            reward_scale=np.array([0.1, 5.0]),   # energy 50x more responsive than speed
-            mass_scale=2.5,                        # heavy → physically reinforces speed cap
+            reward_scale=np.array([0.1, 5.0]),
+            mass_scale=2.5,
             gravity_scale=1.5,
             true_anchor=np.array([0.10, 0.90]),
             cone_radius=0.08,
-            description="Energy-dominated: speed reward suppressed 50x, energy amplified"
+            description="Energy-dominated: speed reward suppressed 50x, energy amplified",
         ),
         ModeConfig(
             name="sprint",
-            reward_scale=np.array([5.0, 0.1]),   # speed 50x more responsive than energy
-            friction_scale=0.3,                    # slippery → physically reinforces speed
+            reward_scale=np.array([5.0, 0.1]),
+            friction_scale=0.3,
             true_anchor=np.array([0.90, 0.10]),
             cone_radius=0.08,
-            description="Speed-dominated: speed reward amplified 50x, energy suppressed"
+            description="Speed-dominated: speed reward amplified 50x, energy suppressed",
         ),
         ModeConfig(
             name="balanced",
-            reward_scale=np.array([1.0, 1.0]),   # both equally responsive
+            reward_scale=np.array([1.0, 1.0]),
             true_anchor=np.array([0.5, 0.5]),
             cone_radius=0.20,
-            description="Balanced: both objectives equally responsive"
+            description="Balanced: both objectives equally responsive",
         ),
     ]
 
 
-def hopper_modes() -> list[ModeConfig]:
+def halfcheetah_bapr_modes() -> "list[ModeConfig]":
+    """HalfCheetah-v5 BAPR-style + hard substrate caps.
+
+    Each mode combines BAPR-style physics perturbations with a *per-step
+    hard reward cap* on one or both objectives.  The caps are the substrate
+    constraints BAMOR's Target Cone is designed to exploit: under a cap,
+    every preference vector that asks for more than the cap on the capped
+    objective is *physically unreachable*.
+
+    For mo-halfcheetah-v5 (per-step rewards):
+      obj 0 = forward_velocity   (typical 0–15 / step, episode 200–600 total)
+      obj 1 = -control_cost      (typical -1.5 to -0.05 / step, episode -1500 to -50)
+
+    Modes:
+      - normal       : no cap, full simplex valid          → anchor [0.5, 0.5]
+      - low_speed    : speed capped at 0.3/step            → anchor [0.15, 0.85]
+                       (hard substrate: progress collapsed; energy regime)
+      - low_cost     : -control_cost capped at -0.05/step  → anchor [0.85, 0.15]
+                       (hard substrate: cost-budget infinite; speed regime)
+      - locked       : both capped (small)                 → anchor [0.5, 0.5]
+                       (hard substrate: rigid joints, narrow operating band)
+    """
+    return [
+        ModeConfig(
+            name="normal",
+            true_anchor=np.array([0.5, 0.5]),
+            cone_radius=0.30,
+            description="Baseline physics, no caps — full simplex valid.",
+        ),
+        ModeConfig(
+            name="low_speed",
+            mass_scale=2.0,
+            gravity_scale=0.6,
+            reward_cap=np.array([0.3, np.inf]),
+            true_anchor=np.array([0.15, 0.85]),
+            cone_radius=0.15,
+            description=(
+                "Heavy + weak gravity + speed hard-capped at 0.3/step → "
+                "energy-dominated cone."
+            ),
+        ),
+        ModeConfig(
+            name="low_cost",
+            mass_scale=0.5,
+            gravity_scale=1.5,
+            reward_cap=np.array([np.inf, -0.05]),
+            true_anchor=np.array([0.85, 0.15]),
+            cone_radius=0.15,
+            description=(
+                "Light + strong gravity + control-cost hard-capped at -0.05/step → "
+                "speed-dominated cone."
+            ),
+        ),
+        ModeConfig(
+            name="locked",
+            dof_damping_scale=3.0,
+            reward_cap=np.array([1.0, -0.2]),
+            true_anchor=np.array([0.5, 0.5]),
+            cone_radius=0.15,
+            description=(
+                "Rigid joints + both objectives hard-capped → narrow operating band."
+            ),
+        ),
+    ]
+
+
+def hopper_modes() -> "list[ModeConfig]":
     """Hopper-v5: 3 objectives [healthy_reward, speed, -energy_cost].
 
     Mode A (Reckless): speed amplified, health/energy suppressed
@@ -158,7 +224,7 @@ def hopper_modes() -> list[ModeConfig]:
     ]
 
 
-def walker2d_modes() -> list[ModeConfig]:
+def walker2d_modes() -> "list[ModeConfig]":
     """Walker2d-v5: 2 objectives [speed, -energy_cost].
 
     Same 2-obj structure as HalfCheetah, different physics.
@@ -192,7 +258,82 @@ def walker2d_modes() -> list[ModeConfig]:
     ]
 
 
-def ant_modes() -> list[ModeConfig]:
+def mountaincar_bapr_modes() -> "list[ModeConfig]":
+    """mo-mountaincarcontinuous-v0 BAPR-style: 2 objectives, 3 modes.
+
+    obj 0 = -1 per step (time penalty, reach goal fast)
+    obj 1 = -squared_action (energy cost)
+
+    Substrate constraints via soft caps + physics scale (gravity proxy via reward_scale).
+    Modes:
+      - normal      : default, no caps, full simplex valid
+      - slow_only   : time-penalty soft-capped tight; only energy matters
+      - energy_only : energy-penalty soft-capped tight; only time matters
+    """
+    return [
+        ModeConfig(
+            name="normal",
+            true_anchor=np.array([0.5, 0.5]),
+            cone_radius=0.30,
+            description="Baseline — full speed/energy trade-off available.",
+        ),
+        ModeConfig(
+            name="slow_only",
+            reward_cap=np.array([-2.0, np.inf]),  # time-penalty floor: episode max -2000 (vs -1000 typical)
+            true_anchor=np.array([0.15, 0.85]),
+            cone_radius=0.15,
+            description="Time-penalty heavily capped → energy-dominated cone.",
+        ),
+        ModeConfig(
+            name="energy_only",
+            reward_cap=np.array([np.inf, -0.005]),  # energy-cost cap small: still penalised but bounded
+            true_anchor=np.array([0.85, 0.15]),
+            cone_radius=0.15,
+            description="Energy-cost soft-capped → time/speed-dominated cone.",
+        ),
+    ]
+
+
+def hopper_bapr_modes() -> "list[ModeConfig]":
+    """mo-hopper-v5 BAPR-style: 3 objectives [healthy, speed, -energy], 4 modes.
+
+    Substrate caps in different objectives create disjoint Target Cones.
+    Same soft-cap mechanism via tanh applied in step().
+    """
+    return [
+        ModeConfig(
+            name="normal",
+            true_anchor=np.array([1/3, 1/3, 1/3]),
+            cone_radius=0.30,
+            description="Baseline — all 3 objectives reachable.",
+        ),
+        ModeConfig(
+            name="fragile",     # health hard, must be careful
+            reward_cap=np.array([np.inf, 0.5, np.inf]),  # speed soft-capped low
+            mass_scale=1.5,
+            true_anchor=np.array([0.85, 0.05, 0.10]),
+            cone_radius=0.15,
+            description="Health-dominated: speed soft-capped (fragile body).",
+        ),
+        ModeConfig(
+            name="cheap_energy",  # control cost is free
+            reward_cap=np.array([np.inf, np.inf, -0.05]),  # energy cost cap small
+            true_anchor=np.array([0.10, 0.85, 0.05]),
+            cone_radius=0.15,
+            description="Speed-dominated: energy cost soft-capped (free energy).",
+        ),
+        ModeConfig(
+            name="grounded",      # cannot jump high, must conserve energy
+            reward_cap=np.array([0.5, 0.3, np.inf]),  # health AND speed capped
+            gravity_scale=1.5,
+            true_anchor=np.array([0.05, 0.05, 0.90]),
+            cone_radius=0.15,
+            description="Energy-dominated: health and speed both capped (grounded mode).",
+        ),
+    ]
+
+
+def ant_modes() -> "list[ModeConfig]":
     """Ant-v5: 3 objectives [healthy_reward, speed, -energy_cost].
 
     Three distinct modes creating well-separated Target Cones.
@@ -229,15 +370,22 @@ def ant_modes() -> list[ModeConfig]:
 
 
 ENV_PRESETS = {
-    "mo-halfcheetah-v5": halfcheetah_modes,
-    "mo-hopper-v5": hopper_modes,
+    "mo-halfcheetah-v5": halfcheetah_bapr_modes,   # default: BAPR-style + soft caps
+    "mo-hopper-v5": hopper_bapr_modes,             # default: BAPR-style + soft caps
+    "mo-mountaincarcontinuous-v0": mountaincar_bapr_modes,  # simplest 2D continuous
     "mo-walker2d-v5": walker2d_modes,
     "mo-ant-v5": ant_modes,
     # v4 aliases
-    "mo-halfcheetah-v4": halfcheetah_modes,
-    "mo-hopper-v4": hopper_modes,
+    "mo-halfcheetah-v4": halfcheetah_bapr_modes,
+    "mo-hopper-v4": hopper_bapr_modes,
     "mo-walker2d-v4": walker2d_modes,
     "mo-ant-v4": ant_modes,
+}
+
+# Legacy presets (reward-scale-driven) accessible by explicit lookup
+ENV_PRESETS_LEGACY = {
+    "mo-halfcheetah-v5": halfcheetah_modes,
+    "mo-halfcheetah-v4": halfcheetah_modes,
 }
 
 
@@ -263,7 +411,7 @@ class PiecewiseStationaryMOEnv(gym.Wrapper):
         mode_configs: Optional[Sequence[ModeConfig]] = None,
         switch_interval: int = 200_000,
         switch_jitter: float = 0.0,
-        mode_order: str = "sequential",   # "sequential" or "random"
+        mode_order: str = "sequential",   # "sequential", "random", or "exponential"
         seed: int = 0,
         **env_kwargs,
     ):
@@ -310,8 +458,14 @@ class PiecewiseStationaryMOEnv(gym.Wrapper):
             self._orig_gravity = model.opt.gravity.copy()
             self._orig_body_mass = model.body_mass.copy()
             self._orig_geom_friction = model.geom_friction.copy()
+            # dof_damping (BAPR addition) — shape (nv,)
+            if hasattr(model, 'dof_damping'):
+                self._orig_dof_damping = model.dof_damping.copy()
+            else:
+                self._orig_dof_damping = None
         else:
             self._orig_gravity = None
+            self._orig_dof_damping = None
 
         # Switching schedule
         self.switch_interval = switch_interval
@@ -324,7 +478,8 @@ class PiecewiseStationaryMOEnv(gym.Wrapper):
         self._steps_in_mode = 0
         self._next_switch = self._sample_next_switch()
         self.current_mode_idx = 0
-        self.mode_history: list[tuple[int, int]] = [(0, 0)]  # (step, mode_idx)
+        self.mode_history: "list[tuple[int, int]]" = [(0, 0)]  # (step, mode_idx)
+        self._lock_mode = False   # if True, _maybe_switch_mode is a no-op (eval)
 
         # Apply initial mode
         self._apply_mode(0)
@@ -334,7 +489,12 @@ class PiecewiseStationaryMOEnv(gym.Wrapper):
         return self.mode_configs[self.current_mode_idx]
 
     def _sample_next_switch(self) -> int:
-        """Sample next switch interval (possibly with jitter)."""
+        """Sample next switch interval (deterministic / jitter / exponential)."""
+        if self.mode_order == "exponential":
+            # BAPR-style: dwell ~ Exponential(mean=switch_interval).  Floor at
+            # 1000 steps to avoid degenerate near-zero dwells.
+            d = int(self._rng.exponential(self.switch_interval))
+            return max(d, 1000)
         if self.switch_jitter > 0:
             lo = int(self.switch_interval * (1 - self.switch_jitter))
             hi = int(self.switch_interval * (1 + self.switch_jitter))
@@ -349,17 +509,21 @@ class PiecewiseStationaryMOEnv(gym.Wrapper):
             model.opt.gravity[:] = self._orig_gravity * mc.gravity_scale
             model.body_mass[:] = self._orig_body_mass * mc.mass_scale
             model.geom_friction[:] = self._orig_geom_friction * mc.friction_scale
+            if self._orig_dof_damping is not None and hasattr(model, 'dof_damping'):
+                model.dof_damping[:] = self._orig_dof_damping * mc.dof_damping_scale
         self.current_mode_idx = mode_idx
 
     def _maybe_switch_mode(self):
         """Check if it's time to switch modes."""
+        if self._lock_mode:
+            return
         if self._steps_in_mode >= self._next_switch:
             # Determine next mode
             if self.mode_order == "sequential":
                 new_mode = (self.current_mode_idx + 1) % self.num_modes
-            else:  # random
+            else:  # random or exponential — both pick uniformly from non-current
                 candidates = [i for i in range(self.num_modes) if i != self.current_mode_idx]
-                new_mode = self._rng.choice(candidates)
+                new_mode = int(self._rng.choice(candidates))
 
             self._apply_mode(new_mode)
             self.mode_history.append((self._total_steps, new_mode))
@@ -371,12 +535,30 @@ class PiecewiseStationaryMOEnv(gym.Wrapper):
         self._total_steps += 1
         self._steps_in_mode += 1
 
-        # Apply mode-dependent reward scaling (PRIMARY substrate constraint)
+        # Apply mode-dependent reward scaling (LEGACY substrate constraint)
         mc = self.current_mode
         if mc.reward_scale is not None:
             reward = reward * mc.reward_scale
         if mc.reward_shift is not None:
             reward = reward + mc.reward_shift
+        # Hard substrate cap: per-step upper ceiling (BAMOR-TC's home turf).
+        # An objective whose cap is reached cannot be exceeded by any policy →
+        # preferences asking for more than the cap are physically unreachable.
+        if mc.reward_cap is not None:
+            # Smooth cap (gpt-fix v3c): replace hard `min` with `tanh`-style
+            # ceiling so the gradient stays continuous at the cap boundary.
+            # For finite cap c: r_capped = c · tanh(r / c) (matches r when |r| ≪ c,
+            # asymptotes to c as r → ∞).  np.inf entries (no cap) pass through.
+            cap = mc.reward_cap
+            for i in range(len(reward)):
+                if np.isfinite(cap[i]):
+                    if cap[i] > 0:
+                        reward[i] = cap[i] * np.tanh(reward[i] / cap[i])
+                    elif cap[i] < 0:
+                        # For negative cap (upper bound on -loss type rewards),
+                        # mirror via abs and re-negate.
+                        a = abs(cap[i])
+                        reward[i] = -a * np.tanh(-reward[i] / a)
 
         # Inject mode info (not visible to agent, for logging/eval only)
         info["mode_idx"] = self.current_mode_idx
@@ -439,12 +621,18 @@ class PiecewiseStationaryMOEnv(gym.Wrapper):
 
 def make_piecewise_mo_env(
     env_name: str = "mo-halfcheetah-v5",
-    switch_interval: int = 200_000,
-    switch_jitter: float = 0.1,
-    mode_order: str = "sequential",
+    switch_interval: int = 50_000,
+    switch_jitter: float = 0.0,
+    mode_order: str = "exponential",   # BAPR-style: random dwell + random next-mode
     seed: int = 0,
 ) -> PiecewiseStationaryMOEnv:
-    """Convenience factory for creating piecewise-stationary MO environments."""
+    """Convenience factory for creating piecewise-stationary MO environments.
+
+    Defaults match the BAPR-style sweet-spot env (BAPR_ENV_DESIGN.md):
+    - 4 discrete physics-only modes (see `halfcheetah_bapr_modes`)
+    - dwell time ~ Exponential(50K env steps), random next-mode
+    - no reward shaping; mo-gym's native MO reward unmodified
+    """
     return PiecewiseStationaryMOEnv(
         base_env_id=env_name,
         switch_interval=switch_interval,
