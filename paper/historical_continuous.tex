@@ -1,0 +1,19 @@
+\subsection{Historical Continuous-Control Comparison}
+\label{app:historical_continuous}
+
+The original 20-seed, 50k-step v23 study used 19 BAMOR actor snapshots but
+one CAPQL actor. Its overall evaluator advanced a persistent mode schedule
+across episodes, weights and actors. Changing the number or order of candidates
+therefore changed evaluation conditions as well as the evaluated policy set.
+Table~\ref{tab:mujoco_3d_policy_set} is retained as a historical record and is
+not used in the matched-comparison conclusions.
+
+\input{table_mujoco_3d_policy_set}
+
+The historical locked-mode diagnostic used restricted preference grids and
+unmatched episode resets. Mean mode-wise archive/final HV, v23 versus CAPQL,
+was 3.032M/2.221M on HalfCheetah, 2.096B/1.838B on Ant and 3.357B/1.914B
+on Hopper. Even there, HalfCheetah mode 3 favored CAPQL, 1.653M versus 0.827M.
+The current main-text comparisons replace these settings with common locked
+modes, full-simplex grids and episode reset seeds.
+\FloatBarrier

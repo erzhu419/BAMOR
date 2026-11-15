@@ -2,8 +2,8 @@
 
 Single panel: x-axis = obj 0 (safety), y-axis = obj 1 (progress).
 Three modes coloured (red/green/blue) showing their distinct Pareto arcs.
-Overlay BAMOR-TC trained policy points + Uniform points to show how
-BAMOR-TC concentrates onto the valid arc per mode while Uniform scatters.
+Compare BAMOR-TC trained policy points and Uniform points when inspecting
+the mode-wise local-arc geometry.
 """
 import json, glob
 from pathlib import Path

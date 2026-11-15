@@ -1,13 +1,18 @@
 \documentclass[10pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage{microtype}
 \usepackage[margin=1in, left=1.25in, right=1.25in, top=1in, bottom=1in]{geometry}
 \usepackage{algorithm}
 \usepackage{algorithmic}
+\usepackage{xurl}
+\usepackage[round,authoryear]{natbib}
+\let\cite\citep
 \usepackage[linktoc=all, bookmarksdepth=3, pdfstartview=FitH]{hyperref}
 \hypersetup{colorlinks=true, linkcolor=blue, filecolor=magenta, urlcolor=cyan}
 \urlstyle{same}
 \usepackage{amsmath}
+\usepackage{mathtools}
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{bbold}
@@ -20,6 +25,10 @@
 \captionsetup[figure]{name=Fig.}
 \usepackage{booktabs}
 \usepackage{multirow}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{seqsplit}
 \usepackage[normalem]{ulem}
 \usepackage{amsthm}
 \usepackage{enumitem}
@@ -31,10 +40,14 @@
 \newtheorem{remark}[theorem]{Remark}
 \newtheorem{assumption}[theorem]{Assumption}
 \newtheorem{example}[theorem]{Example}
+\setlength{\emergencystretch}{2em}
+\allowdisplaybreaks[2]
+\DeclareRobustCommand{\lean}[1]{\texttt{\detokenize{#1}}}
+\newcommand{\bamorv}{BAMOR-v25}
 
 \graphicspath{ {./} }
 
-\title{BAMOR: Bayesian Amnesic Multi-Objective Robust Reinforcement Learning\\with Target Cone Tracking under Substrate Constraints}
+\title{BAMOR: Progress-Driven Update Portfolios for\\Non-Stationary Multi-Objective Reinforcement Learning}
 
 \author{
   Yifan Zhang\thanks{Central South University, \href{mailto:erzhu419@gmail.com}{erzhu419@gmail.com}, \href{mailto:204201048@csu.edu.cn}{204201048@csu.edu.cn}} \and
@@ -47,1028 +60,182 @@
 
 
 \begin{abstract}
-Multi-objective reinforcement learning (MORL) algorithms universally assume that the preference weight $w$ ranges freely over the full simplex $\Delta^{m-1}$, implying a globally smooth and completely reachable Pareto front.  We argue this assumption is physically unrealistic: in non-stationary environments, each operating mode imposes \emph{substrate constraints} that truncate the achievable trade-off space to a narrow subregion---the \textbf{Target Cone}.  Objectives whose physical basis collapses (e.g., speed during severe congestion) become unreachable regardless of the preference weight, causing traditional tracking bounds to explode.
+Non-stationary multi-objective control requires both adapting behavior to
+observed transitions and allocating a finite learning budget. We present BAMOR,
+a context-conditioned actor--critic that allocates 1,500-interaction training
+blocks using normalized vector reward progress. Its 18 fixed arms vary
+preference sampling, relabeling, candidate search and regularization while
+sharing one actor and twin vector critics. Allocation uses training rewards;
+an optional actor archive supplies a separate coverage outcome. Lean-verified
+analysis establishes soft-target consistency, bounded feedback and a strict
+score-margin condition for local target stability.
 
-We propose \textbf{BAMOR} (Bayesian Amnesic Multi-Objective Robust), organised around a single load-bearing mechanism---the Target Cone sampler---and three formal innovations that justify it: (1)~a \emph{component-wise $\gamma$-contraction} for the multi-objective belief-weighted Bellman operator with Banach existence and uniqueness of the robust Pareto-optimal Q-function (Parts~I--VI), proven under a \emph{frozen-belief} assumption so that any consistent mode-estimation rule---oracle, static, or online---interoperates; (2)~\emph{anchor-shifted strong concavity} that preserves Pareto front smoothness when the regulariser is centred on a mode-specific physical anchor (Parts~IX, XI, XIII); and (3)~a \emph{Target Cone localised tracking bound} showing that the scalarised tracking error is bounded by $\gamma^n D_0 + \gamma \Delta_{\mathrm{global}}/(1{-}\gamma) + \langle w, \Delta_{\mathrm{vec}}\rangle$, where the local drift $\langle w, \Delta_{\mathrm{vec}}\rangle \ll \Delta_{\mathrm{global}}$ when the cone suppresses collapsed objectives (Parts~XII--XV).  This bound is never worse than the naive global bound and in full suppression achieves a factor-$\gamma$ reduction.
-
-Empirically, our recommended recipe---\textbf{BAMOR-TC}: Target Cone sampling with a frozen-uniform belief---beats the standard uniform-weight CAPQL recipe by $+12.5\%$ overall hypervolume at less than half the seed variance, and wins every per-mode hypervolume on a synthetic non-stationary multi-objective benchmark ($20$~seeds, $100{,}000$ steps).  Ablations show the cone is the load-bearing component: removing it loses $28\%$ HV.  We also evaluate an \emph{online} Mahalanobis change-point belief update on top of BAMOR-TC and find it to be a net \emph{negative} in this high-noise 2-D setting (loses $29\%$ HV, with $\sim\!20\%$ of seeds suffering catastrophic collapses driven by spurious resets).  Accordingly, the design of a well-calibrated online belief update remains open; the cone mechanism itself is the contribution this paper defends.
-
-All theoretical results are formally verified in Lean~4 with no \texttt{sorry} (1,697 lines in \texttt{BAMOR.lean} + 377 lines in \texttt{BAMOR-Counterproof.lean}, importing 560 lines from \texttt{BAPR.lean}; 50+ machine-verified theorems).  The proof chain---from Blackwell conditions through Banach fixed points, scalarised contraction, weight sensitivity, strong concavity, drift suppression, to the end-to-end Target Cone tracking guarantee---is fully mechanised with zero informal gaps.
+An independent 20-seed comparison of the unchanged v25 implementation with
+CAPQL on custom piecewise-stationary HalfCheetah and Hopper uses 75,000
+training interactions per run. Observed mean utility at the requested
+preference is 55.0\% and 6.0\% higher, with 13 of 20 paired wins on each
+task; both prespecified 97.5\% intervals include zero. Mean final hypervolume
+is 4.8\% and 5.8\% lower, and measured training time is 1.67 and 1.73 times
+CAPQL's. Ant remains a negative transfer case, and score-blind controls give
+task-dependent effects. These findings separate final-policy utility,
+policy-set coverage and the contribution of feedback-driven allocation.
 \end{abstract}
 
-\noindent\textbf{Keywords:} multi-objective reinforcement learning; Bayesian change-point detection; substrate constraints; Target Cone; Pareto front; piecewise stationarity; robust ensemble; formal verification; Lean~4.
+\noindent\textbf{Keywords:} multi-objective reinforcement learning; non-stationary control; adaptive update portfolio; preference-conditioned policy.
 
 
 % ════════════════════════════════════════════════════════════════════════════
 \section{Introduction}
 % ════════════════════════════════════════════════════════════════════════════
 
-Multi-objective reinforcement learning (MORL) seeks policies that simultaneously optimize multiple, often conflicting objectives~\cite{Hayes2022MORL}.  The dominant paradigm---exemplified by CAPQL~\cite{Lu2023CAPQL}, GPI-LS~\cite{Alegre2023GPILS}, and Envelope Q-learning~\cite{Yang2019Envelope}---trains a single conditioned network over the full preference simplex $\Delta^{m-1}$, assuming that \emph{every} weight combination $w$ corresponds to a physically achievable Pareto-optimal policy.
+Multi-objective reinforcement learning (MORL) learns policies for conflicting
+objectives~\cite{Hayes2022MORL}. For a preference-conditioned controller,
+success requires producing useful behavior at the requested preference, not
+only covering a large Pareto region. These outcomes differ because a return
+set does not record which preference elicited each behavior.
 
-\subsection{The uniform preference illusion}
+Changing dynamics or reward responses can change the usefulness of training
+updates. Broad preference coverage, recovery-oriented sampling and extreme
+preferences compete for a fixed interaction budget. Adaptive operator selection
+and learning-progress curricula already address online allocation in optimization
+and neural learning~\cite{DaCosta2008AOS,Graves2017Curriculum}. Here allocation
+jointly changes collected preferences and MORL replay updates under changing
+dynamics. We study this configuration problem through unchanged BAMOR-v25,
+separating final-policy execution, archive coverage and feedback attribution.
 
-\begin{definition}[Global Uniform Preference Assumption]
-\label{def:uniform_pref}
-Existing MORL algorithms implicitly assume that for any preference weight $w \in \Delta^{m-1}$ and any environment state $s$, there exists a policy $\pi_w$ whose expected return vector lies on the Pareto front at the point indexed by $w$.  The preference simplex is treated as globally traversable and uniformly reachable.
-\end{definition}
+BAMOR combines per-transition context with block-level update allocation.
+The context summarizes observed transition history; a portfolio selector
+changes sampling, relabeling, candidate search and regularization for one
+shared actor--critic. Its feedback compares normalized reward coordinates
+across the two halves of a block. This avoids directly scoring changes in
+sampled preference weights as changes in reward progress. Family allocation
+floors and randomized exploration preserve access to low-scoring arms.
+An optional archive is evaluated separately from final-policy execution.
 
-We argue that this assumption is a ``spherical cow'' abstraction that breaks down in real-world non-stationary environments.  The breakdown arises from a fundamental coupling between \emph{environment modes} (physical operating conditions) and the \emph{reachable objective space}:
-
-\begin{example}[Mode-objective coupling in transit control]
-\label{ex:bus}
-Consider a bus transit system optimizing two objectives: headway regularity ($O_1$, preventing bus bunching) and travel speed ($O_2$, minimizing passenger wait time).
-\begin{itemize}
-    \item \textbf{Normal traffic (Mode A):} The road admits speeds $v \in [5, 15]$ m/s.  The Pareto front spans $w_{\mathrm{speed}} \in [0.3, 0.7]$---the operator can meaningfully trade speed for regularity.
-    \item \textbf{Severe congestion (Mode B):} A traffic incident caps speeds at $v \le 3$ m/s.  No policy can achieve high speed regardless of $w_{\mathrm{speed}}$.  The effective preference space shrinks to $w_{\mathrm{headway}} \in [0.85, 1.0]$.
-    \item \textbf{Demand surge (Mode C):} A concert lets out; buses are packed.  Speed matters again (move passengers fast), but headway is less controllable.  The valid range shifts to $w_{\mathrm{speed}} \in [0.6, 0.9]$.
-\end{itemize}
-An algorithm that explores $w_{\mathrm{speed}} = 0.9$ during Mode B wastes network capacity on physically impossible targets, producing gradient conflicts and Q-value collapse.
-\end{example}
-
-\begin{example}[Mode-objective coupling in product design]
-\label{ex:shoes}
-Consider multi-objective optimization over shoe attributes: comfort, speed, waterproofing, grip, breathability, durability, ankle support, toe protection, insulation, quick-dry.  A hiking boot (``mountain mode'') optimizes grip + waterproofing + durability in a narrow cone; a sandal (``beach mode'') optimizes breathability + quick-dry in a completely different narrow cone.  No single shoe simultaneously maximizes all attributes---each mode's physical substrate (terrain, weather, activity) dictates which objectives are relevant and which are physically capped.  The real-world Pareto front is not a smooth global curve but a collection of \emph{narrow, disconnected local sub-manifolds}, one per mode.
-\end{example}
-
-This phenomenon---which we term \textbf{substrate constraints}---is not an edge case but a fundamental feature of multi-objective decision-making in the physical world.  The relevant objectives and their feasible trade-off ranges are \emph{dictated by the operating mode}, not freely chosen by the decision-maker.
-
-\subsection{The Global Blind-Search Paradox}
-
-Traditional MORL tracking bounds rely on the \emph{global} target drift:
-\begin{equation}
-    \Delta_{\mathrm{global}} = \sup_{w \in \Delta^{m-1}} \| Q^*_{w,n} - Q^*_{w,n+1} \|_\infty.
-    \label{eq:global_drift}
-\end{equation}
-When the environment mode switches (e.g., clear $\to$ congested), certain objectives become physically unreachable due to substrate constraints.  The Q-function for those objectives collapses: if Mode A has $Q^*_{\mathrm{speed}} \approx 100$ and Mode B has $Q^*_{\mathrm{speed}} \approx 10$, then $\Delta_{\mathrm{global}} \ge 90$.  The standard tracking bound $\Delta_{\mathrm{global}}/(1{-}\gamma)$ becomes vacuously large:
-\begin{equation}
-    \text{Naive bound: } \frac{\Delta_{\mathrm{global}}}{1 - \gamma} = \frac{90}{1 - 0.99} = 9000.
-\end{equation}
-This tells the agent nothing useful---the bound exceeds the scale of the Q-values themselves.
-
-No existing MORL algorithm---CAPQL, GPI-PD, MOSAC, Envelope, or any method in morl-baselines~\cite{Alegre2023GPILS}---addresses this problem, because \emph{none restricts the preference space per mode}.  They all sample $w$ uniformly over $\Delta^{m-1}$ regardless of the current environment state.
-
-\subsection{Our insight: Piecewise Local Pareto Sub-manifolds}
-
-We propose a paradigm shift in how the Pareto front is conceptualized:
-
-\begin{definition}[Piecewise Local Pareto Sub-manifold]
-\label{def:piecewise_pareto}
-The effective Pareto front of a multi-objective non-stationary environment is not a single smooth global surface over $\Delta^{m-1}$, but a collection of \emph{narrow, potentially disconnected, mode-specific local sub-manifolds}:
-\begin{equation}
-    \mathcal{PF}_{\mathrm{effective}} = \bigcup_{h \in \mathcal{H}} \mathcal{PF}_h, \quad \text{where } \mathcal{PF}_h \text{ is defined over } \mathcal{C}_h \subset \Delta^{m-1}.
-\end{equation}
-Each $\mathcal{C}_h$ (the \emph{Target Cone} for mode $h$) is typically much smaller than $\Delta^{m-1}$, and different cones may not even tile the full simplex when stitched together.
-\end{definition}
-
-\subsection{Contributions}
-
-We propose \textbf{BAMOR} (Bayesian Amnesic Multi-Objective Robust), which extends the single-objective BAPR framework~\cite{Zhang2025BAPR} to vector-valued Q-functions and introduces the \emph{Target Cone} mechanism for mode-aware preference restriction.  Our contributions span theory, algorithm design, and formal verification:
-
+Our contributions are:
 \begin{enumerate}
-    \item \textbf{Multi-objective $\gamma$-contraction (Parts I--VI, \S\ref{sec:contraction}):} We prove that the BAMOR operator---a belief-weighted mixture of mode-conditional \emph{vector-valued} Bellman operators---is a $\gamma$-contraction in the product $L_\infty$ metric.  This involves:
-    \begin{itemize}
-        \item Lifting the scalar BAPR contraction to the nested Pi metric on $\mathcal{S} \times \mathcal{A} \to \mathbb{R}^m$;
-        \item Verifying both Blackwell conditions (monotonicity and discounting) at the per-mode and mixture levels;
-        \item Proving existence and uniqueness of the robust Pareto-optimal Q-function via Mathlib's Banach fixed-point infrastructure;
-        \item Showing contraction is preserved under \emph{frozen-belief} Bayesian updates (the belief is held constant across the inner backup loop), so any consistent mode-estimation rule---learned, labeled, or oracle---interoperates with the contraction proof.
-    \end{itemize}
-    The practical algorithm accordingly \emph{decouples} the cone mechanism from any particular belief-update rule: our experiments (\S\ref{sec:exp_ablation}) show the cone-only variant is empirically the most robust, while an automatic Mahalanobis change-point detector we also implemented destabilises training in high-noise 2-D settings and is discussed in \S\ref{sec:belief_rules} as a limitation and open problem.
-
-    \item \textbf{Scalarized contraction and weight sensitivity (Parts VII--VIII, \S\ref{sec:scalarized}):} Composing component-wise contraction with the non-expansiveness of scalarization yields a scalarized $\gamma$-contraction.  We further prove Lipschitz continuity in preference weights: $|\langle w_1, \mathbf{Q} \rangle - \langle w_2, \mathbf{Q} \rangle| \le B \|w_1 - w_2\|_1$, bounding the sensitivity of Pareto values to weight perturbations.
-
-    \item \textbf{Anchor-shifted strong concavity (Parts IX, XI, XIII, \S\ref{sec:anchor}):} Following CAPQL's insight that $-\eta\|w\|^2$ regularization smooths the Pareto front, we prove that shifting the regularization center to a mode-specific physical anchor $w_{\mathrm{anchor}}$ preserves \emph{identical} strong concavity---the Hessian $\nabla^2 f = -2\eta I$ is translation-invariant.  We formalize the \texttt{ModeConeConstraint} structure and prove the belief-weighted anchor is a valid simplex point.
-
-    \item \textbf{Target Cone localized tracking bound (Parts X, XII--XV, \S\ref{sec:tracking}):} We prove:
-    \begin{equation}
-        |{\langle w, \mathbf{Q}_n(s,a)\rangle - \langle w, \mathbf{Q}^*_n(s,a)\rangle}| \le \gamma^n D_0 + \gamma \frac{\Delta_{\mathrm{global}}}{1{-}\gamma} + \underbrace{\langle w, \Delta_{\mathrm{vec}}\rangle}_{\Delta_{\mathrm{local}}},
-        \label{eq:target_cone_bound_intro}
-    \end{equation}
-    where $\Delta_{\mathrm{local}} \ll \Delta_{\mathrm{global}}$ when $w$ assigns near-zero weight to collapsed objectives.  The improvement is exactly $\Delta_{\mathrm{global}} - \Delta_{\mathrm{local}} \ge 0$; in full suppression ($\Delta_{\mathrm{local}} = 0$), the bound achieves a factor-$\gamma$ reduction.
-
-    \item \textbf{Complete formal verification:} All results are machine-verified in Lean~4/Mathlib with \textbf{no \texttt{sorry}} (1,697 lines in \texttt{BAMOR.lean}, 560 lines imported from \texttt{BAPR.lean}, 35+ theorems).  The key Lean statement for the capstone theorem is:
-    \begin{center}
-    \fbox{\parbox{0.92\linewidth}{\small\ttfamily
-    theorem target\_cone\_multistep\_tracking\\
-    \quad(T : $\mathbb{N}$ $\to$ ($\mathcal{S}$ $\times$ $\mathcal{A}$ $\to$ Fin m $\to$ $\mathbb{R}$) $\to$ ($\mathcal{S}$ $\times$ $\mathcal{A}$ $\to$ Fin m $\to$ $\mathbb{R}$))\\
-    \quad(Q Q\_star : $\mathbb{N}$ $\to$ $\mathcal{S}$ $\times$ $\mathcal{A}$ $\to$ Fin m $\to$ $\mathbb{R}$) (w : Fin m $\to$ $\mathbb{R}$)\\
-    \quad\{$\gamma$\_val : $\mathbb{R}$\} (h$\gamma$\_nn : 0 $\le$ $\gamma$\_val) (h$\gamma$\_lt : $\gamma$\_val $<$ 1)\\
-    \quad(hT\_contract : $\forall$ n x y, dist (T n x) (T n y) $\le$ $\gamma$\_val * dist x y)\\
-    \quad... (n : $\mathbb{N}$) (hn : 0 $<$ n) (sa : $\mathcal{S}$ $\times$ $\mathcal{A}$) :\\
-    \quad|scalarize (Q n) w sa - scalarize (Q\_star n) w sa| $\le$\\
-    \quad$\gamma$\_val \^{} n * dist (Q 0) (Q\_star 0) +\\
-    \quad$\gamma$\_val * ($\Delta$\_g / (1 - $\gamma$\_val)) + $\sum$ i, w i * $\Delta$\_vec i
-    }}
-    \end{center}
+    \item \textbf{MORL update portfolio.} An explicit combination of transition context, preference sampling, relabeling and candidate updates trains shared networks, with bounded reward-coordinate feedback and no additional selector evaluation rollouts.
+    \item \textbf{Independent final-policy evidence.} A prespecified twenty-seed CAPQL comparison reports direct utility, final hypervolume and cost at equal interaction budgets; archive-matched and score-blind controls examine retention and feedback separately.
+    \item \textbf{Implementation-facing analysis.} Lean proofs establish target consistency and feedback bounds. A vector-reselection counterexample and strict margin certificate characterize local target stability, with conditional tracking and archive properties.
 \end{enumerate}
 
-
-% ════════════════════════════════════════════════════════════════════════════
 \section{Related Work}
 % ════════════════════════════════════════════════════════════════════════════
 
 \subsection{Multi-objective reinforcement learning}
-MORL has seen rapid progress in discovering the Pareto front via conditioned networks.  \emph{Envelope Q-learning}~\cite{Yang2019Envelope} trains a universal value function conditioned on the preference weight, but uses linear scalarization which cannot discover non-convex Pareto regions.  \emph{GPI-LS}~\cite{Alegre2023GPILS} combines generalized policy improvement with linear support to efficiently cover the Pareto front with provable quality guarantees.  \emph{CAPQL}~\cite{Lu2023CAPQL} adds a strongly concave regularizer $-\eta\|w\|^2$ to stabilize the scalarized objective, proving:
-\begin{enumerate}
-    \item A bijective mapping from weights to Pareto points (eliminating the discontinuity problem of linear scalarization);
-    \item Convergence of the regularized Bellman operator under stationarity.
-\end{enumerate}
-However, all of these assume stationary dynamics and a globally traversable preference simplex.
+Envelope Q-learning~\cite{Yang2019Envelope} learns preference-conditioned
+values; GPI-LS~\cite{Alegre2023GPILS} combines generalized policy improvement
+with linear support. CAPQL~\cite{Lu2023CAPQL} introduces concave-augmented
+Pareto Q-learning with entropy augmentation and preference-conditioned vector
+critics. These are established building blocks. Hindsight Preference
+Replay~\cite{Shianifar2026HPR} uses return-aligned or neighborhood relabeling
+without changing CAPQL's architecture or losses. BAMOR instead jointly varies
+sampling, relabeling, candidate counts and regularization for context-conditioned
+networks. Robust policy bootstrapping~\cite{Abdelfattah2023Bootstrapping}
+adapts through a coverage set of steppingstone policies; BAMOR's optional
+archive retains actors without bootstrapping the current controller.
 
-\textbf{What BAMOR adds:} (i)~Non-stationary tracking bounds that CAPQL cannot provide; (ii)~mode-specific anchor regularization that provably preserves CAPQL's strong concavity while restricting to the Target Cone; (iii)~a formal improvement quantification showing the advantage over global tracking.
+\subsection{Online allocation and algorithm configuration}
+Adaptive operator selection separates credit assignment from probability
+adaptation; smoothed rewards and exploration floors are established
+strategies~\cite{DaCosta2008AOS}. Learning-progress curricula use bandits to
+allocate examples among tasks~\cite{Graves2017Curriculum}. Online RL algorithm
+selection~\cite{Laroche2018Selection} chooses among off-policy learners trained
+on shared trajectories; BAMOR switches update configurations
+for one continuously trained actor--critic instead of selecting different
+learners' policies. Dynamic algorithm configuration learns state-dependent
+parameter control across instances~\cite{Biedenkapp2020DAC}, including
+heterogeneous controls for multi-objective evolutionary
+optimization~\cite{Xue2022MADAC}. BAMOR uses an online rule rather than a
+separately trained configuration policy. Its contribution is the specified
+MORL combination and its separate analysis of execution, coverage and feedback.
 
 \subsection{Non-stationary and robust RL}
-Piecewise-stationary MDPs~\cite{Padakandla2020Survey, Lecarpentier2019NonStationary} model environments with abrupt regime changes.  BAPR~\cite{Zhang2025BAPR} integrates BOCD~\cite{Adams2007BOCD} with robust ensemble SAC~\cite{Haarnoja2018SAC}, providing $\gamma$-contraction with frozen beliefs and sharp counterexamples for Q-dependent beliefs.  RE-SAC~\cite{Zhang2025RESAC} disentangles aleatoric and epistemic risk via frozen structural penalties.  Robust MDPs~\cite{Wiesemann2013RobustMDP} seek policies optimal under worst-case perturbations, but use a static uncertainty set calibrated for the entire training process.
-
-\textbf{What BAMOR adds:} Extension from scalar to vector-valued Q-functions, with new proof challenges at the nested Pi metric level, plus the entirely new Target Cone theory that has no analogue in single-objective RL.
-
-\subsection{Context-aware multi-objective optimization}
-The R2-EMOA algorithm~\cite{R2EMOA2013} demonstrates that restricting the weight vector domain induces a ``Target Cone'' effect in evolutionary multi-objective optimization---populations concentrate on specific Pareto front slices.  Preference orchestrators~\cite{PRO2024} in LLM alignment use prompt-specific weight inference, essentially performing narrow-interval search per context.  The Multi-Objective Contextual MDP (MOC-MDP)~\cite{MOCMDP2020} framework formalizes mode-objective coupling through context-dependent reward and transition functions.
-
-\textbf{What BAMOR adds:} The first formal theory connecting mode-objective coupling to provably tighter tracking bounds, with machine-verified guarantees.  No prior work provides quantified improvement from Target Cone restriction.
-
-\subsection{Formal verification in RL}
-The use of interactive theorem provers (Lean, Coq, Isabelle) in RL is nascent.  RE-SAC~\cite{Zhang2025RESAC} and BAPR~\cite{Zhang2025BAPR} pioneered machine-verified contraction proofs and counterexamples.  BAMOR significantly extends this: 1,697 lines covering 15 distinct proof chapters, the most extensive formal verification of a MORL algorithm to date.
-
-
-% ════════════════════════════════════════════════════════════════════════════
-\section{Preliminaries}
-% ════════════════════════════════════════════════════════════════════════════
-
-\subsection{Multi-objective piecewise-stationary MDP}
-
-\begin{definition}[MO-PS-MDP]
-\label{def:mopsmdp}
-A \emph{Multi-Objective Piecewise-Stationary MDP} is a sequence of multi-objective MDPs $\{\mathcal{M}_k\}_{k=1}^\infty$ where each $\mathcal{M}_k = (\mathcal{S}, \mathcal{A}, P_k, \mathbf{R}_k, \gamma)$ shares state and action spaces but has distinct:
-\begin{itemize}
-    \item Transition kernels $P_k : \mathcal{S} \times \mathcal{A} \to \Delta(\mathcal{S})$;
-    \item \emph{Vector-valued} reward functions $\mathbf{R}_k : \mathcal{S} \times \mathcal{A} \to \mathbb{R}^m$, where $m$ is the number of objectives;
-    \item Discount factor $\gamma \in [0, 1)$ shared across all modes.
-\end{itemize}
-Regime switches occur at unknown times $t_1 < t_2 < \cdots$.  Between consecutive switches, the MDP is stationary.
-\end{definition}
-
-\subsection{Vector-valued Q-functions and metrics}
-
-The Q-function is vector-valued: $\mathbf{Q} : \mathcal{S} \times \mathcal{A} \to \mathbb{R}^m$, where $Q_i(s,a)$ is the expected discounted return for objective $i$.  The function space is equipped with the product $L_\infty$ (sup-norm) metric:
-\begin{equation}
-    \mathrm{dist}(\mathbf{Q}_1, \mathbf{Q}_2) = \sup_{(s,a) \in \mathcal{S} \times \mathcal{A}} \sup_{i \in \{1,\ldots,m\}} |Q_{1,i}(s,a) - Q_{2,i}(s,a)|.
-    \label{eq:dist}
-\end{equation}
-In Lean~4, this is realized as the nested Pi metric: $\mathcal{S} \times \mathcal{A} \to \mathrm{Fin}\, m \to \mathbb{R}$, where each layer inherits the \texttt{PseudoMetricSpace} instance from Mathlib.
-
-\subsection{Preference-weighted scalarization}
-
-Given a preference weight $w \in \Delta^{m-1}$ (the probability simplex: $w_i \ge 0$, $\sum_i w_i = 1$), the scalarized Q-value is:
-\begin{equation}
-    Q_w(s,a) = \langle w, \mathbf{Q}(s,a) \rangle = \sum_{i=1}^m w_i \cdot Q_i(s,a).
-    \label{eq:scalarize}
-\end{equation}
-The Pareto value function is $V_w(s) = \max_a Q_w(s,a)$.  Following CAPQL~\cite{Lu2023CAPQL}, we regularize:
-\begin{equation}
-    f_\eta(w; s,a) = \langle w, \mathbf{Q}(s,a) \rangle - \eta \|w\|^2,
-    \label{eq:regularized_scalarize}
-\end{equation}
-where $\eta > 0$ ensures a smooth, bijective mapping from weights to Pareto points by making $f_\eta$ strictly concave in $w$.
-
-\subsection{BAPR: Bayesian Amnesic Piecewise-Robust RL}
-
-BAMOR builds upon the BAPR framework~\cite{Zhang2025BAPR}, which integrates Bayesian Online Change Detection (BOCD)~\cite{Adams2007BOCD} with robust ensemble SAC~\cite{Haarnoja2018SAC, Zhang2025RESAC}.  Key properties we import:
-\begin{itemize}
-    \item \textbf{BAPR operator:} $\mathcal{T}^{\mathrm{BAPR}}_\rho Q = \sum_h \rho(h) \mathcal{T}_h Q$ is a $\gamma$-contraction when $\rho$ is frozen.
-    \item \textbf{Bayesian belief update:} $\rho'(h) = \rho(h) L(h) / Z$ preserves $\rho' \ge 0$ and $\sum_h \rho'(h) = 1$.
-    \item \textbf{Counterexample:} Q-dependent beliefs break contraction when $\gamma + \lambda\Delta \ge 1$.
-\end{itemize}
-
-\begin{remark}[What changes from BAPR to BAMOR]
-\label{rem:bapr_to_bamor}
-The extension from BAPR (scalar $Q : \mathcal{S} \times \mathcal{A} \to \mathbb{R}$) to BAMOR (vector $\mathbf{Q} : \mathcal{S} \times \mathcal{A} \to \mathbb{R}^m$) is not a trivial generalization.  It introduces:
-\begin{enumerate}
-    \item \textbf{Nested metric:} The $L_\infty$ metric on $\mathbb{R}^m$-valued functions requires two layers of Pi-metric unpacking in the contraction proof.
-    \item \textbf{Scalarization layer:} An entirely new non-expansiveness proof for the weighted sum, and its composition with component-wise contraction.
-    \item \textbf{Weight space geometry:} Lipschitz continuity in $w$, strong concavity, and the anchor-shift theory have no analogue in single-objective BAPR.
-    \item \textbf{Component-wise drift:} The Target Cone theory exploits the vector structure of the drift, which collapses to a scalar in BAPR.
-\end{enumerate}
-\end{remark}
+Piecewise-stationary MDPs~\cite{Padakandla2020Survey,
+Lecarpentier2019NonStationary} model abrupt changes; contextual
+MORL~\cite{Teoh2025MOCMDP} studies context-dependent multi-objective environments.
+BAPR~\cite{Zhang2025BAPR} combines Bayesian online change-point
+detection~\cite{Adams2007BOCD} with robust ensemble SAC~\cite{Haarnoja2018SAC},
+while RE-SAC~\cite{Zhang2025RESAC} separates risk through structural penalties.
+Robust MDPs~\cite{Wiesemann2013RobustMDP} represent uncertainty through
+ambiguity sets. BAMOR inherits BAPR's adaptation motivation but uses observed
+transition context and progress-based allocation rather than its belief update
+or RE-SAC's penalties. The analysis concerns implemented targets, feedback and
+archives.
 
 
 % ════════════════════════════════════════════════════════════════════════════
-\section{The BAMOR Framework}
-\label{sec:framework}
-% ════════════════════════════════════════════════════════════════════════════
+\input{method_v23}
 
-\subsection{Mode-conditional multi-objective Bellman operator}
-
-For each environment mode $h \in \mathcal{H}$ (finite, non-empty), we define the mode-conditional multi-objective operator acting on vector-valued Q-functions.
-
-\begin{definition}[Mode-conditional operator --- Lean: \texttt{T\_mode\_mo}]
-\label{def:t_mode_mo}
-\begin{equation}
-    [\mathcal{T}_h \mathbf{Q}](s,a,i) = R_h(s,a,i) + \gamma \left( \sum_{s' \in \mathcal{S}} P_h(s'|s,a) \underbrace{\max_{a' \in \mathcal{A}} Q_i(s',a')}_{V_i^{\mathbf{Q}}(s')} - \lambda_{\mathrm{epi}} \Gamma_{\mathrm{epi},h}(s,a,i) - \kappa_i \right),
-    \label{eq:mode_operator}
-\end{equation}
-where:
-\begin{itemize}
-    \item $R_h(s,a,i)$ is the reward for objective $i$ under mode $h$;
-    \item $V_i^{\mathbf{Q}}(s') = \max_{a'} Q_i(s',a')$ is the per-component value function;
-    \item $\Gamma_{\mathrm{epi},h}(s,a,i)$ is the per-objective epistemic penalty from the frozen target ensemble;
-    \item $\kappa_i$ is the per-objective aleatoric penalty from frozen critic weights (cf.\ RE-SAC~\cite{Zhang2025RESAC}).
-\end{itemize}
-\end{definition}
-
-\begin{remark}[Per-objective penalties]
-Unlike BAPR (scalar $\kappa$, scalar $\Gamma_{\mathrm{epi}}$), BAMOR uses \emph{per-objective} penalties $\kappa_i$ and $\Gamma_{\mathrm{epi},h}(s,a,i)$.  This allows different objectives to have different aleatoric noise levels and epistemic uncertainty---critical for multi-objective settings where, e.g., speed measurement is noisy but headway measurement is precise.
-\end{remark}
-
-\subsection{BAMOR operator: belief-weighted multi-objective mixture}
-
-\begin{definition}[BAMOR operator --- Lean: \texttt{T\_BAMOR}]
-\label{def:t_bamor}
-The BAMOR operator is the belief-weighted mixture over modes:
-\begin{equation}
-    [\mathcal{T}^{\mathrm{BAMOR}}_\rho \mathbf{Q}](s,a,i) = \sum_{h \in \mathcal{H}} \rho(h) \cdot [\mathcal{T}_h \mathbf{Q}](s,a,i),
-    \label{eq:bamor_operator}
-\end{equation}
-where $\rho : \mathcal{H} \to [0,1]$ is a belief distribution satisfying $\rho(h) \ge 0$ for all $h$ and $\sum_h \rho(h) = 1$, \textbf{frozen during each Bellman backup}.
-\end{definition}
-
-\begin{remark}[Frozen beliefs: necessary, not convenient]
-As proven in the BAPR counterexample~\cite{Zhang2025BAPR}, Q-dependent beliefs break contraction.  The frozen-belief design is a load-bearing structural requirement, not a simplification.  The belief is updated \emph{between} backup iterations using the Mahalanobis surprise signal.
-\end{remark}
-
-\subsection{Belief-update rules: a separable design choice}
-\label{sec:belief_rules}
-
-The contraction proof (\S\ref{sec:contraction}) holds for \emph{any} belief $\rho$ that is frozen across a single backup iteration.  The practical question is how to produce $\rho$ at deployment.  We consider three regimes, in increasing order of algorithmic commitment:
-
-\textbf{(B1) Oracle / mode-labelled belief.}  When the deployment pipeline exposes a mode label $h^\star$ (e.g., a weather code, a traffic-light phase, or a diurnal indicator), set $\rho = \delta_{h^\star}$.  Contraction holds trivially; the cone estimator receives clean per-mode data.
-
-\textbf{(B2) Static uniform belief ($\rho_h = 1/|\mathcal{H}|$).}  When no label is available and we are unwilling to trust an online estimator, freeze the belief at the uniform prior.  The cone estimator then accumulates a \emph{global} anchor that averages over the modes visited during training---an aggressive simplification, but one that empirically gives the \emph{strongest} results in our high-noise 2-D benchmark (\S\ref{sec:exp_ablation}, variant \texttt{BAMOR-TC}).  Intuitively, the cone-only concentration still filters out clearly-unreachable corners of the simplex, which is where most of the wasted exploration under uniform-$w$ sampling occurs.
-
-\textbf{(B3) Online Mahalanobis change-point belief.}  A fully automatic belief update that turns reward residuals into a Mahalanobis $\chi^2$ surprise and triggers a round-robin mode reassignment on threshold crossings:
-\begin{align}
-    d^2_{\mathrm{Mah}}(\boldsymbol{\xi}, \mathrm{prec}) &= \sum_{i=1}^m \mathrm{prec}_i \cdot \xi_i^2, \qquad
-    L(h) = \exp\bigl(-\tfrac{1}{2} d^2_{\mathrm{Mah}}(\boldsymbol{\xi}(h), \mathrm{prec})\bigr).
-    \label{eq:mahalanobis}
-\end{align}
-The Mahalanobis likelihood is strictly positive, so the normalisation $Z = \sum_h \rho(h) L(h) > 0$ automatically (Lean: \texttt{mahalanobis\_normalization\_pos})---this eliminates the ad-hoc $Z > 0$ hypothesis required in generic BAPR.
-
-\textbf{A caveat from our experiments.}  Variant (B3) is elegant in theory and is the mechanism we originally designed.  However, in our 2-objective synthetic benchmark with narrow per-mode reward gaps the detector over-triggers on genuine reward-noise (\S\ref{sec:exp_ablation}, $\sim\!10$--$14$ spurious switches per run), corrupting the per-mode cone estimator and producing catastrophic Mode-1 collapses on $\sim\!30\%$ of seeds.  We therefore \emph{do not advocate (B3) as the default recipe}; our reported ``BAMOR'' is variant (B2), and (B3) is evaluated as a secondary ablation to quantify the damage that an aggressive automatic rule can inflict.  Designing a well-calibrated online belief update for settings where mode labels are unavailable is an open problem we discuss in \S\ref{sec:limits}.
-
-\subsection{Substrate constraints and Target Cone}
-\label{sec:target_cone}
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.78\linewidth]{fig_submfld_hero.pdf}
-\caption{The piecewise Pareto sub-manifold structure that BAMOR-TC is designed to exploit, here recovered empirically from $20$ seeds on the synthetic non-stationary MO benchmark.  Each mode's achievable trade-off is a \emph{disjoint, narrow arc}: Mode 0 (red) is horizontal because progress is collapsed (any preference weight that demands progress earns nothing); Mode 1 (green) is vertical because safety is collapsed; Mode 2 (blue) is the only mode admitting a full elbow.  The classical assumption that the Pareto front is one globally smooth surface fails by inspection.  BAMOR's \emph{Target Cone} restricts the weight sampler to the relevant arc per mode (\S\ref{sec:framework}).}
-\label{fig:submfld_hero}
-\end{figure}
-
-\begin{definition}[Substrate Constraint]
-\label{def:substrate}
-An environment mode $h$ imposes a \emph{substrate constraint} on objective $i$ if the physical dynamics under mode $h$ bound the achievable improvement in objective $i$ regardless of the policy:
-\begin{equation}
-    \max_\pi V_i^\pi(s) \le B_{h,i} \quad \text{for all } s \in \mathcal{S},
-\end{equation}
-where $B_{h,i}$ is a mode-dependent physical ceiling that may be much lower than the ceiling under other modes.  Fig.~\ref{fig:submfld_hero} shows what this looks like in practice: each mode's achievable returns lie on a different arc.
-\end{definition}
-
-\begin{definition}[Target Cone --- Lean: \texttt{ModeConeConstraint}]
-\label{def:target_cone}
-For each mode $h$, the \emph{Target Cone} $\mathcal{C}_h \subset \Delta^{m-1}$ is characterized by:
-\begin{itemize}
-    \item A \emph{preference anchor} $w_{\mathrm{anchor}}(h) \in \Delta^{m-1}$: the physical center of the cone, satisfying $w_{\mathrm{anchor}}(h,i) \ge 0$ and $\sum_i w_{\mathrm{anchor}}(h,i) = 1$;
-    \item A \emph{cone radius} $r_h > 0$: $\mathcal{C}_h = \{w \in \Delta^{m-1} : \|w - w_{\mathrm{anchor}}(h)\|_2 \le r_h\}$.
-\end{itemize}
-Weights outside $\mathcal{C}_h$ correspond to physically unreachable Pareto points under mode $h$.
-\end{definition}
-
-\begin{example}[Target Cones for bus transit]
-\label{ex:cones}
-Using Example~\ref{ex:bus} with $m = 2$ (headway, speed):
-\begin{center}
-\begin{tabular}{lccc}
-\toprule
-\textbf{Mode} & $w_{\mathrm{anchor}}$ & \textbf{Cone interval} & \textbf{Physical reason} \\
-\midrule
-Normal & $(0.5, 0.5)$ & $w_{\mathrm{headway}} \in [0.3, 0.7]$ & Free trade-off \\
-Severe congestion & $(0.95, 0.05)$ & $w_{\mathrm{headway}} \in [0.85, 1.0]$ & Speed ceiling hit \\
-Demand surge & $(0.2, 0.8)$ & $w_{\mathrm{headway}} \in [0.1, 0.4]$ & Must move passengers \\
-\bottomrule
-\end{tabular}
-\end{center}
-\end{example}
-
-\begin{definition}[Belief-weighted anchor --- Lean: \texttt{belief\_weighted\_anchor}]
-\label{def:belief_anchor}
-The belief-weighted anchor aggregates mode-specific anchors:
-\begin{equation}
-    \tilde{w}_i = \sum_{h \in \mathcal{H}} \rho(h) \cdot w_{\mathrm{anchor}}(h, i).
-    \label{eq:belief_anchor}
-\end{equation}
-When $\rho$ concentrates on mode $h_0$ (after surprise detection), $\tilde{w} \approx w_{\mathrm{anchor}}(h_0)$.  During uncertainty (diffuse $\rho$), it smoothly interpolates.
-\end{definition}
-
-\subsection{Anchor-shifted regularization}
-\label{sec:anchor_reg}
-
-Instead of penalizing distance from the origin ($-\eta\|w\|^2$, as in CAPQL), BAMOR penalizes distance from the current mode's physical anchor:
-\begin{equation}
-    f_{\mathrm{anchor}}(w; s,a) = \langle w, \mathbf{Q}(s,a) \rangle - \eta \|w - \tilde{w}\|^2.
-    \label{eq:anchor_reg}
-\end{equation}
-This acts as a ``gravitational field'' centered at the belief-weighted anchor, penalizing exploration of physically impossible trade-offs while preserving the Pareto front's smoothness (Theorem~\ref{thm:anchor_concavity}).
-
-\subsection{Context-aware weight sampling}
-\label{sec:sampling}
-
-During training, instead of sampling $w \sim \mathrm{Dirichlet}(1,\ldots,1)$ uniformly over the full simplex:
-\begin{equation}
-    w \sim \mathrm{Uniform}(\mathcal{C}_{\tilde{h}}), \quad \text{where } \tilde{h} = \arg\max_h \rho(h),
-\end{equation}
-and the policy loss becomes:
-\begin{equation}
-    \mathcal{L}_\pi(\theta) = \mathbb{E}_{s, w \sim \mathcal{C}_{\tilde{h}}} \left[ \alpha \log \pi_\theta(a|s,e) - \left( \langle w, \bar{\mathbf{Q}}(s \oplus e, a) \rangle - \eta\|w - \tilde{w}\|^2 + \beta_{\mathrm{eff}} \sigma_{\mathrm{ens}}(s,a) \right) \right].
-\end{equation}
-
-\subsection{BAMOR algorithm}
-\label{sec:algorithm}
-
-\begin{algorithm}[H]
-\caption{BAMOR: Bayesian Amnesic Multi-Objective Robust SAC}
-\label{alg:bamor}
-\begin{algorithmic}
-\STATE \textbf{Initialize:} Ensemble $\mathbf{Q}$-networks $\{\mathbf{Q}_{\phi_1}, \dots, \mathbf{Q}_{\phi_K}\}$, Actor $\pi_\theta$, Context network $\phi_\psi$
-\STATE \textbf{Initialize:} Target networks $\phi'_k \leftarrow \phi_k$; belief $\rho \leftarrow$ {\tt BeliefUpdateRule.initial()} (see \S\ref{sec:belief_rules}); per-mode cone statistics $\{\hat w_{\mathrm{anchor}}(h), \hat r_h\}$ (running estimators)
-\FOR{each training iteration}
-    \STATE \textit{// --- Environment Interaction ---}
-    \STATE Collect transitions using $\pi_\theta$; store $(s, a, \mathbf{r}, s', d, \tau_{\mathrm{id}})$ in $\mathcal{D}$
-
-    \STATE \textit{// --- Belief update (pluggable; see \S\ref{sec:belief_rules}) ---}
-    \STATE $\rho \leftarrow$ {\tt BeliefUpdateRule.update($\rho$, observations)}
-    \hfill// B1: oracle, B2: identity, B3: Mahalanobis (Eq.~\ref{eq:mahalanobis})
-    \STATE Compute belief-weighted anchor $\tilde{w} = \sum_h \rho(h)\,\hat w_{\mathrm{anchor}}(h)$ (Eq.~\ref{eq:belief_anchor})
-    \STATE Update cone statistics $\hat w_{\mathrm{anchor}}(h)$, $\hat r_h$ from reward variance, restricted to samples where $\arg\max\rho = h$
-    \STATE Compute adaptive penalty $\beta_{\mathrm{eff}}$ from $\rho$ (cf.\ BAPR~\cite{Zhang2025BAPR})
-
-    \STATE \textit{// --- Target Cone weight sampling ---}
-    \STATE Sample $w \sim \mathrm{Dir}(\kappa \cdot \tilde w)$ with concentration $\kappa$
-    \hfill// concentrates mass inside the current cone
-
-    \STATE \textit{// --- Gradient Updates ---}
-    \FOR{$n = 1, \ldots, N_{\text{updates}}$}
-        \STATE Sample mini-batch from $\mathcal{D}$; compute context $e = \phi_\psi(s)$
-
-        \STATE \textit{// Multi-objective critic update}
-        \STATE $y_i = r_i + \gamma (\frac{1}{K}\sum_k \hat{Q}_{i,\phi'_k}(s' \oplus e', a') - \alpha \log \pi(a'|s',e'))$
-        \STATE $\mathcal{L}_{\mathbf{Q}}(\phi_k) = \sum_i (Q_{i,\phi_k}(s \oplus e, a) - y_i)^2 + \lambda_{\mathrm{ale}} \sum_l \|W_l^{(k)}\|_1$
-
-        \STATE \textit{// Policy update with anchor-shifted regularization}
-        \STATE $\mathcal{L}_\pi(\theta) = \alpha \log \pi - (\langle w, \bar{\mathbf{Q}} \rangle - \eta\|w - \tilde{w}\|^2 + \beta_{\mathrm{eff}} \sigma_{\mathrm{ens}})$
-
-        \STATE \textit{// Context and temperature updates}
-        \STATE Update $\phi_\psi$ via RMDM loss; update $\alpha$ via dual gradient descent
-        \STATE Soft-update targets: $\phi'_k \leftarrow \tau \phi_k + (1-\tau)\phi'_k$
-    \ENDFOR
-\ENDFOR
-\end{algorithmic}
-\end{algorithm}
-
-\begin{remark}[Computational overhead]
-The Target Cone sampling adds negligible overhead: computing $\tilde{w}$ is $O(|\mathcal{H}| \cdot m)$ per iteration (a single weighted sum), and sampling from a simplex-intersected ball is $O(m)$ via rejection sampling.  The dominant cost remains the ensemble critic's $K$ forward/backward passes.
-\end{remark}
-
-\begin{remark}[Tractable approximation]
-As in BAPR~\cite{Zhang2025BAPR}, the abstract mixture $\sum_h \rho(h) \mathcal{T}_h$ is approximated by a single shared multi-objective critic $\mathbf{Q}_\phi(s \oplus e, a)$ conditioned on the context embedding $e$.  The belief is collapsed into (i)~the belief-weighted anchor $\tilde{w}$ for Target Cone sampling, and (ii)~the scalar $\beta_{\mathrm{eff}}$ for adaptive conservatism.  The contraction guarantee applies because $\tilde{w}$ and $\beta_{\mathrm{eff}}$ are frozen during each backup iteration.
-\end{remark}
-
-
-% ════════════════════════════════════════════════════════════════════════════
-\section{Theoretical Analysis}
-\label{sec:theory}
-% ════════════════════════════════════════════════════════════════════════════
-
-All theorems in this section are machine-verified in Lean~4/Mathlib with no \texttt{sorry}.  Full proof details with complete derivations are in Appendix~\ref{app:contraction}--\ref{app:improvement}.  We state each result with proof sketches that highlight the key mathematical moves.
-
-\subsection{BAMOR is a $\gamma$-contraction (Parts I--VI)}
-\label{sec:contraction}
-
-The proof proceeds bottom-up: per-component max properties $\to$ per-mode properties $\to$ mixture properties $\to$ Banach fixed point.
-
-\subsubsection{Component-wise max properties}
-
-\begin{lemma}[Component-wise max is 1-Lipschitz --- Lean: \texttt{max\_over\_a\_comp\_nonexpansive}]
-\label{lem:max_lip}
-If $|Q_{1,i}(s,a) - Q_{2,i}(s,a)| \le \varepsilon$ for all $s,a,i$, then $|V_i^{\mathbf{Q}_1}(s) - V_i^{\mathbf{Q}_2}(s)| \le \varepsilon$ for all $s,i$.
-\end{lemma}
-
-\begin{proof}
-For the upper bound: for any action $a$, $Q_{1,i}(s,a) \le Q_{2,i}(s,a) + \varepsilon \le V_i^{\mathbf{Q}_2}(s) + \varepsilon$.  Taking $\max_a$ gives $V_i^{\mathbf{Q}_1}(s) \le V_i^{\mathbf{Q}_2}(s) + \varepsilon$.  Symmetrically for the lower bound.  The Lean proof proceeds via \texttt{Finset.sup'\_le} applied to the finite action space.
-\end{proof}
-
-\subsubsection{Per-mode contraction}
-
-\begin{lemma}[Per-mode pointwise bound --- Lean: \texttt{t\_mode\_mo\_pointwise\_bound}]
-\label{lem:mode_bound}
-If $\mathrm{dist}(\mathbf{Q}_1, \mathbf{Q}_2) \le \varepsilon$, then $|[\mathcal{T}_h \mathbf{Q}_1](s,a,i) - [\mathcal{T}_h \mathbf{Q}_2](s,a,i)| \le \gamma\varepsilon$ for all $h,s,a,i$.
-\end{lemma}
-
-\begin{proof}
-The frozen penalties ($R_h$, $\Gamma_{\mathrm{epi},h}$, $\kappa_i$) cancel in the difference.  By Lemma~\ref{lem:max_lip}: $|V_i^{\mathbf{Q}_1}(s') - V_i^{\mathbf{Q}_2}(s')| \le \varepsilon$.  Then:
-\begin{align}
-    |[\mathcal{T}_h \mathbf{Q}_1 - \mathcal{T}_h \mathbf{Q}_2](s,a,i)| &= \gamma \left|\sum_{s'} P_h(s'|s,a)(V_i^{\mathbf{Q}_1}(s') - V_i^{\mathbf{Q}_2}(s'))\right| \notag \\
-    &\le \gamma \sum_{s'} P_h(s'|s,a) |V_i^{\mathbf{Q}_1}(s') - V_i^{\mathbf{Q}_2}(s')| \quad \text{(triangle, $P_h \ge 0$)} \notag \\
-    &\le \gamma \sum_{s'} P_h(s'|s,a) \cdot \varepsilon = \gamma\varepsilon \cdot \underbrace{\sum_{s'} P_h(s'|s,a)}_{=1}. \qedhere
-\end{align}
-\end{proof}
-
-\subsubsection{Main contraction theorem}
-
-\begin{theorem}[BAMOR $\gamma$-contraction --- Lean: \texttt{bamor\_contraction}]
-\label{thm:bamor_contraction}
-Under (A0)--(A4), the BAMOR operator satisfies:
-\begin{equation}
-    \mathrm{dist}(\mathcal{T}^{\mathrm{BAMOR}}_\rho \mathbf{Q}_1, \mathcal{T}^{\mathrm{BAMOR}}_\rho \mathbf{Q}_2) \le \gamma \cdot \mathrm{dist}(\mathbf{Q}_1, \mathbf{Q}_2).
-\end{equation}
-\end{theorem}
-
-\begin{proof}
-Let $\varepsilon = \mathrm{dist}(\mathbf{Q}_1, \mathbf{Q}_2)$.  We need to show $\mathrm{dist}(\mathcal{T}\mathbf{Q}_1, \mathcal{T}\mathbf{Q}_2) \le \gamma\varepsilon$.  By Eq.~\eqref{eq:dist}, this requires showing $|[\mathcal{T}\mathbf{Q}_1](s,a,i) - [\mathcal{T}\mathbf{Q}_2](s,a,i)| \le \gamma\varepsilon$ for all $(s,a,i)$.
-
-Expanding the BAMOR operator:
-\begin{align}
-    &|[\mathcal{T}^{\mathrm{BAMOR}}_\rho \mathbf{Q}_1](s,a,i) - [\mathcal{T}^{\mathrm{BAMOR}}_\rho \mathbf{Q}_2](s,a,i)| \notag \\
-    &= \left|\sum_{h} \rho(h) \left([\mathcal{T}_h \mathbf{Q}_1](s,a,i) - [\mathcal{T}_h \mathbf{Q}_2](s,a,i)\right)\right| \notag \\
-    &\le \sum_{h} \rho(h) \left|[\mathcal{T}_h \mathbf{Q}_1](s,a,i) - [\mathcal{T}_h \mathbf{Q}_2](s,a,i)\right| \quad \text{(triangle inequality, $\rho(h) \ge 0$ by (A3))} \notag \\
-    &\le \sum_{h} \rho(h) \cdot \gamma\varepsilon \quad \text{(per-mode bound, Lemma~\ref{lem:mode_bound})} \notag \\
-    &= \gamma\varepsilon \cdot \sum_{h} \rho(h) = \gamma\varepsilon. \quad \text{($\sum \rho = 1$ by (A4))}
-\end{align}
-
-The Lean proof (function \texttt{bamor\_dist\_le}) proceeds by:
-\begin{enumerate}
-    \item Setting $\varepsilon := \mathrm{dist}(\mathbf{Q}_1, \mathbf{Q}_2)$ and showing $0 \le \varepsilon$;
-    \item Applying \texttt{dist\_pi\_le\_iff} twice to unpack the nested Pi metric, reducing to pointwise bounds;
-    \item Extracting pointwise bounds $|Q_{1,i}(s,a) - Q_{2,i}(s,a)| \le \varepsilon$ from the dist assumption;
-    \item Applying the mode-bound lemma and the triangle-inequality/normalization argument;
-    \item Taking the supremum over $(s,a,i)$ via \texttt{dist\_pi\_le\_iff} in the reverse direction.
-\end{enumerate}
-The existential form $\exists k < 1, \forall \mathbf{Q}_1\,\mathbf{Q}_2,\, \mathrm{dist}(\mathcal{T}\mathbf{Q}_1, \mathcal{T}\mathbf{Q}_2) \le k \cdot \mathrm{dist}(\mathbf{Q}_1, \mathbf{Q}_2)$ follows by witnessing $k := \gamma$ and $\gamma < 1$.
-\end{proof}
-
-\subsubsection{Blackwell conditions (Lean: Parts I)}
-
-For completeness and to bridge to the classical theory, we also verify both Blackwell conditions:
-
-\begin{lemma}[BAMOR monotonicity --- Blackwell (i) --- Lean: \texttt{bamor\_monotonicity}]
-If $\mathbf{Q}_1 \le \mathbf{Q}_2$ pointwise, then $\mathcal{T}^{\mathrm{BAMOR}}_\rho \mathbf{Q}_1 \le \mathcal{T}^{\mathrm{BAMOR}}_\rho \mathbf{Q}_2$ pointwise.
-\end{lemma}
-
-\begin{lemma}[BAMOR discounting --- Blackwell (ii) --- Lean: \texttt{bamor\_discounting}]
-For any constant vector $\mathbf{c} \in \mathbb{R}^m$: $\mathcal{T}^{\mathrm{BAMOR}}_\rho(\mathbf{Q} + \mathbf{c}) = \mathcal{T}^{\mathrm{BAMOR}}_\rho \mathbf{Q} + \gamma \mathbf{c}$.
-\end{lemma}
-
-\begin{proof}
-The discounting proof is where $\sum_h \rho(h) = 1$ (A4) is \emph{load-bearing}.  Per-mode: $\mathcal{T}_h(\mathbf{Q} + \mathbf{c})(s,a,i) = \mathcal{T}_h\mathbf{Q}(s,a,i) + \gamma c_i$ (because $\max_a (Q_i(s,a) + c_i) = \max_a Q_i(s,a) + c_i$ and $\sum_{s'} P_h = 1$).  Mixing: $\sum_h \rho(h)(\mathcal{T}_h\mathbf{Q}(s,a,i) + \gamma c_i) = \mathcal{T}^{\mathrm{BAMOR}}\mathbf{Q}(s,a,i) + \gamma c_i \cdot \sum_h \rho(h) = \mathcal{T}^{\mathrm{BAMOR}}\mathbf{Q}(s,a,i) + \gamma c_i$.
-\end{proof}
-
-\subsubsection{Banach fixed point (Part VI)}
-
-\begin{corollary}[Existence and uniqueness --- Lean: \texttt{bamor\_fixed\_point\_exists}, \texttt{bamor\_fixed\_point\_unique}]
-\label{cor:fixed_point}
-$\mathcal{T}^{\mathrm{BAMOR}}_\rho$ has a unique fixed point $\mathbf{Q}^*$---the \emph{robust Pareto-optimal value function} under belief $\rho$.
-\end{corollary}
-
-\begin{proof}
-\textbf{Uniqueness:} If $\mathcal{T}\mathbf{Q}_1 = \mathbf{Q}_1$ and $\mathcal{T}\mathbf{Q}_2 = \mathbf{Q}_2$, then $\mathrm{dist}(\mathbf{Q}_1, \mathbf{Q}_2) = \mathrm{dist}(\mathcal{T}\mathbf{Q}_1, \mathcal{T}\mathbf{Q}_2) \le \gamma \mathrm{dist}(\mathbf{Q}_1, \mathbf{Q}_2)$.  Since $\gamma < 1$ and $\mathrm{dist} \ge 0$: $(1 - \gamma)\mathrm{dist} \le 0$, forcing $\mathrm{dist} = 0$.
-
-\textbf{Existence:} The Lean proof bridges to Mathlib's \texttt{ContractingWith.exists\_fixedPoint}, starting from $\mathbf{Q}_0 = 0$.  The key steps: (i)~\texttt{bamor\_lipschitzWith} shows Lipschitz constant $\gamma$; (ii)~\texttt{bamor\_contractingWith} packages this with $\gamma < 1$; (iii)~the finite type ensures \texttt{edist} from $\mathbf{Q}_0$ to $\mathcal{T}\mathbf{Q}_0$ is finite.
-\end{proof}
-
-\subsubsection{Contraction after belief update (Parts II, IV)}
-
-\begin{corollary}[Post-update contraction --- Lean: \texttt{bamor\_contraction\_after\_update}]
-If $\rho$ is updated to $\rho'$ via Bayesian update with $Z > 0$, then $\mathcal{T}^{\mathrm{BAMOR}}_{\rho'}$ is a $\gamma$-contraction.
-\end{corollary}
-
-\begin{corollary}[Mahalanobis contraction --- Lean: \texttt{bamor\_contraction\_mahalanobis}]
-\label{cor:mahalanobis}
-With Mahalanobis likelihood, the $Z > 0$ requirement is automatically satisfied from prior support ($\exists h, \rho(h) > 0$), providing a stronger guarantee than generic BAPR.
-\end{corollary}
-
-
-\subsection{Scalarized contraction and weight sensitivity (Parts VII--VIII)}
-\label{sec:scalarized}
-
-\begin{theorem}[Scalarized BAMOR contraction --- Lean: \texttt{scalarized\_bamor\_contraction}]
-\label{thm:scalarized_contraction}
-For any $w \in \Delta^{m-1}$ and any $(s,a)$:
-\begin{equation}
-    |\langle w, \mathcal{T}^{\mathrm{BAMOR}}_\rho \mathbf{Q}_1(s,a) \rangle - \langle w, \mathcal{T}^{\mathrm{BAMOR}}_\rho \mathbf{Q}_2(s,a) \rangle| \le \gamma \cdot \mathrm{dist}(\mathbf{Q}_1, \mathbf{Q}_2).
-\end{equation}
-\end{theorem}
-
-\begin{proof}
-This composes two results:
-\begin{enumerate}
-    \item \textbf{Part I (contraction):} $|[\mathcal{T}\mathbf{Q}_1](s,a,i) - [\mathcal{T}\mathbf{Q}_2](s,a,i)| \le \gamma\varepsilon$ for all $i$;
-    \item \textbf{Part III (non-expansiveness):} $|\sum_i w_i (f_i - g_i)| \le \sum_i w_i |f_i - g_i| \le \max_i |f_i - g_i|$ when $w \ge 0, \sum w_i = 1$.
-\end{enumerate}
-Combining: $|\langle w, \mathcal{T}\mathbf{Q}_1(s,a) - \mathcal{T}\mathbf{Q}_2(s,a) \rangle| \le \gamma\varepsilon$.
-\end{proof}
-
-\begin{remark}[Why this matters]
-CAPQL~\cite{Lu2023CAPQL} raises the concern that Pareto aggregation might amplify Q-estimation error.  Theorem~\ref{thm:scalarized_contraction} formally refutes this: the scalarized operator inherits the \emph{same} contraction rate $\gamma$ as the component-wise operator.  No amplification occurs.
-\end{remark}
-
-\begin{lemma}[Weight Lipschitz --- Lean: \texttt{scalarize\_lipschitz\_in\_w}]
-\label{lem:weight_lipschitz}
-For Q-values bounded by $B$ ($|Q_i(s,a)| \le B$ for all $s,a,i$):
-\begin{equation}
-    |\langle w_1, \mathbf{Q}(s,a) \rangle - \langle w_2, \mathbf{Q}(s,a) \rangle| \le B \cdot \|w_1 - w_2\|_1.
-\end{equation}
-\end{lemma}
-
-\begin{proof}
-$|\sum_i (w_{1,i} - w_{2,i}) Q_i(s,a)| \le \sum_i |w_{1,i} - w_{2,i}| \cdot |Q_i(s,a)| \le B \sum_i |w_{1,i} - w_{2,i}|$.
-\end{proof}
-
-\begin{corollary}[Pareto value Lipschitz --- Lean: \texttt{pareto\_val\_lipschitz\_in\_w}]
-$|V_{w_1}(s) - V_{w_2}(s)| \le B \cdot \|w_1 - w_2\|_1$.
-\end{corollary}
-
-This result quantifies the ``nearby preferences $\Rightarrow$ nearby values'' property, justifying the cone-restricted sampling: if the sampled $w$ is within radius $r_h$ of the anchor, the resulting value differs by at most $B \cdot 2r_h$ from the anchor's value.
-
-
-\subsection{Strong concavity and anchor-shifted regularization (Parts IX, XI, XIII)}
-\label{sec:anchor}
-
-\subsubsection{CAPQL-style regularization (Part IX)}
-
-\begin{theorem}[Strong concavity --- Lean: \texttt{regularized\_scalarize\_strongly\_concave}]
-\label{thm:strong_concavity}
-For any $\eta, t \in \mathbb{R}$ and any $w_1, w_2$:
-\begin{equation}
-    f_\eta(tw_1 + (1{-}t)w_2) \ge t \cdot f_\eta(w_1) + (1{-}t) \cdot f_\eta(w_2) + \eta t(1{-}t)\|w_1 - w_2\|^2,
-\end{equation}
-where $f_\eta(w) = \langle w, \mathbf{Q}(s,a) \rangle - \eta\|w\|^2$.
-\end{theorem}
-
-\begin{proof}
-The proof uses two ingredients:
-\begin{enumerate}
-    \item \textbf{Linearity of scalarization:} $\langle tw_1 + (1{-}t)w_2, \mathbf{Q} \rangle = t\langle w_1, \mathbf{Q} \rangle + (1{-}t)\langle w_2, \mathbf{Q} \rangle$ (Lean: \texttt{scalarize\_affine\_in\_w}).
-    \item \textbf{Parallelogram identity:} $\|tw_1 + (1{-}t)w_2\|^2 + t(1{-}t)\|w_1 - w_2\|^2 = t\|w_1\|^2 + (1{-}t)\|w_2\|^2$ (Lean: \texttt{weight\_norm\_sq\_convex\_identity}).
-\end{enumerate}
-Substituting (1) and rearranging (2) into the definition of $f_\eta$:
-\begin{align}
-    f_\eta(tw_1 + (1{-}t)w_2) &= t\langle w_1, \mathbf{Q} \rangle + (1{-}t)\langle w_2, \mathbf{Q} \rangle - \eta\|tw_1 + (1{-}t)w_2\|^2 \\
-    &= t\langle w_1, \mathbf{Q} \rangle + (1{-}t)\langle w_2, \mathbf{Q} \rangle - \eta(t\|w_1\|^2 + (1{-}t)\|w_2\|^2 - t(1{-}t)\|w_1 - w_2\|^2) \\
-    &= tf_\eta(w_1) + (1{-}t)f_\eta(w_2) + \eta t(1{-}t)\|w_1 - w_2\|^2.
-\end{align}
-The gap $\eta t(1{-}t)\|w_1 - w_2\|^2 > 0$ when $\eta > 0$, $t \in (0,1)$, $w_1 \ne w_2$, guaranteeing strict concavity.
-\end{proof}
-
-\subsubsection{Anchor-shifted regularization (Part XI)}
-
-\begin{theorem}[Anchor-shifted strong concavity --- Lean: \texttt{anchor\_regularized\_strongly\_concave}]
-\label{thm:anchor_concavity}
-Shifting the regularization center to any $w_{\mathrm{anchor}}$ preserves the \textbf{identical} strong concavity gap:
-\begin{equation}
-    f_{\mathrm{anchor}}(tw_1 + (1{-}t)w_2) \ge tf_{\mathrm{anchor}}(w_1) + (1{-}t)f_{\mathrm{anchor}}(w_2) + \eta t(1{-}t)\|w_1 - w_2\|^2,
-\end{equation}
-where $f_{\mathrm{anchor}}(w) = \langle w, \mathbf{Q}(s,a) \rangle - \eta\|w - w_{\mathrm{anchor}}\|^2$.
-\end{theorem}
-
-\begin{proof}
-The key insight is a change of variables: let $u = w - w_{\mathrm{anchor}}$.
-\begin{enumerate}
-    \item The convex combination shifts: $t w_1 + (1{-}t)w_2 - w_{\mathrm{anchor}} = t(w_1 - w_{\mathrm{anchor}}) + (1{-}t)(w_2 - w_{\mathrm{anchor}}) = tu_1 + (1{-}t)u_2$.
-    \item Apply the parallelogram identity to $u_1, u_2$: $$\|tu_1 + (1{-}t)u_2\|^2 = t\|u_1\|^2 + (1{-}t)\|u_2\|^2 - t(1{-}t)\|u_1 - u_2\|^2.$$
-    \item The anchor cancels in the difference: $u_1 - u_2 = (w_1 - w_{\mathrm{anchor}}) - (w_2 - w_{\mathrm{anchor}}) = w_1 - w_2$.
-\end{enumerate}
-Therefore $\|u_1 - u_2\|^2 = \|w_1 - w_2\|^2$, and the gap is \emph{identical} to the origin-centered case.  Geometrically: the Hessian $\nabla^2_w f_{\mathrm{anchor}} = -2\eta I$ is constant (translation-invariant).
-\end{proof}
-
-\begin{remark}[Physical significance]
-This theorem formally proves that BAMOR's Target Cone restriction loses \textbf{nothing} in terms of Pareto front smoothness.  CAPQL's bijective weight-to-Pareto mapping is preserved exactly, even though we have moved the regularization center from the simplex center to the mode-specific physical anchor.
-\end{remark}
-
-\subsubsection{Mode Cone formalization and belief-anchor validity (Part XIII)}
-
-\begin{theorem}[Belief-anchor is a valid preference --- Lean: \texttt{belief\_anchor\_valid\_preference}]
-\label{thm:belief_anchor}
-If each mode's anchor lies on $\Delta^{m-1}$ and $\rho$ is a valid belief, then the belief-weighted anchor $\tilde{w}$ (Eq.~\ref{eq:belief_anchor}) satisfies $\tilde{w}_i \ge 0$ for all $i$ and $\sum_i \tilde{w}_i = 1$.
-\end{theorem}
-
-\begin{proof}
-Non-negativity: $\tilde{w}_i = \sum_h \rho(h) w_{\mathrm{anchor}}(h,i) \ge 0$ since each term is a product of non-negatives.  Normalization:
-\begin{align}
-    \sum_i \tilde{w}_i &= \sum_i \sum_h \rho(h) w_{\mathrm{anchor}}(h,i) = \sum_h \rho(h) \underbrace{\sum_i w_{\mathrm{anchor}}(h,i)}_{=1} = \sum_h \rho(h) = 1. \qedhere
-\end{align}
-\end{proof}
-
-\begin{theorem}[Pipeline preserves strong concavity --- Lean: \texttt{belief\_anchor\_valid\_for\_regularization}]
-The anchor-shifted strong concavity (Theorem~\ref{thm:anchor_concavity}) holds when $w_{\mathrm{anchor}} = \tilde{w}$, proving that the entire BAMOR pipeline---surprise detection $\to$ belief update $\to$ anchor computation $\to$ regularized scalarization---preserves strong concavity at every step, for any valid belief $\rho$.
-\end{theorem}
-
-
-\subsection{Target Cone tracking bounds (Parts X, XII--XV)}
-\label{sec:tracking}
-
-This is the central theoretical contribution of BAMOR: proving that mode-aware preference restriction yields provably tighter tracking bounds than any mode-agnostic method.
-
-\subsubsection{Global tracking under non-stationarity (Part X)}
-
-\begin{theorem}[BAMOR robust tracking --- Lean: \texttt{bamor\_robust\_tracking}]
-\label{thm:robust_tracking}
-Given a sequence of $\gamma$-contractions $\{T_n\}$ (each from BAMOR with a different belief $\rho_n$) and bounded per-step target drift $\Delta$:
-\begin{equation}
-    \mathrm{dist}(\mathbf{Q}_n, \mathbf{Q}^*_n) \le \gamma^n \cdot D_0 + \frac{\Delta}{1 - \gamma},
-    \label{eq:global_tracking}
-\end{equation}
-where $D_0 = \mathrm{dist}(\mathbf{Q}_0, \mathbf{Q}^*_0)$.
-\end{theorem}
-
-\begin{proof}
-\textbf{Step 1 (Per-step recursion, Lean: \texttt{time\_varying\_contraction\_step}):}
-\begin{align}
-    \mathrm{dist}(\mathbf{Q}_{n+1}, \mathbf{Q}^*_{n+1}) &= \mathrm{dist}(T_n(\mathbf{Q}_n), \mathbf{Q}^*_{n+1}) \\
-    &\le \mathrm{dist}(T_n(\mathbf{Q}_n), T_n(\mathbf{Q}^*_n)) + \mathrm{dist}(T_n(\mathbf{Q}^*_n), \mathbf{Q}^*_{n+1}) \quad \text{(triangle)} \\
-    &\le \gamma \cdot \mathrm{dist}(\mathbf{Q}_n, \mathbf{Q}^*_n) + \Delta. \quad \text{(contraction + drift)}
-\end{align}
-
-\textbf{Step 2 (Induction, Lean: \texttt{anytime\_tracking\_bound}):} With the recursion $e(n+1) \le \gamma e(n) + \Delta$, induction gives $e(n) \le \gamma^n e(0) + \Delta/(1{-}\gamma)$, using $\gamma \cdot \Delta/(1{-}\gamma) + \Delta = \Delta/(1{-}\gamma)$.
-\end{proof}
-
-\subsubsection{Scalarized drift suppression (Part XII)}
-
-\begin{definition}[Component-wise drift --- Lean: \texttt{pointwise\_drift\_bound}]
-$\Delta_{\mathrm{vec}} \in \mathbb{R}^m_{\ge 0}$ satisfies $|Q_{1,i}(s,a) - Q_{2,i}(s,a)| \le \Delta_{\mathrm{vec},i}$ for all $s,a,i$.
-\end{definition}
-
-\begin{lemma}[Scalarized drift suppression --- Lean: \texttt{scalarized\_drift\_suppression}]
-\label{lem:drift_suppression}
-For $w \ge 0$:
-\begin{equation}
-    |\langle w, \mathbf{Q}_1(s,a) - \mathbf{Q}_2(s,a) \rangle| \le \sum_{i=1}^m w_i \cdot \Delta_{\mathrm{vec},i} = \langle w, \Delta_{\mathrm{vec}} \rangle.
-\end{equation}
-\end{lemma}
-
-\begin{proof}
-\begin{align}
-    \left|\sum_i w_i(Q_{1,i} - Q_{2,i})\right| &\le \sum_i |w_i(Q_{1,i} - Q_{2,i})| = \sum_i w_i |Q_{1,i} - Q_{2,i}| \quad (\text{since } w_i \ge 0) \\
-    &\le \sum_i w_i \Delta_{\mathrm{vec},i}. \qedhere
-\end{align}
-\end{proof}
-
-\begin{example}[Drift suppression in practice]
-\label{ex:drift}
-Consider a mode switch from normal ($Q^*_{\mathrm{headway}} = 50$, $Q^*_{\mathrm{speed}} = 100$) to congested ($Q^*_{\mathrm{headway}} = 45$, $Q^*_{\mathrm{speed}} = 10$).  Then $\Delta_{\mathrm{vec}} = (5, 90)$ and $\Delta_{\mathrm{global}} = \max(5, 90) = 90$.
-
-With a Target-Cone-aligned weight $w = (0.95, 0.05)$:
-\begin{equation}
-    \Delta_{\mathrm{local}} = 0.95 \times 5 + 0.05 \times 90 = 4.75 + 4.5 = 9.25.
-\end{equation}
-The suppression ratio: $\Delta_{\mathrm{local}} / \Delta_{\mathrm{global}} = 9.25 / 90 \approx 10.3\%$.  The scalarized drift is compressed to about one-tenth of the global drift.
-
-With $\gamma = 0.99$:
-\begin{equation}
-    \text{Naive bound: } \frac{90}{0.01} = 9000, \quad \text{BAMOR bound: } 9.25 + 0.99 \times 9000 = 9.25 + 8910 = 8919.25.
-\end{equation}
-The improvement is $9000 - 8919.25 = 80.75$, corresponding to $\Delta_{\mathrm{global}} - \Delta_{\mathrm{local}} = 90 - 9.25 = 80.75$.  $\checkmark$
-\end{example}
-
-\subsubsection{Single-step Target Cone bound (Part XII)}
-
-\begin{theorem}[Target-Cone single-step --- Lean: \texttt{time\_varying\_scalarized\_contraction\_step}]
-\label{thm:single_step_tc}
-\begin{equation}
-    |\langle w, \mathbf{Q}_{n+1}(s,a) \rangle - \langle w, \mathbf{Q}^*_{n+1}(s,a) \rangle| \le \gamma \cdot \mathrm{dist}(\mathbf{Q}_n, \mathbf{Q}^*_n) + \langle w, \Delta_{\mathrm{vec}} \rangle.
-\end{equation}
-\end{theorem}
-
-\begin{proof}
-Decompose via triangle inequality:
-\begin{align}
-    &|\langle w, T_n(\mathbf{Q}_n)(s,a) \rangle - \langle w, \mathbf{Q}^*_{n+1}(s,a) \rangle| \notag \\
-    &\le \underbrace{|\langle w, T_n(\mathbf{Q}_n)(s,a) \rangle - \langle w, T_n(\mathbf{Q}^*_n)(s,a) \rangle|}_{\text{Term 1: contraction}} + \underbrace{|\langle w, T_n(\mathbf{Q}^*_n)(s,a) \rangle - \langle w, \mathbf{Q}^*_{n+1}(s,a) \rangle|}_{\text{Term 2: drift}}.
-\end{align}
-
-\textbf{Term 1:} By scalarize non-expansiveness (Lemma~\ref{lem:scalarize_nonexp} from Part III) applied to $T_n(\mathbf{Q}_n)$ and $T_n(\mathbf{Q}^*_n)$: $\le \mathrm{dist}(T_n(\mathbf{Q}_n), T_n(\mathbf{Q}^*_n)) \le \gamma \mathrm{dist}(\mathbf{Q}_n, \mathbf{Q}^*_n)$.
-
-\textbf{Term 2:} By scalarized drift suppression (Lemma~\ref{lem:drift_suppression}): $\le \langle w, \Delta_{\mathrm{vec}} \rangle$.
-\end{proof}
-
-\subsubsection{End-to-end Target Cone bound (Part XIV)}
-
-\begin{theorem}[Target Cone multi-step tracking --- Lean: \texttt{target\_cone\_multistep\_tracking}]
-\label{thm:target_cone}
-For $n \ge 1$, with Target-Cone-aligned weight $w$:
-\begin{equation}
-    |\langle w, \mathbf{Q}_n(s,a) \rangle - \langle w, \mathbf{Q}^*_n(s,a) \rangle| \le \gamma^n D_0 + \gamma \cdot \frac{\Delta_g}{1{-}\gamma} + \langle w, \Delta_{\mathrm{vec}} \rangle.
-    \label{eq:capstone}
-\end{equation}
-\end{theorem}
-
-\begin{proof}
-Write $n = k + 1$ (since $n \ge 1$).
-
-\textbf{Step 1 (Part XII):} Apply Theorem~\ref{thm:single_step_tc} at step $k$:
-\begin{equation}
-    |\langle w, \mathbf{Q}_{k+1} \rangle - \langle w, \mathbf{Q}^*_{k+1} \rangle| \le \gamma \cdot \mathrm{dist}(\mathbf{Q}_k, \mathbf{Q}^*_k) + \Delta_{\mathrm{local}}.
-\end{equation}
-
-\textbf{Step 2 (Part X):} Substitute the global tracking bound at step $k$:
-\begin{equation}
-    \mathrm{dist}(\mathbf{Q}_k, \mathbf{Q}^*_k) \le \gamma^k D_0 + \frac{\Delta_g}{1{-}\gamma}.
-\end{equation}
-
-\textbf{Step 3 (Compose):}
-\begin{align}
-    \gamma \left(\gamma^k D_0 + \frac{\Delta_g}{1{-}\gamma}\right) + \Delta_{\mathrm{local}} = \gamma^{k+1} D_0 + \gamma \cdot \frac{\Delta_g}{1{-}\gamma} + \Delta_{\mathrm{local}}. \qedhere
-\end{align}
-\end{proof}
-
-\begin{remark}[Steady-state analysis]
-As $n \to \infty$, the transient $\gamma^n D_0 \to 0$.  The residual tracking error is:
-\begin{equation}
-    \text{BAMOR: } \Delta_{\mathrm{local}} + \gamma \cdot \frac{\Delta_g}{1{-}\gamma}, \qquad \text{Naive: } \frac{\Delta_g}{1{-}\gamma}.
-\end{equation}
-\end{remark}
-
-\subsubsection{Improvement quantification (Part XV)}
-
-\begin{theorem}[Target Cone improvement --- Lean: \texttt{target\_cone\_improvement}]
-\label{thm:improvement}
-\begin{equation}
-    \underbrace{\frac{\Delta_g}{1{-}\gamma}}_{\text{Naive}} - \underbrace{\left(\Delta_{\mathrm{local}} + \gamma \cdot \frac{\Delta_g}{1{-}\gamma}\right)}_{\text{BAMOR}} = \Delta_g - \Delta_{\mathrm{local}}.
-\end{equation}
-\end{theorem}
-
-\begin{proof}
-$\frac{\Delta_g}{1{-}\gamma} - \Delta_{\mathrm{local}} - \gamma \cdot \frac{\Delta_g}{1{-}\gamma} = (1{-}\gamma) \cdot \frac{\Delta_g}{1{-}\gamma} - \Delta_{\mathrm{local}} = \Delta_g - \Delta_{\mathrm{local}}$.
-\end{proof}
-
-\begin{corollary}[Non-negative improvement --- Lean: \texttt{target\_cone\_improvement\_nonneg}]
-$\Delta_{\mathrm{local}} + \gamma \Delta_g/(1{-}\gamma) \le \Delta_g/(1{-}\gamma)$ whenever $\Delta_{\mathrm{local}} \le \Delta_g$.
-\end{corollary}
-
-\begin{corollary}[Full suppression --- Lean: \texttt{full\_suppression\_ratio}]
-When $\Delta_{\mathrm{local}} = 0$: BAMOR bound $= \gamma \cdot \Delta_g/(1{-}\gamma)$, exactly a factor $\gamma$ of the naive bound.  For $\gamma = 0.99$, BAMOR's error is $1\%$ of naive.
-\end{corollary}
-
-\begin{center}
-\begin{tabular}{lccc}
-\toprule
-\textbf{Scenario} & $\Delta_{\mathrm{local}}/\Delta_g$ & \textbf{BAMOR bound} & \textbf{Improvement} \\
-\midrule
-No suppression ($w$ uniform) & $1.0$ & $\Delta_g/(1{-}\gamma)$ & $0$ \\
-Partial (Example~\ref{ex:drift}) & $0.103$ & $0.103\Delta_g + 0.99\Delta_g/(1{-}\gamma)$ & $0.897\Delta_g$ \\
-Full ($\Delta_{\mathrm{local}} = 0$) & $0.0$ & $\gamma\Delta_g/(1{-}\gamma)$ & $\Delta_g$ \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\begin{remark}[Why existing algorithms cannot achieve this]
-\begin{itemize}
-    \item \textbf{CAPQL:} Assumes a fixed MDP; no tracking bound for mode switches.
-    \item \textbf{GPI-PD, MOSAC:} Sample $w$ uniformly over $\Delta^{m-1}$; always incur full $\Delta_{\mathrm{global}}$.
-    \item \textbf{morl-baselines:} CAPQL's \texttt{WeightSamplerAngle} uses a fixed $22.5°$ cone centered on the uniform direction---it is \emph{not} environment-aware and does not adapt per mode.
-    \item \textbf{Only BAMOR} restricts $w$ to a belief-driven, mode-specific Target Cone, achieving drift suppression.
-\end{itemize}
-\end{remark}
-
-
-\subsection{Counterexample: Q-dependent beliefs break multi-objective contraction}
-\label{sec:counterexample}
-
-The frozen-belief design is not merely convenient---it is \emph{necessary}.  We prove that allowing $\rho$ to depend on $Q$ destroys contraction, and that the multi-objective setting makes this \emph{worse} than the scalar case.
-
-\begin{definition}[Multi-objective bad operator --- Lean: \texttt{T\_bad\_mo}]
-Consider a 1-state, 1-action, 2-mode MDP where mode weights depend on the scalarized Q-value: $\rho_1(q) = \lambda q$.  The scalarized operator becomes:
-\begin{equation}
-    T_{\mathrm{bad}}(q) = (\gamma + \lambda \Delta_w) q + R_{2,w},
-\end{equation}
-where $\Delta_w = \langle w, \mathbf{R}_1 - \mathbf{R}_2 \rangle$ is the \emph{preference-weighted reward gap}.
-\end{definition}
-
-\begin{theorem}[Non-contraction --- Lean: \texttt{T\_bad\_mo\_not\_contraction}]
-\label{thm:counter}
-If $\gamma + \lambda\Delta_w \ge 1$, then $T_{\mathrm{bad}}$ is not a contraction.
-\end{theorem}
-
-\begin{theorem}[Sharp threshold --- Lean: \texttt{T\_bad\_mo\_exact\_factor}]
-\label{thm:sharp}
-The contraction factor is \emph{exactly} $|\gamma + \lambda\Delta_w|$: contraction holds iff $\gamma + \lambda\Delta_w < 1$.
-\end{theorem}
-
-\begin{theorem}[Multi-objective amplification --- Lean: \texttt{concentrated\_weight\_gap}]
-\label{thm:amplification}
-By concentrating $w$ on the objective with the largest reward gap component, an adversary can set $\Delta_w = \max_i |\Delta R_i|$, which may far exceed the average gap.  This makes the threshold $\gamma + \lambda\Delta_w \ge 1$ \emph{easier to breach} in multi-objective settings.
-\end{theorem}
-
-\begin{center}
-\begin{tabular}{llcl}
-\toprule
-\textbf{Operator} & \textbf{Belief} & \textbf{Factor} & \textbf{Contraction?} \\
-\midrule
-$T_{\mathrm{bad}}$ (MO) & $\rho = f(\langle w, Q \rangle)$ & $\gamma + \lambda\Delta_w$ & $\times$ if $\ge 1$ \\
-$T_{\mathrm{bad}}$ (scalar, BAPR) & $\rho = f(Q)$ & $\gamma + \lambda\Delta$ & $\times$ if $\ge 1$ \\
-$\mathcal{T}^{\mathrm{BAMOR}}_\rho$ & $\rho$ frozen & $\gamma$ & $\checkmark$ (always) \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\begin{remark}[Why multi-objective is strictly harder]
-In scalar BAPR, $\Delta = R_1 - R_2$ is fixed.  In BAMOR, $\Delta_w = \langle w, \mathbf{R}_1 - \mathbf{R}_2 \rangle$ depends on the preference weight.  With $m$ objectives and heterogeneous reward gaps, the worst-case $\Delta_w$ can be much larger than the average, providing more ``fuel'' for the positive feedback loop that destroys contraction.
-\end{remark}
-
-\subsection{Detection delay and adaptive conservatism}
-\label{sec:detection}
-
-\begin{theorem}[Detection delay --- Lean: \texttt{detection\_delay\_sufficient}]
-\label{thm:delay}
-Under mode separability ($L > 1$), the BOCD posterior reaches confidence $1/\delta$ in:
-\begin{equation}
-    n_\delta = \left\lceil \frac{\log(r_0/\delta)}{2\log L} \right\rceil = O(\log(1/\delta)) \text{ steps}.
-\end{equation}
-\end{theorem}
-
-\begin{theorem}[Adaptive conservatism safety --- Lean: \texttt{beta\_eff\_monotone\_conservatism}]
-\label{thm:beta_safe}
-For $\lambda_w \ge 0$, $c_{\mathrm{penalty}} \ge 0$: $\beta_{\mathrm{eff}} = \beta_{\mathrm{base}} - \lambda_w c_{\mathrm{penalty}} \le \beta_{\mathrm{base}}$.  The adaptive mechanism can only \emph{increase} conservatism, never reduce it below the RE-SAC baseline.
-\end{theorem}
-
-\begin{theorem}[Monotonicity --- Lean: \texttt{beta\_eff\_mono\_in\_lambda}]
-Higher surprise ($\lambda_{w,2} \ge \lambda_{w,1}$) yields more conservatism ($\beta_{\mathrm{eff},2} \le \beta_{\mathrm{eff},1}$).
-\end{theorem}
-
-\subsection{Piecewise convergence rate}
-\label{sec:piecewise}
-
-After a regime switch, BAMOR's recovery proceeds in three phases:
-
-\begin{theorem}[Piecewise convergence --- Lean: \texttt{contraction\_phase\_bound}, \texttt{switch\_error\_decomposition}]
-\label{thm:piecewise}
-Under Assumptions~\ref{assump:separability}--\ref{assump:metastable} (see Appendix~\ref{app:piecewise}):
-\begin{enumerate}
-    \item \textbf{Phase 1 (Detection, $n_\delta$ steps):} Error bounded by $E_{\mathrm{switch}} = (\Delta_R + \varepsilon_{\mathrm{proj}} + \sigma)/(1{-}\gamma)$.
-    \item \textbf{Phase 2 (Contraction):} $e(n) \le \gamma^n E_{\mathrm{switch}} + (\varepsilon_{\mathrm{proj}} + \sigma)/(1{-}\gamma)$.
-    \item \textbf{Phase 3 (Steady state):} $e_\infty \le (\varepsilon_{\mathrm{proj}} + \sigma)/(1{-}\gamma)$.
-\end{enumerate}
-Total recovery steps: $N \cdot O(\log(1/\delta)/\log L + \log(\Delta_R/\varepsilon)/(1{-}\gamma))$ --- \textbf{polynomial} in all parameters.
-\end{theorem}
-
-\subsection{Function approximation bridge}
-\label{sec:approx}
-
-The contraction proofs operate in the tabular setting.  The operator-agnostic bounds from \texttt{ApproxContraction.lean} (shared with RE-SAC, 320 lines) bridge to neural network implementations.  Since these results apply to \emph{any} $\gamma$-contraction, they apply to $\mathcal{T}^{\mathrm{BAMOR}}_\rho$ without modification:
-\begin{itemize}
-    \item \textbf{Projected contraction:} If $\Pi$ is non-expansive, $\Pi \circ \mathcal{T}$ is a $\gamma$-contraction.
-    \item \textbf{Approximation error:} $\|\tilde{\mathbf{Q}} - \mathbf{Q}^*\| \le \varepsilon_{\mathrm{proj}}/(1{-}\gamma)$.
-    \item \textbf{Stochastic tracking:} $e(n) \le \gamma^n e(0) + \sigma/(1{-}\gamma)$.
-\end{itemize}
-
-\begin{theorem}[Context embedding equivalence --- Lean: \texttt{context\_embedding\_equiv}]
-For any per-mode Q-functions $\{\mathbf{Q}_h\}$, a shared critic $\mathbf{Q}(h, s, a)$ can exactly represent all modes.  When the context embedding is injective, no representational error is introduced.
-\end{theorem}
-
-
-% ════════════════════════════════════════════════════════════════════════════
 \section{Experiments}
 \label{sec:experiments}
 % ════════════════════════════════════════════════════════════════════════════
 
-We validate BAMOR on a controlled synthetic benchmark where every ingredient of our theory is known by construction: the number of modes $H$, the per-mode substrate constraint, the true anchor $w_{\mathrm{anchor}}(h)$, and the mode switch schedule.  This lets us test not just whether BAMOR \emph{outperforms} baselines, but whether it recovers the specific structure (mode-localised Pareto arcs, piecewise tracking bound) that the theorems promise.  Scalability to complex robotic and transportation domains is out of scope for this paper and is discussed as future work (§\ref{sec:limits}).
+\input{experiments_matched}
 
-% ── 6.1 Setup ───────────────────────────────────────────────────────────────
-\subsection{Experimental setup}
-\label{sec:exp_setup}
-
-\textbf{Environment.}  A 1-D continuous navigation task with position $p\in[-10,10]$ and velocity action $a\in[-1,1]$.  The reward vector is 2-dimensional, $\mathbf{r}=(r_{\text{safety}}, r_{\text{progress}})$, constructed so that \emph{each mode collapses one objective to a different state feature}: in ``safety'' mode $r_{\text{safety}}$ is position-responsive while $r_{\text{progress}}$ collapses to the action; in ``progress'' mode the roles reverse; in ``balanced'' mode both are position-responsive.  This is exactly the structural situation Eq.~\eqref{eq:target_cone_bound_intro} addresses --- different modes admit different valid preference cones.  Three modes cycle deterministically every \texttt{switch\_interval}$=300$ steps with ground-truth anchors $w_0{=}[0.85,0.15]$ (safety-dominated), $w_1{=}[0.15,0.85]$ (progress-dominated), $w_2{=}[0.5,0.5]$ (balanced).
-
-\textbf{Algorithms.}  We compare four methods, all sharing the same actor--critic backbone and weight-conditioned policy $\pi(a\mid s, w)$; they differ \emph{only} in how preference weights are sampled and whether the cone estimator is active:
-\begin{itemize}[topsep=1pt,leftmargin=1.3em]
-    \item \textbf{BAMOR-TC (ours, recommended)}: the (B2) variant from \S\ref{sec:belief_rules}---Target Cone with frozen-uniform belief.  Cone statistics $\hat w_{\mathrm{anchor}}$ are estimated from reward-variance and anchor regularisation is active; $w \sim \mathrm{Dir}(\kappa \cdot \tilde w)$ with $\kappa{=}20$.  No online mode-change detector.
-    \item \textbf{BAMOR $+$ surprise}: the (B3) variant---BAMOR-TC with the Mahalanobis online change-point detector active (threshold$=7$, cooldown$=290$ steps, warm-up$=150$).
-    \item \textbf{BAMOR $-$ Cone}: ablation retaining the (B3) surprise detector but disabling the cone, i.e., $w \sim \mathrm{Dir}(0.1 \cdot \mathbf{1})$ (near-uniform) and no anchor regularisation.  Isolates the cone's contribution while keeping an active belief update.
-    \item \textbf{Uniform-sampling}: $w \sim \mathrm{Dir}(\mathbf{1})$ every step, no cone, no belief---the standard CAPQL-style single-policy recipe.
-\end{itemize}
-All methods train for $100{,}000$ environment steps with identical network sizes, learning rates, replay buffers, and a 20-seed sweep on a shared GPU cluster.  Final performance is measured by hypervolume (HV) against reference point $(-5,-5)$, evaluated (i) globally over a dense grid of $21$ preference weights under the mode-switching schedule and (ii) per mode by locking the environment to a fixed mode and re-evaluating on $11$ weights.
-
-% ── 6.2 Main result ─────────────────────────────────────────────────────────
-\subsection{Main result: BAMOR-TC wins all four columns}
-
-\input{table_main_results}
-
-\noindent Table~\ref{tab:main_results} summarises final HV over $20$ seeds.  Three observations:
-
-\textbf{(i) Target-Cone alone is the empirically-strongest variant.}  BAMOR-TC reaches $\mathrm{HV}_{\text{overall}}=136.2{\times}10^3$ against Uniform's $121.1{\times}10^3$ ($+12.5\%$), with seed-level standard deviation $23.6{\times}10^3$---less than half of Uniform's $50.5{\times}10^3$.  The cone concentration removes the seed-to-seed lottery in which preference weight $w=[0.99,0.01]$ is sampled frequently while the progress axis is collapsed; the frozen-uniform belief avoids the destabilising belief resets of the online detector.  BAMOR-TC wins \emph{overall HV and each per-mode HV} simultaneously.
-
-\textbf{(ii) The Mode 0, Mode 1, and Mode 2 wins are geometric, not a lucky draw.}  On Mode~0 (anchor $[0.85,0.15]$), BAMOR-TC reaches $22.8{\times}10^3$ vs.\ Uniform's $21.0{\times}10^3$ ($+8.6\%$); on Mode~1 (anchor $[0.15,0.85]$), $40.7{\times}10^3$ vs.\ $38.6{\times}10^3$ ($+5.4\%$); on Mode~2 (balanced), $130.1{\times}10^3$ vs.\ $119.2{\times}10^3$ ($+9.1\%$).  All three wins are accompanied by substantially tighter seed-level bands---BAMOR-TC's Mode~2 std is $26.5{\times}10^3$ against Uniform's $50.1{\times}10^3$.  Under the curved-Pareto reward design where each mode admits a real internal trade-off, the cone's advantage manifests in every mode rather than only on skewed-anchor ones.
-
-\textbf{(iii) The classical scalar baseline ``Fixed $w{=}[0.5,0.5]$''} (omitted from the table for brevity) is dominated by Uniform on this benchmark and does not compete with any BAMOR variant; committing to a single preference is the wrong response to a non-stationary substrate.
-
-% ── 6.3 Ablation ────────────────────────────────────────────────────────────
-\subsection{Ablation: cone helps; automatic surprise actively hurts}
-\label{sec:exp_ablation}
-
-The two ablations in Table~\ref{tab:main_results} isolate the two candidate mechanisms.
-
-\textbf{BAMOR $-$ Cone catastrophically fails ($-28\%$ overall HV, $-13\%$ Mode~1 vs.\ BAMOR-TC).}  Disabling the Target Cone while keeping the surprise detector yields one of the worst methods in the table.  Without a cone the surprise detector's belief estimate has nothing meaningful to do: the sampler collapses to near-uniform, and the only effect of the belief is to occasionally reset the critic's normaliser mid-training.  This is a clean falsification of the hypothesis that an ``active belief update'' is what drives improvement.
-
-\textbf{BAMOR $+$ surprise is strictly worse than BAMOR-TC ($-29\%$ overall, $-19\%$ Mode~1).}  Adding the (B3) Mahalanobis online detector to the otherwise-winning BAMOR-TC does not help---it hurts.  Inspection shows why: the detector over-triggers on within-mode reward noise (average $11$ spurious switches per $100{,}000$ steps beyond the $333$ true switches), each spurious trigger resets the per-mode cone estimator, and on $\sim\!20\%$ of seeds this corrupts the cone enough to cause a complete training collapse ($\mathrm{HV}_{\mathrm{Mode\,1}} < 10^3$).  The large seed-to-seed std of $43.8{\times}10^3$ is dominated by these rare but catastrophic seeds.
-
-\textbf{Joint reading of the two ablations.}  Cone without surprise (BAMOR-TC) is best; cone with surprise (BAMOR $+$ surprise) is $29\%$ worse; surprise without cone (BAMOR $-$ Cone) is $28\%$ worse.  The cone is the driver; the online surprise rule is, at least in this 2-D noisy benchmark, a net negative.  We therefore report BAMOR-TC as our recommended recipe and treat the design of a well-calibrated online belief update as open future work (\S\ref{sec:limits}).
-
-% ── 6.4 Qualitative: per-mode Pareto arcs ───────────────────────────────────
-\subsection{Per-mode Pareto fronts: visualising the piecewise sub-manifolds}
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.98\linewidth]{fig_pareto_permode.pdf}
-\caption{Per-mode Pareto fronts recovered by BAMOR-TC and Uniform, pooled across seeds and weights in the evaluation grid.  Each mode exhibits a distinct geometric substrate: Mode~0's achievable front is a near-horizontal arc (progress collapsed), Mode~1's is near-vertical (safety collapsed), and Mode~2 is a full elbow.  BAMOR-TC's samples cluster tightly along each arc, while Uniform's fan out into the physically-unreachable interior---each off-arc point is a wasted policy evaluation at a preference that cannot be served by the current substrate.  These are the ``piecewise local Pareto sub-manifolds'' of §\ref{sec:framework}.}
-\label{fig:pareto_permode}
-\end{figure}
-
-Fig.~\ref{fig:pareto_permode} visualises the central claim of §\ref{sec:framework}: each mode admits a geometrically distinct achievable region and the effective Pareto front is the union of three disjoint arcs, not a single globally smooth surface.  The axis collapses in Modes~0 and~1 appear as near-horizontal and near-vertical arcs respectively.  Uniform produces the same general shape but with substantially more scatter into the physically-unreachable interior.  BAMOR-TC's target-cone sampler targets each arc directly.
-
-% ── 6.5 Training dynamics ───────────────────────────────────────────────────
-\subsection{Training dynamics and stability}
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.72\linewidth]{fig_training_curves_v2.pdf}
-\caption{Overall HV during training.  Shaded bands are $\pm1\sigma$ across 20 seeds.  BAMOR-TC (blue) is on top for most of training and closes the highest, with a tight band.  BAMOR $+$ surprise (orange) and BAMOR $-$ Cone (green) both \emph{degrade} as training proceeds---the spurious-reset / no-concentration failure modes accumulate over steps, driving the means downward and the bands outward.  Uniform (red) is stable but flat around $\sim\!117{\times}10^3$.  Fixed-weight (grey) is noisy and consistently the worst.}
-\label{fig:training_curves}
-\end{figure}
-
-Fig.~\ref{fig:training_curves} shows HV trajectories during training.  Two qualitative patterns stand out.  First, BAMOR-TC is already above Uniform from the first evaluation point and stays there: cone-concentrated sampling is not a catch-up strategy but a head-start.  Second, both ablation variants have a \emph{downward} trend across training---BAMOR $+$ surprise is steadily eroded by spurious belief resets, and BAMOR $-$ Cone over-commits to a near-uniform sampler while the surprise detector keeps nudging its cone statistics with nothing to concentrate on.  Frozen belief $+$ cone is the configuration that monotonically benefits from additional training steps in this benchmark.
-
-% ── 6.6 Summary ─────────────────────────────────────────────────────────────
-\subsection{Summary of experimental findings}
-
-The synthetic study delivers three empirical findings that constrain the design space:
-
-(1) \textbf{The Target Cone mechanism works as advertised:} BAMOR-TC beats Uniform by $+12.5\%$ overall HV and by $+5$--$9\%$ on every per-mode HV component, at less than half the seed variance (Table~\ref{tab:main_results}).  This is the empirical manifestation of the $\Delta_{\mathrm{global}}-\Delta_{\mathrm{local}}$ improvement proven in Eq.~\eqref{eq:target_cone_bound_intro}: the cone-concentrated sampler avoids the wasted exploration at physically-unreachable preference corners.
-
-(2) \textbf{Removing the cone is catastrophic:} the ablation BAMOR $-$ Cone loses $28\%$ overall HV vs.\ BAMOR-TC, confirming the cone is the load-bearing component.  A belief update without a cone to concentrate on does not help.
-
-(3) \textbf{An aggressive automatic belief-update rule is a net negative in this 2-D, high-noise benchmark:} enabling the Mahalanobis (B3) detector on top of BAMOR-TC loses $29\%$ overall HV, with $\sim\!20\%$ of seeds suffering catastrophic Mode~1 collapses caused by spurious reset events.  The frozen-uniform (B2) variant is the empirically safer default; the design of a well-calibrated online belief update for settings without mode labels is an open problem.
-
-Together these findings reframe BAMOR's algorithmic contribution: it is the Target Cone sampler, not the online change-point detector, that delivers the theoretical advantage in practice.
-
-
-% ════════════════════════════════════════════════════════════════════════════
 \section{Discussion}
 \label{sec:discussion}
-% ════════════════════════════════════════════════════════════════════════════
 
-\subsection{The paradigm shift: from global Pareto to piecewise local manifolds}
+The utility--HV ordering makes the execution objective consequential.
+Direct utility preserves the requested-preference/behavior association, whereas
+HV describes the return set. Their disagreement can occur even for identical
+sets (Section~\ref{sec:problem_v23}); the observed comparison therefore concerns
+two distinct outcomes. Different reward scales also make HalfCheetah's larger
+utility difference task-specific.
 
-BAMOR challenges the implicit assumption underlying all existing MORL methods: that the Pareto front is a single, globally smooth, completely reachable surface.  In non-stationary environments with substrate constraints, the effective Pareto front is a \emph{piecewise collection of narrow local sub-manifolds}, each dictated by the current mode's physical limits.
-
-This is not merely a computational optimization (``search faster by restricting the space'').  It is a fundamental reconceptualization: the goals themselves are mode-dependent.  Trying to optimize speed during congestion is not just inefficient---it is \emph{physically incoherent}, and the theoretical tracking bounds reflect this by exploding.
+Retention expands the available behavior set; block allocation changes the
+training trajectory of one shared policy. Hopper's archive results favor
+coverage, while score-blind controls do not identify a consistent feedback
+benefit. Ant further separates useful vertex behavior from poor mixed-weight
+execution. Together these observations make the complete-method comparison,
+selector ablation and archive evaluation complementary, rather than substitutes.
 
 \subsection{Scope and limitations}
 \label{sec:limits}
 
-\begin{enumerate}
-    \item \textbf{(S1) Per-step vs.\ learning-dynamics guarantee:} Like all Bellman contraction proofs, our results are per-step properties.  End-to-end convergence of the full training loop under function approximation and mini-batch sampling requires additional assumptions (cf.\ \texttt{ApproxContraction.lean}).
+Both primary utility intervals include zero: the study establishes neither
+superiority nor equivalence in expected utility. Tasks and the utility
+hypothesis were selected from a pilot, although confirmation seeds and analysis
+were fixed before training. Three episodes per preference give noisy estimates;
+observed wins and minima do not establish population robustness. Ant remains
+negative, and adaptive allocation has no consistent score-blind advantage.
+There is no matched comparison with HPR or established adaptive allocation
+rules; the CAPQL comparison does not isolate the portfolio's individual
+learning operations.
 
-    \item \textbf{(S2) Target Cone specification:} The Mode Cone profiles (anchors and radii) must be specified a priori or learned.  In simulation, they can be estimated from the reward structure; in deployment, they could be inferred from the context embedding.  Misspecified cones may lead to suboptimal (but never unsafe, since $\beta_{\mathrm{eff}} \le \beta_{\mathrm{base}}$) behavior.
+Equal interactions do not equalize computation or architecture. BAMOR uses
+width 64, CAPQL width 256, and their replay expansion and candidate work differ.
+BAMOR's measured runtime is higher. The 50k CAPQL archive cohort omitted
+action-space and Python replay RNG seeds; it is retrospective, unlike the fully
+seeded 75k studies. Invalid continuations are excluded
+(Appendix~\ref{app:experiment_details}). Different cohorts do not identify a
+causal effect of longer training.
 
-    \item \textbf{(S3) Frozen-parameter chain:} BAMOR requires freezing at \emph{four} levels: (i)~$\kappa$ (aleatoric, from RE-SAC), (ii)~$\Gamma_{\mathrm{epi}}$ (epistemic, from RE-SAC), (iii)~$\rho$ (belief, from BAPR), (iv)~$\tilde{w}$ (anchor, new in BAMOR).  Each has a counterexample demonstrating necessity.
+The tasks have custom physics/reward modes, two or three objectives and short
+training horizons; a trajectory need not visit every mode. Locked-mode final
+evaluation does not measure switch-aligned recovery or performance on unseen
+families. Archive HV depends on the grid, noisy returns and final encoder; it
+is neither an online learning curve nor a deployment selection guarantee.
 
-    \item \textbf{(S4) Number of objectives:} The theoretical results hold for any finite $m$, but the practical benefit of Target Cone restriction grows with $m$ (more objectives $\Rightarrow$ more collapsed dimensions to suppress).
+The margin certificate requires matched candidates and bounded critic/entropy
+perturbations, not established along training. Neural approximation and learned
+context do not inherit auxiliary contraction results; componentwise Bellman
+maxima can also be jointly unachievable. Bounded progress is not an unbiased
+causal arm-value estimate because learning, preferences and modes all affect
+it. No neural-convergence or training-selector-regret theorem is established.
+Archive-selection bounds require uniform return accuracy, and fixed-value HV
+monotonicity does not cover changing the encoder or re-estimating returns.
 
-    \item \textbf{(S5) Substrate-constraint assumption is load-bearing; scaling beyond 1-D is an open problem.}  BAMOR's empirical advantage \emph{requires} that some preference vectors be physically unreachable in some modes---the very condition the Target Cone is designed to exploit (\S\ref{sec:framework}).  We pursued an extensive study of this boundary across multiple mo-gymnasium continuous-control benchmarks (\texttt{HalfCheetah-v5}, \texttt{Hopper-v5}, \texttt{MountainCarContinuous-v0}) under three env-design variants:
-    \begin{enumerate}[label=(\roman*),leftmargin=1.5em,topsep=2pt]
-        \item BAPR-style physics-only modes (mass, gravity, joint-damping multipliers) without explicit reward shaping;
-        \item Hard substrate caps via $\min(r, c)$ on per-step reward;
-        \item Soft caps via $r \mapsto c \cdot \tanh(r/c)$ paired with slow exponential-dwell switching ($\mathbb{E}[\text{dwell}]=500{,}000$).
-    \end{enumerate}
-    We additionally implemented every implementation refinement an external review identified (CUSUM-based change-point detection to suppress single-step Mahalanobis false alarms, a true Dirichlet$(1,\dots,1)$ uniform ablation, removal of a no-op anchor-shifted regulariser, and per-mode \emph{cone-restricted} weight grids at evaluation time).
-
-    \emph{None of these variants reproduces the synthetic-benchmark advantage of BAMOR-TC over uniform-weight sampling}: across $300{,}000$ to $1{,}000{,}000$ training steps and $5$--$10$ random seeds, BAMOR-TC's mean hypervolume is bracketed by the Uniform and Fixed-weight baselines, often dominated by Fixed.  Two distinct failure modes appear at scale: in physics-only modes, no preference is genuinely unreachable so the cone restriction provides no benefit; in caps-equipped modes, the discontinuous (or even smooth) substrate plus mode-switching destabilises SAC training across \emph{all} weight-sampling strategies, with returns sometimes turning negative (the agent moves backward).  At our compute budgets, weight-conditioning itself appears to be the dominant sample-complexity cost in these continuous-control settings; even in the substrate-constrained regime the cone's per-cone-weight specialisation does not amortise.
-
-    We therefore delineate BAMOR-TC's empirically validated scope to \emph{piecewise-stationary environments where (a) the per-step dynamics admit clean cone-aligned policy specialisation under modest compute, and (b) the substrate-collapse assumption is honestly satisfied}---a profile cleanly met by our 1-D synthetic benchmark with curved Pareto sub-manifolds (\S\ref{sec:experiments}).  Lifting the algorithm to higher-dimensional continuous-control benchmarks is an open problem that, at minimum, requires either (i) stabilising the SAC backbone under aggressive non-stationarity or (ii) replacing weight-conditioned policies with a multi-policy archive.  Both directions are genuinely future work; we explicitly do not claim mujoco-scale results.
-\end{enumerate}
-
-\subsection{Connection to BAPR and RE-SAC}
-
-BAMOR is a strict generalization: with $m = 1$, it reduces to BAPR; with $|\mathcal{H}| = 1$, the belief term vanishes and it reduces to multi-objective RE-SAC; with both, it reduces to vanilla multi-objective SAC.  The new theoretical content (Parts VII--XV) has no analogue in the single-objective case.
-
-
-% ════════════════════════════════════════════════════════════════════════════
 \section{Conclusion}
-% ════════════════════════════════════════════════════════════════════════════
 
-We have presented BAMOR, a Bayesian adaptive multi-objective robust RL framework that challenges the foundational assumption of MORL: that the preference simplex is globally and uniformly reachable.  By formalizing \emph{substrate constraints}---the physical limits each environment mode imposes on achievable objective trade-offs---we introduce the \emph{Target Cone} mechanism that restricts preference exploration to physically valid subregions.
-
-Our theoretical analysis, fully machine-verified in Lean~4 with no \texttt{sorry} (2,074 lines across 2 files, 50+ theorems), establishes a complete proof chain from component-wise $\gamma$-contraction through Banach fixed points, scalarized contraction, anchor-shifted strong concavity, and the end-to-end Target Cone tracking bound.  The key result: the scalarized tracking error under Target Cone restriction is bounded by $\Delta_{\mathrm{local}} + \gamma \cdot \Delta_{\mathrm{global}}/(1{-}\gamma)$, which is \emph{provably and quantifiably} better than the naive $\Delta_{\mathrm{global}}/(1{-}\gamma)$.
-
-The insight that real-world Pareto fronts are not smooth global curves but \emph{piecewise local sub-manifolds} dictated by substrate constraints has implications beyond RL: it applies to any multi-objective optimization in physically constrained, non-stationary environments.  Future work will extend BAMOR to continuous mode spaces, multi-agent settings with shared change-point detection, and automatic Target Cone learning from data.
+BAMOR combines transition-derived context with progress-driven allocation of
+fixed updates to a shared actor--critic. Its unchanged v25 implementation gives
+higher observed mean direct utility than CAPQL on HalfCheetah and Hopper at
+75k interactions, alongside lower final HV, higher runtime and primary intervals
+including zero. Archive and score-blind controls distinguish retention from
+feedback; Ant records a transfer failure. Target consistency, bounded feedback
+and margin-certified local stability provide implementation-facing foundations
+for this separation of execution, coverage and learning allocation.
 
 \section*{Acknowledgments}
 This work was supported by the National Natural Science Foundation of China (Grant No. 72371251), the Natural Science Foundation for Distinguished Young Scholars of Hunan Province (Grant No. 2024JJ2080), and the Key Research and Development Program of Hunan Province of China (Grant No. 2024JK2007).

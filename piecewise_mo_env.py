@@ -188,14 +188,12 @@ def halfcheetah_bapr_modes() -> "list[ModeConfig]":
 
 
 def hopper_modes() -> "list[ModeConfig]":
-    """Hopper-v5: 3 objectives [healthy_reward, speed, -energy_cost].
+    """Hopper-v5: [forward velocity, jumping height, -unweighted control cost].
 
-    Mode A (Reckless): speed amplified, health/energy suppressed
-      → go fast, ignore falls and energy
-    Mode B (Survival): health amplified, speed/energy suppressed
-      → stay alive at all costs
-    Mode C (Efficient): energy amplified, speed/health moderate
-      → minimize energy use, moderate performance
+    MO-Gym adds the survival reward to every component before mode scaling.
+    Mode A (Reckless): jumping component amplified, forward/cost suppressed.
+    Mode B (Survival): forward component amplified, jumping/cost suppressed.
+    Mode C (Efficient): cost component amplified, forward/jumping suppressed.
     """
     return [
         ModeConfig(
@@ -204,7 +202,7 @@ def hopper_modes() -> "list[ModeConfig]":
             gravity_scale=0.6,
             true_anchor=np.array([0.05, 0.90, 0.05]),
             cone_radius=0.06,
-            description="Speed-dominated 50x: health and energy suppressed"
+            description="Jumping-dominated 50x: forward and cost components suppressed"
         ),
         ModeConfig(
             name="survival",
@@ -212,7 +210,7 @@ def hopper_modes() -> "list[ModeConfig]":
             gravity_scale=1.8,
             true_anchor=np.array([0.85, 0.05, 0.10]),
             cone_radius=0.06,
-            description="Health-dominated 50x: survival matters most"
+            description="Forward-dominated 50x: jumping and cost components suppressed"
         ),
         ModeConfig(
             name="efficient",
@@ -295,8 +293,9 @@ def mountaincar_bapr_modes() -> "list[ModeConfig]":
 
 
 def hopper_bapr_modes() -> "list[ModeConfig]":
-    """mo-hopper-v5 BAPR-style: 3 objectives [healthy, speed, -energy], 4 modes.
+    """mo-hopper-v5: [forward velocity, jumping height, -control cost], 4 modes.
 
+    MO-Gym adds the survival reward to every component before mode caps.
     Substrate caps in different objectives create disjoint Target Cones.
     Same soft-cap mechanism via tanh applied in step().
     """
@@ -308,35 +307,36 @@ def hopper_bapr_modes() -> "list[ModeConfig]":
             description="Baseline — all 3 objectives reachable.",
         ),
         ModeConfig(
-            name="fragile",     # health hard, must be careful
-            reward_cap=np.array([np.inf, 0.5, np.inf]),  # speed soft-capped low
+            name="fragile",
+            reward_cap=np.array([np.inf, 0.5, np.inf]),  # jumping component capped
             mass_scale=1.5,
             true_anchor=np.array([0.85, 0.05, 0.10]),
             cone_radius=0.15,
-            description="Health-dominated: speed soft-capped (fragile body).",
+            description="Forward-dominated: jumping component soft-capped, increased mass.",
         ),
         ModeConfig(
-            name="cheap_energy",  # control cost is free
+            name="cheap_energy",
             reward_cap=np.array([np.inf, np.inf, -0.05]),  # energy cost cap small
             true_anchor=np.array([0.10, 0.85, 0.05]),
             cone_radius=0.15,
-            description="Speed-dominated: energy cost soft-capped (free energy).",
+            description="Jumping-dominated: cost component soft-capped.",
         ),
         ModeConfig(
             name="grounded",      # cannot jump high, must conserve energy
-            reward_cap=np.array([0.5, 0.3, np.inf]),  # health AND speed capped
+            reward_cap=np.array([0.5, 0.3, np.inf]),  # forward and jumping components capped
             gravity_scale=1.5,
             true_anchor=np.array([0.05, 0.05, 0.90]),
             cone_radius=0.15,
-            description="Energy-dominated: health and speed both capped (grounded mode).",
+            description="Cost-dominated: forward and jumping components capped, increased gravity.",
         ),
     ]
 
 
 def ant_modes() -> "list[ModeConfig]":
-    """Ant-v5: 3 objectives [healthy_reward, speed, -energy_cost].
+    """Ant-v5: [x_velocity, y_velocity, -unweighted_control_cost].
 
-    Three distinct modes creating well-separated Target Cones.
+    MO-Gym adds survival and contact rewards to every component before these
+    mode scales apply. Mode names are historical; there is no health-only axis.
     """
     return [
         ModeConfig(
@@ -346,7 +346,7 @@ def ant_modes() -> "list[ModeConfig]":
             friction_scale=1.5,
             true_anchor=np.array([0.05, 0.05, 0.90]),
             cone_radius=0.06,
-            description="Energy-dominated 50x: heavy + high friction"
+            description="Control-cost component amplified 50x, including shared bonuses; heavy + high friction"
         ),
         ModeConfig(
             name="race",
@@ -355,7 +355,7 @@ def ant_modes() -> "list[ModeConfig]":
             friction_scale=0.5,
             true_anchor=np.array([0.05, 0.90, 0.05]),
             cone_radius=0.06,
-            description="Speed-dominated 50x: low gravity + friction"
+            description="Y-velocity component amplified 50x, including shared bonuses; low gravity + friction"
         ),
         ModeConfig(
             name="cautious",
@@ -364,7 +364,7 @@ def ant_modes() -> "list[ModeConfig]":
             friction_scale=0.3,
             true_anchor=np.array([0.85, 0.05, 0.10]),
             cone_radius=0.06,
-            description="Health-dominated 50x: dangerous terrain"
+            description="X-velocity component emphasized, including shared bonuses; high gravity + low friction"
         ),
     ]
 

@@ -1,8 +1,8 @@
 """Generate main-result table + training/pareto figures for the BAMOR paper.
 
-Reads per-seed JSONs from results/probe7_100k/ and writes:
+Reads per-seed JSONs from results/server_curved20/ and writes:
     - paper/table_main_results.tex
-    - paper/fig_training_curves.pdf  (also .png for quick view)
+    - paper/fig_training_curves_v2.pdf  (also .png for quick view)
     - paper/fig_pareto_permode.pdf
 """
 import json
@@ -41,7 +41,7 @@ def write_main_table(data, out_path):
     lines = [
         r'\begin{table}[t]',
         r'\centering\small',
-        r'\caption{Hypervolume (HV) on the synthetic non-stationary MO environment at 100K steps (5 seeds).  Mode anchors are $w_0{=}[0.85,0.15]$, $w_1{=}[0.15,0.85]$, $w_2{=}[0.5,0.5]$.  Reference point $(-5,-5)$.  Bold = best per column; BAMOR dominates Mode~1 (skewed cone, $+28.2\%$ over Uniform) and wins on three of four columns.}',
+        r'\caption{Hypervolume (HV) on the synthetic non-stationary MO environment at 100K steps (20 seeds).  Mode anchors are $w_0{=}[0.85,0.15]$, $w_1{=}[0.15,0.85]$, $w_2{=}[0.5,0.5]$.  Reference point $(-5,-5)$.  Bold = best per column.}',
         r'\label{tab:main_results}',
         r'\begin{tabular}{lcccc}',
         r'\toprule',
@@ -74,7 +74,7 @@ def write_main_table(data, out_path):
             continue
         name = PRETTY[m][0]
         lines.append(f'{name} & {cell(m, "overall")} & {cell(m, "m0")} & {cell(m, "m1")} & {cell(m, "m2")} \\\\')
-    lines += [r'\bottomrule', r'\multicolumn{5}{l}{\footnotesize HV values in units of $10^3$; $\pm$ = one standard deviation across 5 seeds.}',
+    lines += [r'\bottomrule', r'\multicolumn{5}{l}{\footnotesize HV values in units of $10^3$; $\pm$ = one standard deviation across 20 seeds.}',
               r'\end{tabular}', r'\end{table}']
 
     out_path.write_text('\n'.join(lines))
@@ -146,7 +146,7 @@ def make_pareto_arcs(data, out_path):
         ax.grid(alpha=0.25, lw=0.5)
         ax.legend(loc='lower left', fontsize=7.5, frameon=True)
 
-    fig.suptitle('Per-mode Pareto fronts: BAMOR concentrates on the valid local arc', fontsize=10)
+    fig.suptitle('Recovered per-mode Pareto fronts on local arcs', fontsize=10)
     fig.tight_layout(rect=[0, 0, 1, 0.95])
     fig.savefig(out_path.with_suffix('.pdf'))
     fig.savefig(out_path.with_suffix('.png'), dpi=150)

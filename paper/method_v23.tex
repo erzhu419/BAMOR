@@ -1,0 +1,215 @@
+\section{Problem and Evaluation Object}
+\label{sec:problem_v23}
+
+An unobserved mode $h_t$ determines the transition kernel and vector reward
+$\mathbf r_t\in\mathbb R^m$. Modes change at unknown times. The learner observes
+states, actions and rewards, and receives a preference $w\in\Delta^{m-1}$.
+Training uses discounted scalar utilities $w^\top\mathbf Q$ with $\gamma=0.99$.
+The primary evaluation object is the final preference-conditioned policy,
+which computes context from its own observed transition history. This policy
+is history-dependent through its context even though its actor parameters are
+fixed at evaluation. A retained set $A$ of such policies defines a separate
+archive-coverage outcome.
+
+For a locked mode $h$, let
+$J_h(\pi,w)=\mathbb E[\sum_{t=0}^{L-1}\mathbf r_t]$, where an episode ends on
+termination or at $L\leq1000$ steps. These reported returns are undiscounted.
+For the fixed evaluation grid $W$, the empirical candidate set is
+$F_h(A)=\{\widehat J_h(\pi,w):\pi\in A,w\in W\}$, using three episodes per
+candidate. We compute $\mathrm{HV}_r(F_h(A))$ with a fixed reference $r$ and
+summarize environments by $H^{-1}\sum_h\mathrm{HV}_r(F_h(A))$. Mode-conditioned
+fronts are not pooled into a cross-mode Pareto front. In archive experiments,
+the final-actor subset and full archive are evaluated from the same rollouts.
+
+The primary outcome in the twenty-seed study is same-preference final-policy utility,
+\begin{equation}
+ U(\pi)=\frac{1}{H|W|}\sum_{h=1}^H\sum_{w\in W}
+              w^\top\widehat J_h(\pi,w).
+ \label{eq:direct_utility}
+\end{equation}
+Here the sum runs over all modes and grid weights; there is no maximization
+over other preferences or archived actors. A policy-set HV gain need not
+increase this deployment-oriented outcome.
+
+\paragraph{Why utility and coverage differ.}
+Consider one mode and two requested weights $e_1=(1,0)$ and $e_2=(0,1)$.
+A policy returning $(2,1)$ at $e_1$ and $(1,2)$ at $e_2$ has direct utility
+$2$. A second policy that swaps these two responses has direct utility $1$.
+Their return sets, and hence HV at any common reference, are identical.
+This illustrative example separates preference-conditioned execution from
+set coverage without assuming either metric determines the other.
+
+\section{BAMOR Update Portfolio}
+\label{sec:method_v23}
+
+BAMOR denotes the frozen v25 implementation throughout the current comparisons.
+At each interaction it constructs context from past transitions and conditions
+one shared actor and twin vector critics on that context and a preference.
+At each block boundary it chooses a fixed update configuration from a portfolio.
+The configuration governs both collected preferences and replay updates for
+the block; it does not instantiate a separate actor. Training rewards update
+the selector, while test returns and mode identities are reserved for
+evaluation. Algorithm~\ref{alg:bamor} gives the complete sequence.
+
+\subsection{Context and replay}
+
+One actor $\pi_\theta(a\mid s,w,z)$ and twin vector critics
+$\mathbf Q_{\phi_i}(s,a,w,z)$ share a history-derived context $z$: reward
+exponential averages, a scalar coordinate-response statistic and an
+eight-dimensional learned transition embedding. The encoder reconstructs
+scaled rewards and state displacements with temporal contrastive regularization.
+Replay stores the collected context; preference relabeling changes only its
+weight coordinates, not its stored history features. Mode labels are not
+inputs. Appendix~\ref{app:implementation_details} specifies the coordinate
+feature, encoder loss and exponential averages.
+
+\subsection{Update configurations}
+\label{sec:operator_portfolio}
+
+Each arm $o$ specifies a preference sampler, relabel rate and copy count $C_o$,
+critic candidate count $K_o^Q$, actor candidate count $K_o^\pi$, vector-loss
+coefficient $\lambda_o$, and behavior-cloning coefficient $b_o$. There are seven
+coverage arms, seven recovery arms and four extreme-preference arms, comprising
+14 distinct sampler/update settings. Identical settings in different arm slots
+retain separate scores and allocation counts. Relabeling
+reuses vector-reward transitions under new preference inputs. All arms update
+the same networks; the family names describe their intended roles. The full
+configuration and warmup sequence are in Appendix~\ref{app:v23_operators}.
+
+\paragraph{Critic update.}
+For each replay transition, let $u$ denote its update preference after relabeling.
+Set candidate preference $v_1=u$ and sample the remaining preferences using the
+arm's replay sampler. Draw $a'_j\sim\pi_\theta(\cdot\mid s',v_j,z')$ and define
+\begin{align}
+ \mathbf q'_j&=\min_{i=1,2}\mathbf Q_{\phi_i^-}(s',a'_j,v_j,z'), \nonumber\\
+ j^*&=\arg\max_j\{u^\top\mathbf q'_j-\alpha\log\pi_\theta(a'_j\mid s',v_j,z')\},\nonumber\\
+ \mathbf y_v&=\mathbf r+\gamma(1-d_{\mathrm{term}})
+       [\mathbf q'_{j^*}-\alpha\log\pi_\theta(a'_{j^*}\mid s',v_{j^*},z')\mathbf 1],\nonumber\\
+ y_s&=u^\top\mathbf y_v.
+ \label{eq:v25_targets}
+\end{align}
+Here the minimum is componentwise, targets are detached, $\alpha=0.2$ is fixed,
+and only true termination sets $d_{\mathrm{term}}=1$; time limits retain the
+bootstrap. The critic loss is
+\begin{equation}
+ \mathcal L_Q=\mathbb E\sum_{i=1}^2\left[
+ (u^\top\mathbf Q_{\phi_i}(s,a,u,z)-y_s)^2+
+ \frac{\lambda_o}{m}\|\mathbf Q_{\phi_i}(s,a,u,z)-\mathbf y_v\|_2^2\right].
+ \label{eq:v23_critic_loss}
+\end{equation}
+Both target terms include the same selected-candidate entropy bonus.
+
+\paragraph{Actor update.}
+Generate $K_o^\pi$ actions $a_j\sim\pi_\theta(\cdot\mid s,v_j,z)$ with $v_1=u$.
+Unlike the critic target above, rank these actions with critics conditioned on
+the update preference $u$:
+\begin{align}
+ \mathbf q_j&=\min_{i=1,2}\mathbf Q_{\phi_i}(s,a_j,u,z),
+ &j^\dagger&=\arg\max_j u^\top\mathbf q_j,\\
+ \mathcal L_\pi&=\mathbb E\left[
+ \alpha\log\pi_\theta(a_{j^\dagger}\mid s,v_{j^\dagger},z)
+ -u^\top\mathbf q_{j^\dagger}
+ +\frac{b_o}{d_a}\|a_{j^\dagger}-a\|_2^2\right].
+ \label{eq:v23_actor_loss}
+\end{align}
+The discrete ranking is detached; gradients flow through the selected sampled
+action and its generating policy log probability. $d_a$ is action dimension and
+$a$ in the last term is the replay action. Thus multi-candidate updates are
+specified training heuristics, not an exact optimality operator.
+
+\subsection{Progress-driven block allocation}
+\label{sec:method_v25}
+
+Progress is measured in reward coordinates without multiplying by each
+transition's collection preference. The first 5,000 transitions initialize
+causal reward moments. Before each subsequent 1,500-transition block $k$, freeze
+the per-objective standard deviations $s_{k,j}$ from past rewards. For the
+first- and second-half means, the selected arm receives
+\begin{equation}
+ P_k=\frac{1}{m}\sum_{j=1}^m\tanh\left(
+ \frac{\overline r^{(2)}_{k,j}-\overline r^{(1)}_{k,j}}{s_{k,j}}\right),
+ \qquad q_o\leftarrow0.87q_o+0.13P_k,
+ \label{eq:v25_progress}
+\end{equation}
+The arm stays fixed within a block, while interaction preferences change at
+each transition. A completed block updates its score after the last reward
+and before that transition's gradient; incomplete blocks remain unscored.
+After ten prescribed warmup blocks, the selector first corrects family
+allocation deficits against fractions $(0.36,0.22,0.18)$. Otherwise it samples
+a family using the mean of its two highest arm scores, then an arm using its
+own score, with softmax and uniform exploration at both levels. The score-blind
+control substitutes zero routing scores while computing the same observations.
+Exact temperatures, scales and scheduling parameters are in
+Appendix~\ref{app:implementation_details}.
+
+\subsection{Implementation budget and optional archive}
+
+The main protocol uses 75,000 interactions and evaluates only the final actor
+with its final encoder, without intermediate evaluation or actor selection.
+Training context trackers persist across resets; evaluation initializes them
+afresh. The separate 50k protocol retains 19 actors at steps
+$5{,}000,7{,}500,\ldots,50{,}000$, all evaluated with the final encoder.
+Archive evaluation does not feed the selector. Per-run network, optimization
+and candidate resources are in Table~\ref{tab:v23_budget}.
+
+\begin{algorithm}[t]
+\caption{BAMOR-v25 training with optional actor retention}
+\label{alg:bamor}
+\label{sec:algorithm}
+\begin{algorithmic}
+\STATE Initialize networks, replay, context trackers and arm scores $q_o=0$; set $L=5{,}000$
+\FOR{$t=1,\ldots,T$}
+ \IF{$t\leq L$}
+  \STATE Use the first warmup arm
+ \ELSIF{a new scored block starts}
+  \STATE Select an arm by Section~\ref{sec:method_v25}; freeze scales from past rewards
+ \ENDIF
+ \STATE Sample the arm's interaction preference; construct context from past transitions
+ \STATE Act randomly if $t<L$, otherwise use the actor; observe the transition
+ \STATE Update reward moments; for $t>L$, accumulate half-block rewards and allocation counts
+ \IF{the 1,500-transition scored block is complete}
+  \STATE Update $q_o$ by Eq.~\eqref{eq:v25_progress}, increment its block count and close the block
+ \ENDIF
+ \STATE Update context trackers; store the transition, both contexts and true-termination mask
+ \IF{$t\geq L$}
+  \STATE Relabel and expand a replay minibatch according to the selected arm
+  \STATE Update critics using Eq.~\eqref{eq:v25_targets}, actor and target critics; update encoder
+ \ENDIF
+ \STATE Retain actor parameters at the prescribed steps, if an archive is requested
+\ENDFOR
+\STATE Leave any incomplete block unscored; evaluate the final actor in each locked mode
+\STATE For archive experiments, also evaluate saved actors with the final encoder
+\end{algorithmic}
+\end{algorithm}
+
+\FloatBarrier
+\section{Supporting Mathematical Properties}
+
+\paragraph{Target consistency and feedback.}
+Simplex weights project the soft vector target exactly onto its scalar target
+in Eq.~\eqref{eq:v25_targets} (Proposition~\ref{prop:soft_projection}). The
+progress statistic and its score EMA stay in $[-1,1]$, and constant reward
+offsets cancel at fixed scale (Proposition~\ref{prop:progress}). These are
+properties of the implemented quantities.
+
+\paragraph{Candidate selection and local stability.}
+At equal weights, perturbing $(1,0),(0,0.9)$ to $(1,0),(0,1.1)$ changes the
+unique selected vector's first coordinate by $1$ despite an input change of
+only $0.2$ (Proposition~\ref{prop:reselection}). Scalar-maximization stability
+therefore does not imply selected-vector stability. For matched actions and
+contexts, let $S_j=u^\top q_j+e_j$, with critic-coordinate perturbations at
+most $\epsilon\geq0$ and entropy-bonus perturbations at most $\rho\geq0$. If the winner
+$j^*$ satisfies
+\begin{equation}
+ S_{j^*}-S_j>2\delta\quad(j\neq j^*),\qquad\delta=\epsilon+\rho,
+ \label{eq:main_candidate_margin}
+\end{equation}
+the winner is unchanged. With fixed reward and bootstrap multiplier $b\geq0$,
+the soft targets obey $\|Y-\widetilde Y\|_\infty\leq b\delta$
+(Proposition~\ref{prop:candidate_margin}).
+
+Appendix~\ref{sec:theory} gives the Lean proofs and conditional tracking and
+archive results. Tracking requires contractive selected maps, bounded update
+error and bounded selected-map residual. HV monotonicity fixes returns,
+reference and encoder; archive selection additionally requires uniform return
+accuracy. These assumptions delimit the supporting analysis.

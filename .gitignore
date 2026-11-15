@@ -1,0 +1,23 @@
+# Local experiment outputs and input datasets.
+/results/*
+!/results/iclr_update_residual_20261002/
+/results/iclr_update_residual_20261002/*
+!/results/iclr_update_residual_20261002/runner_v1.py
+/bamor_experiments/
+/env/data/
+*.pt
+*.pth
+*.ckpt
+
+# Local caches and build byproducts.
+__pycache__/
+*.pyc
+.pytest_cache/
+*.log
+/paper/*.aux
+/paper/*.bbl
+/paper/*.blg
+/paper/*.fdb_latexmk
+/paper/*.fls
+/paper/*.out
+/paper/*.synctex.gz

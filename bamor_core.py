@@ -128,7 +128,8 @@ class BeliefTracker:
                  reset_prior: Optional[np.ndarray] = None,
                  switch_cooldown: int = 30,
                  cusum_required_consecutive: int = 5,
-                 cusum_decay: float = 0.5):
+                 cusum_decay: float = 0.5,
+                 freeze_belief: bool = False):
         """
         Args:
             num_modes:           |H| — number of environment modes
@@ -150,6 +151,7 @@ class BeliefTracker:
         self.switch_cooldown = switch_cooldown
         self.cusum_required_consecutive = cusum_required_consecutive
         self.cusum_decay = cusum_decay
+        self.freeze_belief = freeze_belief
         self.reset_prior = reset_prior if reset_prior is not None else \
             np.ones(num_modes, dtype=np.float64) / num_modes
 
@@ -177,6 +179,15 @@ class BeliefTracker:
         """
         mahal_sq = surprise_info['mahalanobis_sq']
         self.steps_since_switch += 1
+
+        if self.freeze_belief:
+            return {
+                'belief': self.belief.copy(),
+                'mode_switched': False,
+                'current_mode': self.current_mode,
+                'mode_switch_count': self.mode_switch_count,
+                'steps_since_switch': self.steps_since_switch,
+            }
 
         # CUSUM-style accumulation: each over-threshold step adds 1 to the
         # counter; sub-threshold steps decay it.  A switch fires only when
@@ -235,6 +246,16 @@ class BeliefTracker:
         self.current_mode = np.argmax(self.belief)
         self.mode_switch_count = 0
         self.steps_since_switch = 0
+
+    def set_mode(self, mode: int, one_hot: bool = True):
+        """Set the active mode explicitly for oracle-mode diagnostics."""
+        mode = int(mode)
+        if mode < 0 or mode >= self.num_modes:
+            raise ValueError(f"mode must be in [0, {self.num_modes}), got {mode}")
+        self.current_mode = mode
+        if one_hot:
+            self.belief = np.zeros(self.num_modes, dtype=np.float64)
+            self.belief[mode] = 1.0
 
 
 # ════════════════════════════════════════════════════════════════
@@ -457,7 +478,8 @@ class ContextAwareWeightSampler:
     def __init__(self, cone_estimator: TargetConeEstimator,
                  belief_tracker: BeliefTracker,
                  concentration = 10.0,
-                 force_uniform: bool = False):
+                 force_uniform: bool = False,
+                 residual_uniform_prob: float = 0.0):
         """
         Args:
             cone_estimator:  estimates per-mode anchors and radii
@@ -475,6 +497,9 @@ class ContextAwareWeightSampler:
         self.cone_estimator = cone_estimator
         self.belief_tracker = belief_tracker
         self.force_uniform = force_uniform
+        self.residual_uniform_prob = float(residual_uniform_prob)
+        if not 0.0 <= self.residual_uniform_prob <= 1.0:
+            raise ValueError("residual_uniform_prob must be in [0, 1]")
         num_modes = belief_tracker.num_modes
         conc = np.asarray(concentration, dtype=float)
         if conc.ndim == 0:
@@ -507,7 +532,7 @@ class ContextAwareWeightSampler:
         """
         belief = self.belief_tracker.belief
         w_anchor = self.cone_estimator.belief_weighted_anchor(belief)
-        if self.force_uniform:
+        if self.force_uniform or np.random.rand() < self.residual_uniform_prob:
             # bamor_nc ablation: true uniform Dirichlet(1, 1, …) — no cone, no anchor bias.
             reward_dim = w_anchor.shape[0]
             w = np.random.dirichlet(np.ones(reward_dim)).astype(np.float32)
@@ -541,6 +566,22 @@ class ContextAwareWeightSampler:
             reward_dim = w_anchor.shape[0]
             ws = np.random.dirichlet(np.ones(reward_dim),
                                       size=batch_size).astype(np.float32)
+            anchors = np.tile(w_anchor.astype(np.float32), (batch_size, 1))
+            return ws, anchors
+        if self.residual_uniform_prob > 0.0:
+            reward_dim = w_anchor.shape[0]
+            use_uniform = np.random.rand(batch_size) < self.residual_uniform_prob
+            ws = np.empty((batch_size, reward_dim), dtype=np.float32)
+            n_uniform = int(use_uniform.sum())
+            if n_uniform:
+                ws[use_uniform] = np.random.dirichlet(np.ones(reward_dim), size=n_uniform)
+            n_cone = batch_size - n_uniform
+            if n_cone:
+                radius = self.cone_estimator.belief_weighted_radius(belief)
+                base_conc = self._effective_concentration(belief)
+                effective_concentration = base_conc / max(radius, 0.01)
+                alpha = effective_concentration * w_anchor + 1e-3
+                ws[~use_uniform] = np.random.dirichlet(alpha, size=n_cone)
             anchors = np.tile(w_anchor.astype(np.float32), (batch_size, 1))
             return ws, anchors
         radius = self.cone_estimator.belief_weighted_radius(belief)
@@ -668,11 +709,23 @@ class BAMORPipeline:
                  ema_alpha: float = 0.05,
                  switch_cooldown: int = 80,
                  warmup: int = 50,
+                 cusum_required_consecutive: int = 5,
+                 cusum_decay: float = 0.5,
                  disable_surprise: bool = False,
-                 disable_cone: bool = False):
+                 disable_cone: bool = False,
+                 freeze_belief: bool = False,
+                 mode_source: str = "belief",
+                 fixed_anchors: Optional[np.ndarray] = None,
+                 fixed_radii: Optional[np.ndarray] = None,
+                 residual_uniform_prob: float = 0.0):
 
         self.disable_surprise = disable_surprise
         self.disable_cone = disable_cone
+        self.freeze_belief = freeze_belief
+        if mode_source not in ("belief", "oracle", "global"):
+            raise ValueError("mode_source must be one of: belief, oracle, global")
+        self.mode_source = mode_source
+        self.freeze_cone = fixed_anchors is not None
 
         self.surprise_computer = SurpriseComputer(
             reward_dim=reward_dim, ema_alpha=ema_alpha, warmup=warmup)
@@ -682,11 +735,33 @@ class BAMORPipeline:
         self.belief_tracker = BeliefTracker(
             num_modes=num_modes,
             surprise_threshold=effective_threshold,
-            switch_cooldown=switch_cooldown)
+            switch_cooldown=switch_cooldown,
+            cusum_required_consecutive=cusum_required_consecutive,
+            cusum_decay=cusum_decay,
+            freeze_belief=freeze_belief)
 
         self.cone_estimator = TargetConeEstimator(
             num_modes=num_modes, reward_dim=reward_dim,
             window_size=cone_window, normalize_rewards=False)
+        if fixed_anchors is not None:
+            anchors = np.asarray(fixed_anchors, dtype=np.float64)
+            if anchors.shape != (num_modes, reward_dim):
+                raise ValueError(
+                    f"fixed_anchors must have shape {(num_modes, reward_dim)}, "
+                    f"got {anchors.shape}")
+            anchors = np.clip(anchors, 0.0, None)
+            anchors /= np.maximum(anchors.sum(axis=1, keepdims=True), 1e-12)
+            if fixed_radii is None:
+                radii = np.full(num_modes, 0.25, dtype=np.float64)
+            else:
+                radii = np.asarray(fixed_radii, dtype=np.float64)
+                if radii.shape != (num_modes,):
+                    raise ValueError(
+                        f"fixed_radii must have shape {(num_modes,)}, got {radii.shape}")
+            self.cone_estimator.constraint = ModeConeConstraint(
+                w_anchor=anchors,
+                cone_radius=radii,
+            )
 
         # Ablation: disable cone → true Dirichlet(1, …, 1) uniform sampling.
         # (gpt diagnosis #4: concentration=0.1 with anchor produces a
@@ -696,7 +771,8 @@ class BAMORPipeline:
             cone_estimator=self.cone_estimator,
             belief_tracker=self.belief_tracker,
             concentration=concentration,
-            force_uniform=disable_cone)
+            force_uniform=disable_cone,
+            residual_uniform_prob=residual_uniform_prob)
 
         self.diagnostics = BAMORDiagnostics(
             reward_dim=reward_dim, gamma=gamma)
@@ -705,7 +781,12 @@ class BAMORPipeline:
         self.num_modes = num_modes
         self._cone_grace_remaining = 0  # steps to skip cone estimation after switch
 
-    def observe_reward(self, reward_vec: np.ndarray) -> dict:
+    def set_mode(self, mode: int, one_hot: bool = True):
+        """Set active mode before sampling when using oracle-mode diagnostics."""
+        self.belief_tracker.set_mode(mode, one_hot=one_hot)
+
+    def observe_reward(self, reward_vec: np.ndarray,
+                       true_mode: Optional[int] = None) -> dict:
         """Process a new reward observation through the full pipeline.
 
         Steps:
@@ -718,6 +799,11 @@ class BAMORPipeline:
             Combined info dict from all components.
         """
         reward_vec = np.asarray(reward_vec, dtype=np.float64)
+
+        if self.mode_source == "oracle":
+            if true_mode is None:
+                raise ValueError("true_mode is required when mode_source='oracle'")
+            self.set_mode(true_mode, one_hot=True)
 
         # Step 1: Surprise
         surprise_info = self.surprise_computer.compute(reward_vec)
@@ -736,9 +822,15 @@ class BAMORPipeline:
         # Step 4: Cone estimation (skip during grace period)
         if self._cone_grace_remaining > 0:
             self._cone_grace_remaining -= 1
-        else:
+        elif not self.freeze_cone:
             current_mode = belief_info['current_mode']
-            self.cone_estimator.observe(reward_vec, current_mode)
+            if self.mode_source == "oracle" and true_mode is not None:
+                self.cone_estimator.observe(reward_vec, int(true_mode))
+            elif self.mode_source == "global":
+                for mode in range(self.num_modes):
+                    self.cone_estimator.observe(reward_vec, mode)
+            else:
+                self.cone_estimator.observe(reward_vec, current_mode)
 
         return {**surprise_info, **belief_info}
 

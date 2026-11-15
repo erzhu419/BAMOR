@@ -1,0 +1,59 @@
+\section{Cohorts, Statistical Analysis and Interaction Accounting}
+\label{app:experiment_details}
+
+\subsection{Independent final-policy cohorts}
+
+The main twenty-seed study used seeds 1601--1620 on HalfCheetah and Hopper,
+75k training interactions per run and only the final actor. The earlier
+fully seeded pilot used seeds 1201--1205 on HalfCheetah, Hopper and Ant,
+with final HV as its primary outcome. Its utility observations motivated
+the independent study; the seed cohorts and outcomes were not pooled.
+
+\input{table_final_policy}
+
+The earlier pilot did not yield a general final-HV advantage
+(Table~\ref{tab:final_policy}). HalfCheetah mean final HV increased by 4.46\%,
+Hopper decreased by 20.02\%, and Ant decreased by 6.94\%. HalfCheetah and
+Hopper each won three of five HV pairs and four of five utility pairs. Ant
+lost all five pairs on both outcomes. No intermediate checkpoint was selected
+using test outcomes.
+
+The main study used 20,000 paired bootstrap resamples with NumPy generator
+seed 0 and percentile intervals. Each resampled unit was a complete
+training-seed pair, retaining all modes and weights together. The frozen
+97.5\% intervals for the two environment-specific mean utility differences
+implement nominal 95\% Bonferroni family coverage, with approximate bootstrap
+coverage. Ordinary 95\% intervals also included zero: $[-15.93,220.51]$ on
+HalfCheetah and $[-48.49,96.88]$ on Hopper. All 20 pairs were retained; the
+five-seed pilot was not added to the confirmation cohort.
+
+The 80-run study consumed 6,000,000 training interactions, 16,512,980
+evaluation interactions and 160 environment-initialization probe steps.
+Separate prelaunch tests consumed 1,280 training, 16,128 evaluation and 32
+probe interactions. The earlier 30-run pilot consumed 2,250,000 training,
+6,240,415 evaluation and 60 initialization probe interactions. Evaluation
+was excluded from replay and operator feedback. Both 75k studies explicitly
+seeded Python, NumPy, PyTorch, environment-reset and action-space RNGs for CAPQL.
+
+\subsection{Retrospective archive cohort}
+
+The 50k archive comparison used 19 actors per method, with HalfCheetah seeds
+1011--1025 and Hopper/Ant seeds 1011--1015. It added CAPQL after inspecting
+the BAMOR cohort. The early CAPQL runs omitted seeds for Gym's action-space
+RNG and Python's replay-sampling RNG, so their retained cross-sectional
+outcomes are not exactly reproducible from the recorded training seed.
+All 15 attempted 75k CAPQL continuation checks failed to reproduce the
+earlier 50k actors; these continuation outcomes are excluded from the tables.
+
+Measured mean training-time ratios, BAMOR/CAPQL, were 1.91, 1.69 and 1.65
+on HalfCheetah, Hopper and Ant. Evaluation-time ratios were 1.74, 1.79 and
+1.45. Actor counts and rollout inputs matched, but network widths and
+context/update computation differed.
+
+The initial three-seed v23 archive-matched development pilot used seeds
+20--22. Adaptive selection won only one, one and two archive-HV pairs
+against score-blind on HalfCheetah, Hopper and Ant, respectively. This
+historical pilot is separate from v25 and from the independent twenty-seed
+comparison. Historical synthetic and unmatched continuous-control outcomes
+are in Appendices~\ref{app:historical_synthetic}
+and~\ref{app:historical_continuous}.

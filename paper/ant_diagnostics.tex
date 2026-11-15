@@ -1,0 +1,46 @@
+\section{Ant Execution and Structure Diagnostics}
+\label{app:ant_diagnostics}
+
+These experiments investigate the mixed-preference failure reported in
+Section~\ref{sec:ant_diagnosis}. They are separate development and diagnostic
+cohorts, not modifications to the BAMOR method used in the main comparison.
+
+\subsection{Candidate-search ablations}
+
+On the inspected seeds 1201--1205, with a score-blind selector, disabling actor
+candidate search improved mean mixed-energy utility by 1,116.0 on all five
+seeds; disabling critic candidate search as well added 339.8 on four of five
+seeds. Both-search-off still lost to CAPQL by 407.1 on this metric and 4.01\%
+on final HV. Integrating only the actor change into adaptive selection instead
+lost all five mixed-utility pairs against CAPQL. These development results
+motivated a separate test of mixed-preference capacity.
+
+\subsection{Independent structure-by-selector pilot}
+
+At 75k training interactions, seeds 1301--1305 crossed the base or residual
+actor with adaptive or score-blind selection; a fifth arm was fully seeded
+CAPQL. The actor's pre-tanh mean was augmented by zero-initialized pairwise heads,
+\begin{equation}
+ \mu(s,w,z)=\mu_{\mathrm{base}}(h)
+       +\sum_{i<j}2w_iw_j(A_{ij}h+b_{ij}),
+ \label{eq:pairwise_residual}
+\end{equation}
+where $h$ is the existing hidden representation. Variance parameterization
+and the shared trunk were unchanged. The direct residual is zero at vertices,
+but shared-trunk training can still alter vertex behavior. Own-preference actor
+and critic updates were used in all four BAMOR ablation arms. The primary
+comparison was residual adaptive minus base adaptive, averaged over the 14
+mode-0 evaluation weights with $0<w_{\mathrm{energy}}<1$.
+
+\input{table_ant_pairwise}
+
+The primary mean gain was 39.6 with two wins and three losses
+(Table~\ref{tab:ant_pairwise}). The analogous residual effect under blind
+selection was -412.5. Their difference, the structure-by-selector interaction,
+was positive on all five seeds (mean 452.1), while residual adaptive still
+trailed CAPQL by 247.9 mixed utility and 2.06\% final HV. The blind schedules
+matched across architectures in all five seeds; adaptive and blind schedules
+differed in every seed. Thus the interaction was a closed-loop treatment
+contrast, not a consistent primary or external-comparator win. The full
+25-run pilot consumed 1,875,000 training and 4,700,168 evaluation interactions,
+plus 50 initialization probe steps. The residual variant was not adopted.

@@ -192,6 +192,47 @@ def get_canonical_modes():
     return create_env().modes
 
 
+BAMOR_FAMILY = {
+    'bamor',
+    'bamor_nc',
+    'bamor_ns',
+    'bamor_oracle',
+    'bamor_oracle_cone',
+    'bamor_fixed_cone',
+    'bamor_ns_eps',
+}
+
+
+def _oracle_cones_from_env(env):
+    anchors = np.stack([m.true_anchor for m in env.modes]).astype(np.float64)
+    radii = np.full(env.num_modes, 0.25, dtype=np.float64)
+    return anchors, radii
+
+
+def _make_bamor_pipeline(method, env, reward_dim, gamma):
+    fixed_anchors = fixed_radii = None
+    if method in ('bamor_oracle_cone', 'bamor_fixed_cone'):
+        fixed_anchors, fixed_radii = _oracle_cones_from_env(env)
+
+    is_oracle_mode = method in ('bamor_oracle', 'bamor_oracle_cone')
+    is_frozen_global = method in ('bamor_ns', 'bamor_ns_eps')
+
+    return BAMORPipeline(
+        num_modes=env.num_modes,
+        reward_dim=reward_dim,
+        gamma=gamma,
+        surprise_threshold=5.0,
+        concentration=20.0,
+        disable_surprise=is_frozen_global or is_oracle_mode,
+        disable_cone=(method == 'bamor_nc'),
+        freeze_belief=is_frozen_global or is_oracle_mode,
+        mode_source='oracle' if is_oracle_mode else ('global' if is_frozen_global else 'belief'),
+        fixed_anchors=fixed_anchors,
+        fixed_radii=fixed_radii,
+        residual_uniform_prob=0.05 if method == 'bamor_ns_eps' else 0.0,
+    )
+
+
 def train(method, max_episodes=500, switch_interval=300, seed=0,
           save_dir='results/synthetic', device='cpu'):
     np.random.seed(seed)
@@ -222,13 +263,8 @@ def train(method, max_episodes=500, switch_interval=300, seed=0,
 
     # BAMOR pipeline
     bamor = None
-    if method.startswith('bamor'):
-        bamor = BAMORPipeline(
-            num_modes=3, reward_dim=r_dim, gamma=gamma,
-            surprise_threshold=5.0, concentration=20.0,
-            disable_surprise=(method == 'bamor_ns'),
-            disable_cone=(method == 'bamor_nc'),
-        )
+    if method in BAMOR_FAMILY:
+        bamor = _make_bamor_pipeline(method, env, r_dim, gamma)
 
     # Logging
     log = {'method': method, 'seed': seed, 'episodes': [], 'pareto': [],
@@ -246,6 +282,10 @@ def train(method, max_episodes=500, switch_interval=300, seed=0,
 
         done = False
         while not done:
+            active_mode = int(getattr(env, 'current_mode_idx', info.get('mode_idx', 0)))
+            if bamor and bamor.mode_source == 'oracle':
+                bamor.set_mode(active_mode, one_hot=True)
+
             # Sample weight
             if bamor:
                 w_np, w_anchor_np = bamor.sample_weight()
@@ -275,7 +315,10 @@ def train(method, max_episodes=500, switch_interval=300, seed=0,
             prev_bamor_mode = (bamor.belief_tracker.current_mode
                                if bamor is not None else None)
             if bamor:
-                bamor.observe_reward(rew)
+                if bamor.mode_source == 'oracle':
+                    bamor.observe_reward(rew, true_mode=active_mode)
+                else:
+                    bamor.observe_reward(rew)
             cur_bamor_mode = (bamor.belief_tracker.current_mode
                               if bamor is not None else None)
 
@@ -472,7 +515,17 @@ def eval_pareto(env, pi, r_dim, dev, num_w=21, num_ep=3, ref_point=None):
     return results, hv, ref_point
 
 
-METHODS = ['bamor', 'bamor_nc', 'bamor_ns', 'uniform', 'fixed']
+METHODS = [
+    'bamor',
+    'bamor_nc',
+    'bamor_ns',
+    'bamor_oracle',
+    'bamor_oracle_cone',
+    'bamor_fixed_cone',
+    'bamor_ns_eps',
+    'uniform',
+    'fixed',
+]
 
 def main():
     p = argparse.ArgumentParser()

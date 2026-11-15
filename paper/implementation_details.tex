@@ -1,0 +1,66 @@
+\section{Context, Allocation and Resource Details}
+\label{app:implementation_details}
+
+\subsection{Transition-derived context}
+
+The non-preference context contains reward exponential averages, a scalar
+coordinate-response statistic and an eight-dimensional transition embedding.
+Using zero-based coordinates, accept $v=s'_1/a_0$ only when $|a_0|>0.05$,
+$v$ is finite and $|v|<10$. Initialize $\bar v$ with the first accepted value,
+then update it with EMA rate $0.2$. The response feature is
+$\operatorname{clip}((\bar v-1)/0.5,-3,3)$, or zero before the first accepted
+value; reward features are $\tanh(\overline{\mathbf r}/3)$. This coordinate
+statistic is an input feature, not an identified physical parameter.
+
+The encoder maps $(s,a,\tanh(\mathbf r/3),s'-s)$ to a bounded latent. Its
+auxiliary loss reconstructs scaled reward and state displacement, penalizes
+latent squared magnitude with coefficient $10^{-4}$, and adds a temporal
+contrastive loss with coefficient $0.2$, temperature $0.2$ and positive time
+window 256. Online latent features use an exponential average with coefficient
+$0.35$; reward and response averages use $0.2$. Actor--critic replay stores
+the collected context and does not re-encode its historical features during
+preference relabeling. No mode labels enter these updates.
+
+\subsection{Block allocation parameters}
+
+During the first 5,000 transitions, the first warmup arm supplies preferences
+and observations initialize a causal vector mean and variance. Scored blocks
+start afterward. The reward-moment EMA rate is $1/1500$; before each block,
+freeze the standard deviation with numerical floor $10^{-6}$. The chosen
+arm's score update is $q_o\leftarrow0.87q_o+0.13P_k$. Completed blocks update
+scores after observing the last reward and before that transition's gradient.
+Incomplete blocks do not update scores.
+
+The first ten scored blocks follow Appendix~\ref{app:v23_operators}.
+Subsequently, check family deficits against fractions $(0.36,0.22,0.18)$ and
+choose the largest positive deficit. Otherwise sample a family using the mean
+of its two highest arm scores, softmax temperature $0.22$ and uniform
+exploration mixture $0.16$. Within the family, sample an arm with temperature
+$0.28$ and exploration mixture $0.16$. Score-blind selection computes the
+same reward statistics but substitutes zero scores for routing.
+
+\subsection{Per-run resources}
+
+\begin{table}[htbp]
+\centering\small
+\caption{Resources for the 75k final-policy comparison. Widths refer to two
+hidden layers. The 50k archive comparisons use the same network and optimizer
+settings but evaluate 19 actors per method. Extra preference copies expand a
+replay minibatch; candidate evaluation adds computation, not training transitions.}
+\label{tab:v23_budget}
+\begin{tabular}{lcc}
+\toprule
+Quantity & BAMOR (v25) & CAPQL\\
+\midrule
+Training transitions & 75,000 & 75,000\\
+Learning starts / replay batch & 5,000 / 256 & 5,000 / 256\\
+Actor and critic width & 64 & 256\\
+Replay capacity & 500,000 & 500,000\\
+Learning rate / target update & $3\times10^{-4}$ / $0.005$ & $3\times10^{-4}$ / $0.005$\\
+Evaluated actors / preference weights & 1 / 21 & 1 / 21\\
+Episode resets per weight and mode & 3 & 3\\
+Preference copies per update & 1--3 & 1\\
+Critic / actor candidates per row & 1--5 / 1--5 & 1 / 1\\
+\bottomrule
+\end{tabular}
+\end{table}

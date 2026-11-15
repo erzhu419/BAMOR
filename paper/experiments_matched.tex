@@ -1,0 +1,99 @@
+\subsection{Evaluation design}
+\label{sec:mujoco_3d}
+
+The primary comparison evaluated unchanged BAMOR-v25 and fully seeded CAPQL
+at 75k interactions on HalfCheetah and Hopper, using seeds 1601--1620 and only
+the final actor. An earlier five-seed pilot motivated the task selection and
+utility hypothesis; confirmation seeds and analysis were fixed before training.
+The cohorts remain separate (Appendix~\ref{app:experiment_details}).
+
+The custom piecewise-stationary tasks have two objectives/four modes on
+HalfCheetah, three/four on Hopper and three/three on Ant. Modes alter physics
+and reward scales or smooth caps; exponential dwell lengths have scale 25k
+and minimum 1,000. Evaluation locks each mode, uses deterministic actions at
+21 full-simplex weights with three paired reset seeds, and ends on termination
+or at 1,000 steps. Training schedules and evaluation inputs are paired;
+mode-wise fronts are not pooled (Appendix~\ref{app:task_details}).
+
+Direct utility $U$ evaluates the requested preference; final HV evaluates the
+final actor's return set; archive HV evaluates retained actors. W/L/T denotes
+paired seed wins/losses/ties, including every pair. Relative differences compare
+cohort means; utilities and raw HV are not pooled across tasks. BAMOR uses width
+64 and CAPQL width 256, with equal interaction budgets but different update
+computation (Table~\ref{tab:v23_budget}).
+
+\subsection{Twenty-seed final-policy utility}
+\label{sec:utility_confirmation}
+
+BAMOR achieved higher observed mean direct utility on both tasks
+(Table~\ref{tab:utility_confirmation}). HalfCheetah means were 296.32 versus
+191.17 for CAPQL, a difference of 105.15 (+55.00\%); Hopper means were 436.59
+versus 411.93, a difference of 24.67 (+5.99\%). Each task had 13 positive
+and seven negative seed-paired differences. Every run used the original
+method settings, with no intermediate evaluation or checkpoint selection.
+
+\input{table_utility_confirmation}
+
+\paragraph{Prespecified uncertainty analysis.}
+Intervals used 20,000 bootstrap resamples of complete training-seed pairs,
+retaining their mode and preference outcomes together. The frozen criterion
+used a 97.5\% percentile interval per task for nominal 95\% Bonferroni family
+coverage; bootstrap coverage is approximate. Both intervals included zero, as
+did ordinary 95\% intervals (Appendix~\ref{app:experiment_details}). The
+observed means therefore did not meet the criterion for an expected-utility
+advantage. No pairs were excluded and no pilot seeds were added.
+
+\paragraph{Coverage and computational cost.}
+Final HV and runtime gave different orderings from mean utility
+(Table~\ref{tab:utility_secondary}). BAMOR's mean final HV was 4.84\% lower
+on HalfCheetah and 5.77\% lower on Hopper, with 10 and eight wins out of 20,
+respectively. The descriptive paired HV intervals included zero. Mean
+training time was 1.67 and 1.73 times CAPQL's. These are measured times on a
+shared cluster, not dedicated-machine benchmarks; both methods used two CPU
+threads per run.
+
+\input{table_utility_secondary}
+
+The 80 runs consumed 6,000,000 training and 16,512,980 evaluation interactions.
+Evaluation did not enter replay or selector feedback. Initialization probes,
+prelaunch tests and per-cohort costs are accounted for in
+Appendix~\ref{app:experiment_details}.
+
+\subsection{Archive coverage and feedback attribution}
+
+At 50k interactions, both methods retained 19 actors. This retrospective
+comparison used 15 HalfCheetah and five Hopper/Ant seeds, adding CAPQL after
+the BAMOR cohort was inspected. Archive coverage favored BAMOR most strongly
+on Hopper, with five paired wins (Table~\ref{tab:matched_archive}). Ant final
+HV fell on all five seeds; HalfCheetah's 16.21\% archive-mean gain accompanied
+only 0.74\% in final HV. The early CAPQL cohort's incomplete RNG seeding is
+documented in Section~\ref{sec:limits}.
+
+\input{table_matched_archive}
+
+The score-blind control retained networks, arms, family floors and archive
+schedule while replacing routing scores with zero
+(Table~\ref{tab:selector_effect}). Adaptive selection did not improve mean
+archive or final HV on HalfCheetah or Ant. Hopper's positive means had two
+wins, one loss and two ties; seven of fifteen HalfCheetah pairs tied exactly.
+These observations separate an external archive advantage from evidence of a
+consistent feedback benefit.
+
+\input{table_selector_effect}
+
+\subsection{Ant mixed-preference diagnosis}
+\label{sec:ant_diagnosis}
+
+The earlier fully seeded 75k pilot lost all five Ant pairs in utility and final
+HV: mean utility was 988.8 versus CAPQL's 1364.9, and mean final HV was 6.94\%
+lower (Table~\ref{tab:final_policy}). Failure was concentrated in mixed weights
+containing the energy objective. On that inspected cohort, re-scalarizing evaluated
+returns showed that v25's pure-energy policy beat its corresponding
+mixed-preference policy at 66 of 70 mode-0 seed--weight cells. This comparison
+uses the same saved actor and requires no extra environment interactions.
+
+Candidate-search ablations and an independent structure-by-selector pilot did
+not close the CAPQL gap. The latter's primary residual effect had only two of
+five wins, and its residual adaptive arm still trailed CAPQL by 247.9 mixed
+utility and 2.06\% final HV (Appendix~\ref{app:ant_diagnostics}). The residual
+variant was not adopted; cross-environment BAMOR remains unchanged v25.
