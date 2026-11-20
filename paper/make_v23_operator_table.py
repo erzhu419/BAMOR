@@ -1,4 +1,4 @@
-"""Generate the current v25 arm specification; retain the existing file names."""
+"""Generate the BAMOR portfolio specification table from the selector implementation."""
 from pathlib import Path
 import sys
 
@@ -27,31 +27,33 @@ def table_source():
         rows.append(r"\midrule")
     rows[-1] = r"\bottomrule"
     warmup = ", ".join(names[arm] for arm in selector.warmup_sequence)
-    shared = "; ".join(" = ".join(group) for group in groups.values() if len(group) > 1)
-    return r"""\section{BAMOR-v25 Operator Specification}
-\label{app:v23_operators}
+    shared = "; ".join("/".join(group) for group in groups.values() if len(group) > 1)
+    return r"""\section{Portfolio Configuration Specification}
+\label{app:operators}
 \begin{table}[ht]
 \centering\small
-\caption{The 18 family-labelled arms generated from the v25 selector,
-unchanged from v23.
-C, R and E denote coverage, recovery and extreme families. Relabel is the
-fraction of the original replay batch assigned fresh preferences; $C_o$ includes
-that batch and any additional preference copies.}
-\label{tab:v23_operators}
+\caption{The 18 allocation slots of the BAMOR update portfolio across coverage
+(C), recovery (R) and extreme-preference (E) families. Relabel denotes the
+fraction of the replay minibatch assigned fresh preferences; $C_o$ counts total
+preference copies per batch; $K_o^Q$ and $K_o^\pi$ are critic and actor
+candidate counts; $\lambda_o$ and $b_o$ weight vector-target and
+behavior-cloning losses.}
+\label{tab:operators}
 \begin{tabular}{llrrrrrr}
 \toprule
-Arm & Replay sampler & Relabel & $C_o$ & $K_o^Q$ & $K_o^\pi$ & $\lambda_o$ & $b_o$\\
+Slot & Sampler & Relabel & $C_o$ & $K_o^Q$ & $K_o^\pi$ & $\lambda_o$ & $b_o$\\
 \midrule
 """ + "\n".join(rows) + r"""
 \end{tabular}
 \end{table}
 
-After the initial 5,000 transitions, the first ten scored 1,500-transition
-blocks use the following order:
+Following the initial 5,000-step initialization phase, the first ten
+1,500-step blocks follow the deterministic coverage schedule:
 """ + warmup + ".\n\n" + (
-        f"The arms comprise {len(groups)} distinct sampler/update settings. "
-        f"Identical settings occur in {shared}; "
-        "these arms retain separate scores and allocation counts.\n")
+        f"The 18 slots specify {len(groups)} distinct parameter settings. "
+        f"The pairs {shared} share settings and keep separate scores and counts. "
+        "For three objectives, C4 also coincides with C5 and R2, giving "
+        "13 distinct behaviors.\n")
 
 
 if __name__ == "__main__":

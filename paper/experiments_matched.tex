@@ -1,99 +1,183 @@
-\subsection{Evaluation design}
+\subsection{Sample-constrained non-stationary benchmarks and protocol}
 \label{sec:mujoco_3d}
 
-The primary comparison evaluated unchanged BAMOR-v25 and fully seeded CAPQL
-at 75k interactions on HalfCheetah and Hopper, using seeds 1601--1620 and only
-the final actor. An earlier five-seed pilot motivated the task selection and
-utility hypothesis; confirmation seeds and analysis were fixed before training.
-The cohorts remain separate (Appendix~\ref{app:experiment_details}).
+We evaluate preference-conditioned control in a sample-constrained
+non-stationary regime of $T = 75{,}000$ training interactions per run across
+custom piecewise-stationary continuous-control environments built on
+MO-Gymnasium's MuJoCo v5 tasks~\cite{Felten2023Toolkit}: two-objective HalfCheetah (four modes), three-objective
+Hopper (four modes) and three-objective Ant (three modes). Table~\ref{tab:task_modes}
+specifies the unobserved physical perturbations and smooth coordinatewise
+saturation caps $r_j = |c_j|\tanh(\rho_j r_j^{\mathrm{base}} / |c_j|)$ that
+reshape Pareto geometry across modes. Mode dwell durations follow a floored
+exponential law $D = \max\{1000, \lfloor X \rfloor\}$ ($X \sim \mathrm{Exp}(1/25000)$)
+with uniform transitions to distinct regimes, persisting across episode resets.
 
-The custom piecewise-stationary tasks have two objectives/four modes on
-HalfCheetah, three/four on Hopper and three/three on Ant. Modes alter physics
-and reward scales or smooth caps; exponential dwell lengths have scale 25k
-and minimum 1,000. Evaluation locks each mode, uses deterministic actions at
-21 full-simplex weights with three paired reset seeds, and ends on termination
-or at 1,000 steps. Training schedules and evaluation inputs are paired;
-mode-wise fronts are not pooled (Appendix~\ref{app:task_details}).
+\begin{table}[t]
+\centering\small
+\caption{Piecewise-stationary benchmark specification. Multipliers $g$, $m_b$, $f$
+and $d$ scale gravity, body masses, geom friction and joint damping relative to
+base MuJoCo physics; finite cap magnitudes $|c_j|$ apply smooth symmetric
+saturation $|c_j|\tanh(\rho_j r_j^{\mathrm{base}}/|c_j|)$ to reward coordinates.}
+\label{tab:task_modes}
+\begin{tabular}{@{}llccc@{}}
+\toprule
+Task (Objectives) & Mode & Physics multipliers & Reward scale $\rho$ & Soft-cap $|c|$ \\
+\midrule
+\multirow{4}{*}{HalfCheetah ($m=2$)}
+ & Normal & --- & $(1,1)$ & $(\infty,\infty)$ \\
+ & Low speed & $m_b=2,\ g=0.6$ & $(1,1)$ & $(0.3,\infty)$ \\
+ & Low cost & $m_b=0.5,\ g=1.5$ & $(1,1)$ & $(\infty,0.05)$ \\
+ & Locked & $d=3$ & $(1,1)$ & $(1,0.2)$ \\
+\midrule
+\multirow{4}{*}{Hopper ($m=3$)}
+ & Normal & --- & $(1,1,1)$ & $(\infty,\infty,\infty)$ \\
+ & Fragile & $m_b=1.5$ & $(1,1,1)$ & $(\infty,0.5,\infty)$ \\
+ & Cheap energy & --- & $(1,1,1)$ & $(\infty,\infty,0.05)$ \\
+ & Grounded & $g=1.5$ & $(1,1,1)$ & $(0.5,0.3,\infty)$ \\
+\midrule
+\multirow{3}{*}{Ant ($m=3$)}
+ & Energy save & $m_b=2,\ f=1.5$ & $(0.1,0.1,5)$ & $(\infty,\infty,\infty)$ \\
+ & Race & $g=0.7,\ f=0.5$ & $(0.1,5,0.1)$ & $(\infty,\infty,\infty)$ \\
+ & Cautious & $g=1.5,\ f=0.3$ & $(5,0.1,0.2)$ & $(\infty,\infty,\infty)$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-Direct utility $U$ evaluates the requested preference; final HV evaluates the
-final actor's return set; archive HV evaluates retained actors. W/L/T denotes
-paired seed wins/losses/ties, including every pair. Relative differences compare
-cohort means; utilities and raw HV are not pooled across tasks. BAMOR uses width
-64 and CAPQL width 256, with equal interaction budgets but different update
-computation (Table~\ref{tab:v23_budget}).
+At training completion, only the final actor $\pi_T$ is evaluated (with zero
+intermediate checkpoint selection) by locking each physical mode $h$, executing
+deterministic actions across 21 full-simplex preference weights with three
+fixed reset seeds per mode--weight cell ($L \leq 1000$ steps), and computing
+preference-aligned direct utility $U$ (Eq.~\eqref{eq:direct_utility}) and
+mode-averaged Final HV (Appendix~\ref{app:task_details}). All paired runs share
+identical mode-switching trajectories, evaluation grids and reset seeds, with
+full RNG seeding across Python, NumPy, PyTorch and Gym action spaces. On the
+main 20-seed HalfCheetah and Hopper benchmarks (seeds 1601--1620), we compare
+BAMOR (width 64 with context $z_t$) against both native CAPQL ($22.5^\circ$
+central preference cone, width 256) and a matched full-simplex CAPQL variant
+replacing the angular cone with uniform $\mathrm{Dir}(\mathbf{1})$ sampling
+under identical architectures, losses and mode histories
+(Appendices~\ref{app:implementation_details} and~\ref{app:experiment_details}).
 
-\subsection{Twenty-seed final-policy utility}
+\subsection{Preference-aligned execution and fixed-sampler trade-offs}
 \label{sec:utility_confirmation}
 
-BAMOR achieved higher observed mean direct utility on both tasks
-(Table~\ref{tab:utility_confirmation}). HalfCheetah means were 296.32 versus
-191.17 for CAPQL, a difference of 105.15 (+55.00\%); Hopper means were 436.59
-versus 411.93, a difference of 24.67 (+5.99\%). Each task had 13 positive
-and seven negative seed-paired differences. Every run used the original
-method settings, with no intermediate evaluation or checkpoint selection.
+The prespecified 20-seed comparison assessed final-policy utility against
+native CAPQL at 75k interactions. BAMOR had 13 of 20 paired wins on each task.
+The observed mean differences were $+105.15$ on HalfCheetah ($+55.00\%$) and
+$+24.67$ on Hopper ($+5.99\%$). Both prespecified 97.5\% marginal intervals
+included zero, so the study did not meet its utility superiority criterion
+(Table~\ref{tab:utility_confirmation}). Ordinary 95\% intervals also
+included zero (Appendix~\ref{app:experiment_details}).
 
 \input{table_utility_confirmation}
 
-\paragraph{Prespecified uncertainty analysis.}
-Intervals used 20,000 bootstrap resamples of complete training-seed pairs,
-retaining their mode and preference outcomes together. The frozen criterion
-used a 97.5\% percentile interval per task for nominal 95\% Bonferroni family
-coverage; bootstrap coverage is approximate. Both intervals included zero, as
-did ordinary 95\% intervals (Appendix~\ref{app:experiment_details}). The
-observed means therefore did not meet the criterion for an expected-utility
-advantage. No pairs were excluded and no pilot seeds were added.
+\paragraph{Retrospective sampler comparison.}
+A follow-up froze a sampler-only change before training 40 full-simplex
+CAPQL runs on the inspected seeds, reusing BAMOR and native CAPQL records
+(Table~\ref{tab:full_simplex_capql}).
+On HalfCheetah, this change raised CAPQL's mean utility by $91.01$
+($+47.61\%$, descriptive 95\% interval $[15.72,169.03]$).
+The difference between BAMOR and full-simplex CAPQL shrank to $+14.13$
+($+5.01\%$, 97.5\% interval $[-99.42,121.50]$, 11/20 wins).
+BAMOR had higher observed means in the low-speed and low-cost modes and
+lower means in the normal and locked modes (Fig.~\ref{fig:utility_confirmation}b).
 
-\paragraph{Coverage and computational cost.}
-Final HV and runtime gave different orderings from mean utility
-(Table~\ref{tab:utility_secondary}). BAMOR's mean final HV was 4.84\% lower
-on HalfCheetah and 5.77\% lower on Hopper, with 10 and eight wins out of 20,
-respectively. The descriptive paired HV intervals included zero. Mean
-training time was 1.67 and 1.73 times CAPQL's. These are measured times on a
-shared cluster, not dedicated-machine benchmarks; both methods used two CPU
-threads per run.
+On Hopper, full-simplex CAPQL had lower mean utility than native CAPQL
+in all four modes. Its overall difference was $-58.51$ ($-14.20\%$,
+descriptive 95\% interval $[-140.66,28.79]$). BAMOR exceeded full-simplex
+CAPQL by $83.17$ ($+23.53\%$, 97.5\% interval $[3.03,165.15]$, 13/20 wins).
+This contrast met the follow-up's interval criterion for Hopper on the
+inspected cohort. The comparison with native CAPQL on Hopper remains
+uncertain, as shown in Table~\ref{tab:utility_confirmation}.
+
+\input{table_full_simplex_capql}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=\textwidth]{Fig2.pdf}
+\caption{Requested-preference utility at 75k interactions. Panel (a) shows
+the 20 paired seed differences (small dots), means (large dots) and
+percentile bootstrap intervals (horizontal bars). HC denotes HalfCheetah.
+BAMOR contrasts use the prespecified 97.5\% marginal intervals of their
+respective protocols. Full-simplex minus native CAPQL uses descriptive
+95\% intervals. Panels (b) and (c) show HalfCheetah and Hopper per-mode
+means, respectively, with one standard error across training seeds.
+In panels (b) and (c), solid, hatched and dotted bars denote BAMOR,
+native CAPQL and full-simplex CAPQL, respectively}
+\label{fig:utility_confirmation}
+\end{figure}
+
+\paragraph{Pareto set coverage and computational cost.}
+Comparing single-actor Final HV and wall-clock runtime confirms the empirical
+decoupling between set coverage and requested-preference execution
+(Table~\ref{tab:utility_secondary}). Despite BAMOR's $+55.00\%$ and $+5.99\%$
+mean utility gains over native CAPQL, its single-actor Final HV is $4.84\%$ and
+$5.77\%$ lower ($-14.99\%$ and $+4.71\%$ relative to full-simplex CAPQL). Because
+BAMOR expands replay minibatches ($C_o \in [1,3]$) and evaluates multiple
+action/target candidates per update, mean wall-clock training times on the shared cluster with two CPU
+threads per run are $1.67\times$ and $1.73\times$ native CAPQL
+($1.70\times$ and $1.98\times$ full-simplex CAPQL). Across all three
+methods, the 120 runs totaled $9{,}000{,}000$ training and $24{,}205{,}155$
+evaluation interactions (Appendix~\ref{app:experiment_details}).
 
 \input{table_utility_secondary}
+\FloatBarrier
 
-The 80 runs consumed 6,000,000 training and 16,512,980 evaluation interactions.
-Evaluation did not enter replay or selector feedback. Initialization probes,
-prelaunch tests and per-cohort costs are accounted for in
-Appendix~\ref{app:experiment_details}.
+\subsection{Multi-snapshot archive coverage and quota-regulated allocation}
+\label{sec:archive_quota}
 
-\subsection{Archive coverage and feedback attribution}
-
-At 50k interactions, both methods retained 19 actors. This retrospective
-comparison used 15 HalfCheetah and five Hopper/Ant seeds, adding CAPQL after
-the BAMOR cohort was inspected. Archive coverage favored BAMOR most strongly
-on Hopper, with five paired wins (Table~\ref{tab:matched_archive}). Ant final
-HV fell on all five seeds; HalfCheetah's 16.21\% archive-mean gain accompanied
-only 0.74\% in final HV. The early CAPQL cohort's incomplete RNG seeding is
-documented in Section~\ref{sec:limits}.
+Across the separate 50k-step cohorts, the final actor was included among
+the 19 retained actors and all were evaluated with the final encoder.
+Archive HV exceeded its final-actor subset on every seed, with ratios
+of means of $+35.10\%$ on HalfCheetah, $+91.53\%$ on Hopper and $+22.91\%$
+on Ant (Table~\ref{tab:matched_archive}). Monotonicity follows from set
+inclusion (Proposition~\ref{prop:hv_current}). The measured increments
+describe the coverage of this candidate set.
 
 \input{table_matched_archive}
 
-The score-blind control retained networks, arms, family floors and archive
-schedule while replacing routing scores with zero
-(Table~\ref{tab:selector_effect}). Adaptive selection did not improve mean
-archive or final HV on HalfCheetah or Ant. Hopper's positive means had two
-wins, one loss and two ties; seven of fifteen HalfCheetah pairs tied exactly.
-These observations separate an external archive advantage from evidence of a
-consistent feedback benefit.
+The score-neutral control keeps family quotas, warmup and randomized
+exploration while passing zero scores to routing (Table~\ref{tab:selector_effect}).
+Mean archive and final HV differences were negative on HalfCheetah and
+Ant. On Hopper, mean final HV was $59.56\%$ higher across five seeds
+(two wins, one loss and two ties). A leave-one-out sensitivity calculation
+that excludes the largest positive difference gives $-2.96\%$. The table
+retains all five seeds. With two tied outcomes and this sensitivity, the
+Hopper result does not establish a consistent routing advantage.
 
 \input{table_selector_effect}
+\FloatBarrier
 
-\subsection{Ant mixed-preference diagnosis}
+\subsection{Diagnosing cross-preference candidate search on three-objective Ant}
 \label{sec:ant_diagnosis}
 
-The earlier fully seeded 75k pilot lost all five Ant pairs in utility and final
-HV: mean utility was 988.8 versus CAPQL's 1364.9, and mean final HV was 6.94\%
-lower (Table~\ref{tab:final_policy}). Failure was concentrated in mixed weights
-containing the energy objective. On that inspected cohort, re-scalarizing evaluated
-returns showed that v25's pure-energy policy beat its corresponding
-mixed-preference policy at 66 of 70 mode-0 seed--weight cells. This comparison
-uses the same saved actor and requires no extra environment interactions.
+An exploratory five-seed 75k benchmark across all three tasks revealed a
+pronounced mixed-preference degradation on three-objective Ant: BAMOR trailed
+native CAPQL in direct utility ($988.8$ versus $1364.9$) and Final HV ($-6.94\%$,
+0/5 wins; Appendix~\ref{app:experiment_details}), with losses concentrated on
+interior weights involving energy efficiency ($0 < w_{\mathrm{energy}} < 1$).
+Re-scalarizing existing evaluation returns showed that BAMOR's
+pure-energy policy ($w_{\mathrm{energy}}=1$) yielded higher utility than
+the same actor queried at mixed weights in 66 of 70 mode-0 seed--weight
+cells. These are paired comparisons of saved returns.
 
-Candidate-search ablations and an independent structure-by-selector pilot did
-not close the CAPQL gap. The latter's primary residual effect had only two of
-five wins, and its residual adaptive arm still trailed CAPQL by 247.9 mixed
-utility and 2.06\% final HV (Appendix~\ref{app:ant_diagnostics}). The residual
-variant was not adopted; cross-environment BAMOR remains unchanged v25.
+When a cross-preference action wins Eq.~\eqref{eq:v23_actor_loss}, its
+direct actor gradient comes from the generating preference. The critic
+can also bootstrap from a different preference (Eq.~\eqref{eq:v25_targets}).
+These are plausible contributors to weaker mixed-preference execution.
+The ablations vary the candidate set and its associated updates, and
+do not isolate target perturbations or measure a bias in the training
+critic. The corners-plus-center sampler also leaves the non-vertex
+simplex edges without discrete sampling mass, an unisolated factor.
+
+Under score-neutral routing (Table~\ref{tab:ant_search}), restricting actor updates to one
+own-preference candidate improved mode-0 mixed-energy utility by $1{,}116.0$
+on the five development seeds (5/0/0). Restricting the critic in addition
+improved it by another $339.8$ (4/1/0), for a combined gain of $1{,}455.8$.
+This variant still trailed CAPQL by $407.1$ on the same mixed preferences.
+With progress-based routing active, the actor-only intervention gained
+$223.5$ (3/2/0). The independent residual-actor experiment is reported
+separately in Appendix~\ref{app:ant_diagnostics}.
+
+\input{table_ant_search}
+\FloatBarrier

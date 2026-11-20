@@ -9,6 +9,11 @@
 *.pth
 *.ckpt
 
+# Local manuscript snapshots and submission packages.
+/BAMOR_gemini_*.zip
+/BAMOR_journal_reproducibility.zip
+/paper/nca/
+
 # Local caches and build byproducts.
 __pycache__/
 *.pyc

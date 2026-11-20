@@ -1,16 +1,17 @@
-\section{BAMOR-v25 Operator Specification}
-\label{app:v23_operators}
+\section{Portfolio Configuration Specification}
+\label{app:operators}
 \begin{table}[ht]
 \centering\small
-\caption{The 18 family-labelled arms generated from the v25 selector,
-unchanged from v23.
-C, R and E denote coverage, recovery and extreme families. Relabel is the
-fraction of the original replay batch assigned fresh preferences; $C_o$ includes
-that batch and any additional preference copies.}
-\label{tab:v23_operators}
+\caption{The 18 allocation slots of the BAMOR update portfolio across coverage
+(C), recovery (R) and extreme-preference (E) families. Relabel denotes the
+fraction of the replay minibatch assigned fresh preferences; $C_o$ counts total
+preference copies per batch; $K_o^Q$ and $K_o^\pi$ are critic and actor
+candidate counts; $\lambda_o$ and $b_o$ weight vector-target and
+behavior-cloning losses.}
+\label{tab:operators}
 \begin{tabular}{llrrrrrr}
 \toprule
-Arm & Replay sampler & Relabel & $C_o$ & $K_o^Q$ & $K_o^\pi$ & $\lambda_o$ & $b_o$\\
+Slot & Sampler & Relabel & $C_o$ & $K_o^Q$ & $K_o^\pi$ & $\lambda_o$ & $b_o$\\
 \midrule
 C1 & edge & 1 & 3 & 1 & 1 & 0.05 & 0 \\
 C2 & stratified & 1 & 2 & 1 & 1 & 0.05 & 0 \\
@@ -36,8 +37,8 @@ E4 & edge & 1 & 3 & 5 & 5 & 0.06 & 0 \\
 \end{tabular}
 \end{table}
 
-After the initial 5,000 transitions, the first ten scored 1,500-transition
-blocks use the following order:
+Following the initial 5,000-step initialization phase, the first ten
+1,500-step blocks follow the deterministic coverage schedule:
 C6, C1, C2, R1, R5, E1, E2, E3, C7, R7.
 
-The arms comprise 14 distinct sampler/update settings. Identical settings occur in C3 = R1; C5 = R2; C6 = R3; E1 = E4; these arms retain separate scores and allocation counts.
+The 18 slots specify 14 distinct parameter settings. The pairs C3/R1; C5/R2; C6/R3; E1/E4 share settings and keep separate scores and counts. For three objectives, C4 also coincides with C5 and R2, giving 13 distinct behaviors.

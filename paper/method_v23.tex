@@ -1,215 +1,295 @@
-\section{Problem and Evaluation Object}
+\section{Problem Formulation and Evaluation Decoupling}
+\label{sec:problem}
 \label{sec:problem_v23}
 
-An unobserved mode $h_t$ determines the transition kernel and vector reward
-$\mathbf r_t\in\mathbb R^m$. Modes change at unknown times. The learner observes
-states, actions and rewards, and receives a preference $w\in\Delta^{m-1}$.
-Training uses discounted scalar utilities $w^\top\mathbf Q$ with $\gamma=0.99$.
-The primary evaluation object is the final preference-conditioned policy,
-which computes context from its own observed transition history. This policy
-is history-dependent through its context even though its actor parameters are
-fixed at evaluation. A retained set $A$ of such policies defines a separate
-archive-coverage outcome.
+We consider a piecewise-stationary multi-objective Markov decision process
+(MOMDP) in which an unobserved regime index $h_t \in \{1,\ldots,H\}$ governs
+both the state-transition kernel $P_{h_t}(s_{t+1}\mid s_t, a_t)$ and the
+$m$-dimensional reward vector $\mathbf{r}_t \in \mathbb{R}^m$. Regime switches
+occur at unknown times during a sample-constrained interaction budget of $T$
+steps. At each step, the controller observes transitions without mode labels
+and conditions decisions on a user preference weight
+$w \in \Delta^{m-1} = \{w \in \mathbb{R}_{\geq 0}^m : \sum_{i=1}^m w_i = 1\}$,
+optimizing discounted scalarized value $w^\top \mathbf{Q}$ with $\gamma = 0.99$.
+At deployment, our primary object is the single final preference-conditioned
+policy $\pi_T$, which infers online context from its own transition history
+within an episode; an optional finite archive $A$ of periodically saved actor
+snapshots defines a secondary coverage output.
 
-For a locked mode $h$, let
-$J_h(\pi,w)=\mathbb E[\sum_{t=0}^{L-1}\mathbf r_t]$, where an episode ends on
-termination or at $L\leq1000$ steps. These reported returns are undiscounted.
-For the fixed evaluation grid $W$, the empirical candidate set is
-$F_h(A)=\{\widehat J_h(\pi,w):\pi\in A,w\in W\}$, using three episodes per
-candidate. We compute $\mathrm{HV}_r(F_h(A))$ with a fixed reference $r$ and
-summarize environments by $H^{-1}\sum_h\mathrm{HV}_r(F_h(A))$. Mode-conditioned
-fronts are not pooled into a cross-mode Pareto front. In archive experiments,
-the final-actor subset and full archive are evaluated from the same rollouts.
+For each locked physical regime $h \in \{1,\ldots,H\}$ and preference weight
+$w$ in a full-simplex evaluation grid $W$, let
+$\mathbf{J}_h(\pi, w) = \mathbb{E}[\sum_{t=0}^{L-1} \mathbf{r}_t]$ denote the
+undiscounted episode return vector up to termination or horizon $L \leq 1000$,
+estimated empirically by $\widehat{\mathbf{J}}_h(\pi, w)$ over paired reset
+seeds. For any candidate policy set $A$, the empirical mode-conditioned return
+set is $F_h(A) = \{\widehat{\mathbf{J}}_h(\pi, w) : \pi \in A, w \in W\}$,
+whose Pareto spread against reference point $r \in \mathbb{R}^m$ is summarized
+by mode-averaged hypervolume
+$\overline{\mathrm{HV}}(A) = H^{-1}\sum_{h=1}^H \mathrm{HV}_r(F_h(A))$ without
+pooling fronts across physically distinct modes. Evaluating $A = \{\pi_T\}$
+yields single-actor \emph{Final HV}; evaluating retained checkpoints yields
+\emph{Archive HV}.
 
-The primary outcome in the twenty-seed study is same-preference final-policy utility,
+Crucially, $\overline{\mathrm{HV}}$ discards the mapping between the commanded
+preference $w$ and the behavior it elicits. To measure operational execution
+fidelity directly, we evaluate \emph{preference-aligned direct utility}:
 \begin{equation}
- U(\pi)=\frac{1}{H|W|}\sum_{h=1}^H\sum_{w\in W}
-              w^\top\widehat J_h(\pi,w).
+ U(\pi) = \frac{1}{H|W|}\sum_{h=1}^H \sum_{w \in W}
+          w^\top \widehat{\mathbf{J}}_h(\pi, w),
  \label{eq:direct_utility}
 \end{equation}
-Here the sum runs over all modes and grid weights; there is no maximization
-over other preferences or archived actors. A policy-set HV gain need not
-increase this deployment-oriented outcome.
+which scores the deployed policy strictly at the requested preference $w$,
+without post-hoc maximization over alternative weights or archived policies.
 
-\paragraph{Why utility and coverage differ.}
-Consider one mode and two requested weights $e_1=(1,0)$ and $e_2=(0,1)$.
-A policy returning $(2,1)$ at $e_1$ and $(1,2)$ at $e_2$ has direct utility
-$2$. A second policy that swaps these two responses has direct utility $1$.
-Their return sets, and hence HV at any common reference, are identical.
-This illustrative example separates preference-conditioned execution from
-set coverage without assuming either metric determines the other.
+\paragraph{Analytical decoupling of direct utility and hypervolume.}
+Consider a single mode ($H=1$) and two requested vertex preferences
+$e_1 = (1,0)$ and $e_2 = (0,1)$. A well-aligned policy $\pi^{(1)}$ returning
+$\widehat{\mathbf{J}}(\pi^{(1)}, e_1) = (2,1)$ and
+$\widehat{\mathbf{J}}(\pi^{(1)}, e_2) = (1,2)$ achieves direct utility
+$U(\pi^{(1)}) = \frac{1}{2}(2 + 2) = 2$. A misaligned policy $\pi^{(2)}$ that
+swaps these responses—returning $(1,2)$ at $e_1$ and $(2,1)$ at $e_2$—yields
+only $U(\pi^{(2)}) = \frac{1}{2}(1 + 1) = 1$. Yet both policies generate the
+exact same return set $\{(2,1), (1,2)\}$ and therefore identical hypervolume
+for every reference point $r$. Thus hypervolume alone cannot distinguish the
+two preference-to-behavior mappings.
 
-\section{BAMOR Update Portfolio}
+\section{Context-Conditioned Quota-Regulated Update Portfolio}
+\label{sec:method}
 \label{sec:method_v23}
 
-BAMOR denotes the frozen v25 implementation throughout the current comparisons.
-At each interaction it constructs context from past transitions and conditions
-one shared actor and twin vector critics on that context and a preference.
-At each block boundary it chooses a fixed update configuration from a portfolio.
-The configuration governs both collected preferences and replay updates for
-the block; it does not instantiate a separate actor. Training rewards update
-the selector, while test returns and mode identities are reserved for
-evaluation. Algorithm~\ref{alg:bamor} gives the complete sequence.
+BAMOR addresses sample-constrained non-stationary MORL by coupling per-step
+transition context with block-level portfolio allocation over one shared
+preference-conditioned actor and twin vector critics
+(Fig.~\ref{fig:architecture}, Algorithm~\ref{alg:bamor}). Rather than training
+isolated per-arm networks or requiring evaluation rollouts during training,
+each 1,500-step block activates an update configuration governing interaction
+preferences, replay relabeling, candidate search and regularization on the
+shared parameters.
 
-\subsection{Context and replay}
+\input{fig_architecture}
 
-One actor $\pi_\theta(a\mid s,w,z)$ and twin vector critics
-$\mathbf Q_{\phi_i}(s,a,w,z)$ share a history-derived context $z$: reward
-exponential averages, a scalar coordinate-response statistic and an
-eight-dimensional learned transition embedding. The encoder reconstructs
-scaled rewards and state displacements with temporal contrastive regularization.
-Replay stores the collected context; preference relabeling changes only its
-weight coordinates, not its stored history features. Mode labels are not
-inputs. Appendix~\ref{app:implementation_details} specifies the coordinate
-feature, encoder loss and exponential averages.
+\subsection{Transition-derived context representation}
 
-\subsection{Update configurations}
+A single stochastic actor $\pi_\theta(a \mid s, w, z)$ and twin vector critics
+$\mathbf{Q}_{\phi_i}(s, a, w, z)$ ($i \in \{1,2\}$) condition on the current
+preference $w$ and a compact history-derived context vector $z_t$ composed of
+three label-free statistics: (i) exponential moving averages of squashed vector
+rewards $\tanh(\overline{\mathbf{r}}/3)$, (ii) a lightweight scalar
+\emph{local action-response probe} tracking short-horizon state-to-action
+gain, and (iii) an eight-dimensional $\tanh$-bounded latent embedding $e_\psi$
+trained to reconstruct scaled reward $\tanh(\mathbf{r}/3)$ and state
+displacement $\tanh((s'-s)/3)$ with temporal contrastive regularization.
+Replay transitions store their observed context features so hindsight
+preference relabeling updates only the preference coordinates of the input,
+preserving historical regime context without ground-truth mode identifiers
+(exact probe thresholds and losses are given in
+Appendix~\ref{app:implementation_details}).
+
+\subsection{Portfolio configurations and shared actor--critic updates}
 \label{sec:operator_portfolio}
 
-Each arm $o$ specifies a preference sampler, relabel rate and copy count $C_o$,
-critic candidate count $K_o^Q$, actor candidate count $K_o^\pi$, vector-loss
-coefficient $\lambda_o$, and behavior-cloning coefficient $b_o$. There are seven
-coverage arms, seven recovery arms and four extreme-preference arms, comprising
-14 distinct sampler/update settings. Identical settings in different arm slots
-retain separate scores and allocation counts. Relabeling
-reuses vector-reward transitions under new preference inputs. All arms update
-the same networks; the family names describe their intended roles. The full
-configuration and warmup sequence are in Appendix~\ref{app:v23_operators}.
+The selector maintains 18 slots across coverage (C), recovery (R) and
+extreme-preference (E) families. They specify 14 distinct parameter settings
+and 13 distinct behaviors for the three-objective tasks, where the edge and
+stratified samplers coincide. Repeated settings have separate scores and counts
+(Appendix~\ref{app:operators}). Each configuration $o$ specifies a preference
+sampler (\texttt{uniform}, \texttt{edge}, \texttt{stratified} or \texttt{mixed};
+Appendix~\ref{app:implementation_details}), replay relabel fraction and batch
+expansion factor $C_o$, critic and actor candidate counts $(K_o^Q, K_o^\pi)$,
+vector-target loss weight $\lambda_o$, and behavior-cloning regularization
+weight $b_o$.
 
-\paragraph{Critic update.}
-For each replay transition, let $u$ denote its update preference after relabeling.
-Set candidate preference $v_1=u$ and sample the remaining preferences using the
-arm's replay sampler. Draw $a'_j\sim\pi_\theta(\cdot\mid s',v_j,z')$ and define
+\paragraph{Twin vector critic update.}
+Given a replay transition and its relabeled update preference $u \in \Delta^{m-1}$,
+we set $v_1 = u$, draw $K_o^Q - 1$ auxiliary preferences from the configuration's
+replay sampler, sample next actions $a'_j \sim \pi_\theta(\cdot \mid s', v_j, z')$,
+and form consistent scalar and vector soft Bellman targets:
 \begin{align}
- \mathbf q'_j&=\min_{i=1,2}\mathbf Q_{\phi_i^-}(s',a'_j,v_j,z'), \nonumber\\
- j^*&=\arg\max_j\{u^\top\mathbf q'_j-\alpha\log\pi_\theta(a'_j\mid s',v_j,z')\},\nonumber\\
- \mathbf y_v&=\mathbf r+\gamma(1-d_{\mathrm{term}})
-       [\mathbf q'_{j^*}-\alpha\log\pi_\theta(a'_{j^*}\mid s',v_{j^*},z')\mathbf 1],\nonumber\\
- y_s&=u^\top\mathbf y_v.
+ \mathbf{q}'_j &= \min_{i=1,2}\mathbf{Q}_{\phi_i^-}(s', a'_j, v_j, z'), \nonumber\\
+ j^* &= \arg\max_{1 \leq j \leq K_o^Q}\bigl\{u^\top\mathbf{q}'_j - \alpha\log\pi_\theta(a'_j \mid s', v_j, z')\bigr\},\nonumber\\
+ \mathbf{y}_v &= \mathbf{r} + \gamma(1 - d_{\mathrm{term}})
+       \bigl[\mathbf{q}'_{j^*} - \alpha\log\pi_\theta(a'_{j^*} \mid s', v_{j^*}, z')\mathbf{1}\bigr],\qquad
+ y_s = u^\top\mathbf{y}_v,
  \label{eq:v25_targets}
 \end{align}
-Here the minimum is componentwise, targets are detached, $\alpha=0.2$ is fixed,
-and only true termination sets $d_{\mathrm{term}}=1$; time limits retain the
-bootstrap. The critic loss is
+where $\min$ is coordinatewise, target networks $\phi_i^-$ are detached,
+$\alpha = 0.2$ is fixed, and $d_{\mathrm{term}} \in \{0,1\}$ masks only true
+physical termination so time-limit truncations retain bootstrapping. Both
+critics minimize a joint scalarized and coordinatewise regression objective:
 \begin{equation}
- \mathcal L_Q=\mathbb E\sum_{i=1}^2\left[
- (u^\top\mathbf Q_{\phi_i}(s,a,u,z)-y_s)^2+
- \frac{\lambda_o}{m}\|\mathbf Q_{\phi_i}(s,a,u,z)-\mathbf y_v\|_2^2\right].
+ \mathcal{L}_Q = \mathbb{E}\sum_{i=1}^2\left[
+ \bigl(u^\top\mathbf{Q}_{\phi_i}(s,a,u,z) - y_s\bigr)^2 +
+ \frac{\lambda_o}{m}\bigl\|\mathbf{Q}_{\phi_i}(s,a,u,z) - \mathbf{y}_v\bigr\|_2^2\right].
  \label{eq:v23_critic_loss}
 \end{equation}
-Both target terms include the same selected-candidate entropy bonus.
 
-\paragraph{Actor update.}
-Generate $K_o^\pi$ actions $a_j\sim\pi_\theta(\cdot\mid s,v_j,z)$ with $v_1=u$.
-Unlike the critic target above, rank these actions with critics conditioned on
-the update preference $u$:
+\paragraph{Preference-conditioned actor update.}
+To update the actor at preference $u$, we sample $K_o^\pi$ candidate actions
+$a_j \sim \pi_\theta(\cdot \mid s, v_j, z)$ ($v_1 = u$) and evaluate all
+candidates under the target preference $u$:
 \begin{align}
- \mathbf q_j&=\min_{i=1,2}\mathbf Q_{\phi_i}(s,a_j,u,z),
- &j^\dagger&=\arg\max_j u^\top\mathbf q_j,\\
- \mathcal L_\pi&=\mathbb E\left[
- \alpha\log\pi_\theta(a_{j^\dagger}\mid s,v_{j^\dagger},z)
- -u^\top\mathbf q_{j^\dagger}
- +\frac{b_o}{d_a}\|a_{j^\dagger}-a\|_2^2\right].
+ \mathbf{q}_j &= \min_{i=1,2}\mathbf{Q}_{\phi_i}(s, a_j, u, z),
+ & j^\dagger &= \arg\max_{1 \leq j \leq K_o^\pi} u^\top\mathbf{q}_j,\\
+ \mathcal{L}_\pi &= \mathbb{E}\left[
+ \alpha\log\pi_\theta(a_{j^\dagger} \mid s, v_{j^\dagger}, z)
+ - u^\top\mathbf{q}_{j^\dagger}
+ + \frac{b_o}{d_a}\|a_{j^\dagger} - a\|_2^2\right],
  \label{eq:v23_actor_loss}
 \end{align}
-The discrete ranking is detached; gradients flow through the selected sampled
-action and its generating policy log probability. $d_a$ is action dimension and
-$a$ in the last term is the replay action. Thus multi-candidate updates are
-specified training heuristics, not an exact optimality operator.
+where $d_a$ is the action dimension, $a$ is the stored replay action, and the
+discrete index $j^\dagger$ is detached while reparameterization gradients flow
+through $a_{j^\dagger}$. Section~\ref{sec:ant_diagnosis} analyzes how
+cross-preference selection ($v_{j^\dagger} \neq u$) interacts with
+high-dimensional simplex geometry.
 
-\subsection{Progress-driven block allocation}
+\subsection{Quota-regulated block allocation and optional archive}
 \label{sec:method_v25}
 
-Progress is measured in reward coordinates without multiplying by each
-transition's collection preference. The first 5,000 transitions initialize
-causal reward moments. Before each subsequent 1,500-transition block $k$, freeze
-the per-objective standard deviations $s_{k,j}$ from past rewards. For the
-first- and second-half means, the selected arm receives
+Under tight sample budgets, unconstrained bandit routing can prematurely
+collapse simplex coverage, whereas weighting block rewards by changing
+preferences confounds preference shifts with policy improvement. BAMOR
+therefore pairs family deficit correction with reward-coordinate
+progress routing. An initial 5,000-step warmup initializes causal reward
+moments, followed by ten deterministic warmup blocks covering all three
+families (Appendix~\ref{app:operators}). Before each subsequent 1,500-step
+block $k$, per-objective reward standard deviations $s_{k,j}$ are frozen from
+causal history, and at block completion the active slot $o$ updates its score
+via normalized second-half minus first-half reward means:
 \begin{equation}
- P_k=\frac{1}{m}\sum_{j=1}^m\tanh\left(
- \frac{\overline r^{(2)}_{k,j}-\overline r^{(1)}_{k,j}}{s_{k,j}}\right),
- \qquad q_o\leftarrow0.87q_o+0.13P_k,
+ P_k = \frac{1}{m}\sum_{j=1}^m\tanh\!\left(
+ \frac{\overline{r}^{(2)}_{k,j} - \overline{r}^{(1)}_{k,j}}{s_{k,j}}\right),
+ \qquad q_o \leftarrow 0.87\,q_o + 0.13\,P_k.
  \label{eq:v25_progress}
 \end{equation}
-The arm stays fixed within a block, while interaction preferences change at
-each transition. A completed block updates its score after the last reward
-and before that transition's gradient; incomplete blocks remain unscored.
-After ten prescribed warmup blocks, the selector first corrects family
-allocation deficits against fractions $(0.36,0.22,0.18)$. Otherwise it samples
-a family using the mean of its two highest arm scores, then an arm using its
-own score, with softmax and uniform exploration at both levels. The score-blind
-control substitutes zero routing scores while computing the same observations.
-Exact temperatures, scales and scheduling parameters are in
-Appendix~\ref{app:implementation_details}.
+At each post-warmup block boundary, the selector first checks cumulative
+allocation fractions for the coverage, recovery and extreme families against
+minimum quota floors $(0.36, 0.22, 0.18)$, deterministically selecting the
+family with the largest positive deficit. When all quotas are satisfied, a
+family is sampled via a softmax-explore mixture over the mean of its top two
+slot scores, followed by slot sampling within that family
+(Appendix~\ref{app:implementation_details}). Setting $q_o \equiv 0$ defines the
+score-neutral control. This comparison varies whether routing uses feedback
+with the quota mechanism present in both arms.
+When policy-set coverage is desired, periodic actor checkpoints are stored passively
+without influencing training or block routing.
 
-\subsection{Implementation budget and optional archive}
-
-The main protocol uses 75,000 interactions and evaluates only the final actor
-with its final encoder, without intermediate evaluation or actor selection.
-Training context trackers persist across resets; evaluation initializes them
-afresh. The separate 50k protocol retains 19 actors at steps
-$5{,}000,7{,}500,\ldots,50{,}000$, all evaluated with the final encoder.
-Archive evaluation does not feed the selector. Per-run network, optimization
-and candidate resources are in Table~\ref{tab:v23_budget}.
-
-\begin{algorithm}[t]
-\caption{BAMOR-v25 training with optional actor retention}
+\begin{algorithm}[!htbp]
+\caption{BAMOR training with quota-regulated portfolio allocation}
 \label{alg:bamor}
 \label{sec:algorithm}
-\begin{algorithmic}
-\STATE Initialize networks, replay, context trackers and arm scores $q_o=0$; set $L=5{,}000$
-\FOR{$t=1,\ldots,T$}
- \IF{$t\leq L$}
-  \STATE Use the first warmup arm
- \ELSIF{a new scored block starts}
-  \STATE Select an arm by Section~\ref{sec:method_v25}; freeze scales from past rewards
+\begin{algorithmic}[1]
+\STATE Initialize shared networks $(\theta, \phi_{1,2}, \psi)$, replay buffer, context trackers and scores $q_o = 0$; set $L_{\mathrm{init}} = 5{,}000$
+\FOR{$t = 1, \ldots, T$}
+ \IF{$t \leq L_{\mathrm{init}}$}
+  \STATE Activate initial coverage configuration
+ \ELSIF{a new 1,500-step block $k$ begins}
+  \STATE Use the prescribed first ten slots, then apply family deficit correction and hierarchical routing. Freeze $s_{k,j}$
  \ENDIF
- \STATE Sample the arm's interaction preference; construct context from past transitions
- \STATE Act randomly if $t<L$, otherwise use the actor; observe the transition
- \STATE Update reward moments; for $t>L$, accumulate half-block rewards and allocation counts
- \IF{the 1,500-transition scored block is complete}
-  \STATE Update $q_o$ by Eq.~\eqref{eq:v25_progress}, increment its block count and close the block
+ \STATE Sample interaction preference $w_t$; construct label-free context $z_t$ from transition history
+ \STATE Execute random exploration if $t < L_{\mathrm{init}}$, else $a_t \sim \pi_\theta(\cdot \mid s_t, w_t, z_t)$; observe $(\mathbf{r}_t, s_{t+1}, d_{\mathrm{term}})$
+ \STATE Update causal reward moments; accumulate half-block reward means for $t > L_{\mathrm{init}}$
+ \IF{current 1,500-step block $k$ is complete}
+  \STATE Update $q_o$ via Eq.~\eqref{eq:v25_progress}, increment allocation count and close block $k$
  \ENDIF
- \STATE Update context trackers; store the transition, both contexts and true-termination mask
- \IF{$t\geq L$}
-  \STATE Relabel and expand a replay minibatch according to the selected arm
-  \STATE Update critics using Eq.~\eqref{eq:v25_targets}, actor and target critics; update encoder
+ \STATE Update context to $z_{t+1}$ and store $(s_t,a_t,w_t,\mathbf{r}_t,s_{t+1},z_t,z_{t+1},d_{\mathrm{term}})$
+ \IF{$t \geq L_{\mathrm{init}}$}
+  \STATE Relabel and expand replay minibatch ($C_o$); update critics via Eq.~\eqref{eq:v23_critic_loss}, actor via Eq.~\eqref{eq:v23_actor_loss}, target critics and encoder $\psi$
  \ENDIF
- \STATE Retain actor parameters at the prescribed steps, if an archive is requested
+ \STATE Optionally snapshot actor parameters $\theta$ into archive $A$ at prescribed intervals
 \ENDFOR
-\STATE Leave any incomplete block unscored; evaluate the final actor in each locked mode
-\STATE For archive experiments, also evaluate saved actors with the final encoder
+\STATE Evaluate final actor $\pi_T$ (and archive $A$, if retained) across locked modes and full-simplex grid $W$
 \end{algorithmic}
 \end{algorithm}
 
 \FloatBarrier
-\section{Supporting Mathematical Properties}
+\section{Theoretical Analysis of Target Stability}
+\label{sec:theory_main}
 
-\paragraph{Target consistency and feedback.}
-Simplex weights project the soft vector target exactly onto its scalar target
-in Eq.~\eqref{eq:v25_targets} (Proposition~\ref{prop:soft_projection}). The
-progress statistic and its score EMA stay in $[-1,1]$, and constant reward
-offsets cancel at fixed scale (Proposition~\ref{prop:progress}). These are
-properties of the implemented quantities.
+Lean~4 verifies the named identities and bounds below and in
+Appendix~\ref{sec:theory} over exact real numbers
+(\path{BAMOR/Implementation.lean}, Lean and Mathlib~4.28.0). By simplex
+normalization ($\sum_{i=1}^m u_i = 1$),
+the vector soft target in Eq.~\eqref{eq:v25_targets} projects identically onto
+its scalarized counterpart, $u^\top\mathbf{y}_v = u^\top\mathbf{r} + \gamma(1 - d_{\mathrm{term}})(u^\top\mathbf{q}'_{j^*} - \alpha\log\pi_\theta)$,
+while true-termination masking preserves $\gamma(q_i + e)$ across continuing
+time-limit truncations (Lean: \lean{soft_target_projection}, \lean{terminal_target},
+\lean{truncation_target_difference}). Likewise, the block progress signal $P_k$
+and EMA score $q_o$ stay in $[-1,1]$ for the stated initialization and update
+rate (\lean{progress_score_bounds}, \lean{score_ema_bounds}). Reward offsets
+cancel at fixed scales, and positive rescaling cancels if the reward differences
+and supplied scales rescale together (\lean{progress_translation_invariant},
+\lean{progress_rescaling_invariant}). The implementation's fixed scale floor
+can break the latter premise.
 
-\paragraph{Candidate selection and local stability.}
-At equal weights, perturbing $(1,0),(0,0.9)$ to $(1,0),(0,1.1)$ changes the
-unique selected vector's first coordinate by $1$ despite an input change of
-only $0.2$ (Proposition~\ref{prop:reselection}). Scalar-maximization stability
-therefore does not imply selected-vector stability. For matched actions and
-contexts, let $S_j=u^\top q_j+e_j$, with critic-coordinate perturbations at
-most $\epsilon\geq0$ and entropy-bonus perturbations at most $\rho\geq0$. If the winner
-$j^*$ satisfies
+Less trivially, multi-candidate target selection introduces a fundamental
+discontinuity between scalarized value stability and vector target stability:
+even though $\max_j s_j$ is $1$-Lipschitz in the candidate scores, the
+\emph{selected vector} $\mathbf{q}'_{j^*}$ can jump by $O(1)$ under
+arbitrarily small critic perturbations.
+
+\begin{proposition}[Candidate reselection amplifies vector perturbations]
+\label{prop:reselection}
+Fix equal preference weights $u = (1/2, 1/2)$ and zero entropy differences.
+Perturbing candidate vectors $\{(1, 0), (0, 0.9)\}$ to $\{(1, 0), (0, 1.1)\}$
+changes every candidate coordinate by at most $0.2$ while both scalar
+maximizers remain strict and unique, yet shifts the selected vector's first
+coordinate by $1$.
+\end{proposition}
+\begin{proof}
+The scalarized scores shift from $(0.5, 0.45)$ to $(0.5, 0.55)$, flipping the
+unique winner from candidate~1 to candidate~2 and changing the selected first
+coordinate from $1$ to $0$. This instance is machine-checked in Lean:
+\lean{candidate_reselection_counterexample} and \lean{candidate_reselection_unique}.
+\end{proof}
+
+For any $0<\varepsilon<1$, replacing $0.9$ and $1.1$ by $1-\varepsilon$
+and $1+\varepsilon$ gives scalar scores $0.5 \mp \varepsilon/2$ for the
+second candidate. The first candidate's score is $0.5$ on both sides.
+The selected first coordinate still jumps by $1$ as the input perturbation
+$2\varepsilon$ tends to zero. This is an analytical extension of the verified
+instance. The following sufficient margin condition keeps the selected
+candidate fixed under the specified perturbations.
+
+\begin{theorem}[Margin-certified local target stability]
+\label{thm:candidate_margin}
+\label{prop:candidate_margin}
+Fix a nonempty finite set of matched candidate actions and contexts,
+preference $u \in \Delta^{m-1}$,
+reward $\mathbf{r} \in \mathbb{R}^m$ and bootstrap factor $b \geq 0$. For each
+candidate $j$, let $\mathbf{q}_j$ denote the coordinatewise twin-critic minimum,
+$e_j$ its entropy bonus, and $S_j = u^\top\mathbf{q}_j + e_j$. Suppose perturbed
+quantities $(\widetilde{\mathbf{q}}_j, \widetilde{e}_j)$ satisfy
+$\|\mathbf{q}_j - \widetilde{\mathbf{q}}_j\|_\infty \leq \epsilon$ and
+$|e_j - \widetilde{e}_j| \leq \rho$ ($\epsilon, \rho \geq 0$), and define
+$\delta = \epsilon + \rho$. If the unperturbed winner $j^*$ satisfies the strict
+score margin
 \begin{equation}
- S_{j^*}-S_j>2\delta\quad(j\neq j^*),\qquad\delta=\epsilon+\rho,
+ S_{j^*} - S_j > 2\delta \quad \text{for all } j \neq j^*,
  \label{eq:main_candidate_margin}
 \end{equation}
-the winner is unchanged. With fixed reward and bootstrap multiplier $b\geq0$,
-the soft targets obey $\|Y-\widetilde Y\|_\infty\leq b\delta$
-(Proposition~\ref{prop:candidate_margin}).
+then $j^*$ remains the unique maximizer under perturbation, and the resulting
+vector and scalar soft targets $\mathbf{Y}, \widetilde{\mathbf{Y}}$ obey
+\begin{equation}
+ \|\mathbf{Y} - \widetilde{\mathbf{Y}}\|_\infty \leq b\delta,
+ \qquad
+ |u^\top\mathbf{Y} - u^\top\widetilde{\mathbf{Y}}| \leq b\delta.
+ \label{eq:margin_target_bound}
+\end{equation}
+\end{theorem}
+\begin{proof}
+Since $u \in \Delta^{m-1}$, $|u^\top(\mathbf{q}_j - \widetilde{\mathbf{q}}_j)| \leq \epsilon$,
+giving $|S_j - \widetilde{S}_j| \leq \epsilon + \rho = \delta$ for every $j$.
+Thus $\widetilde{S}_{j^*} - \widetilde{S}_j \geq (S_{j^*} - S_j) - 2\delta > 0$,
+preserving the unique winner $j^*$. With $j^*$ fixed, coordinate $i$ satisfies
+$|Y_i - \widetilde{Y}_i| = b|(q_{j^*,i} - \widetilde{q}_{j^*,i}) + (e_{j^*} - \widetilde{e}_{j^*})| \leq b\delta$,
+and convexity over $u \in \Delta^{m-1}$ yields the scalar bound. Machine-checked
+in Lean: \lean{soft_score_perturbation}, \lean{strict_margin_preserves_winner},
+and \lean{margin_selected_target_lipschitz}.
+\end{proof}
 
-Appendix~\ref{sec:theory} gives the Lean proofs and conditional tracking and
-archive results. Tracking requires contractive selected maps, bounded update
-error and bounded selected-map residual. HV monotonicity fixes returns,
-reference and encoder; archive selection additionally requires uniform return
-accuracy. These assumptions delimit the supporting analysis.
+Appendix~\ref{sec:theory} complements Theorem~\ref{thm:candidate_margin} with
+Lean-verified bounds on approximate selected-operator tracking under bounded
+update residuals (Proposition~\ref{prop:tracking_current}), continuous Lebesgue
+hypervolume monotonicity under snapshot archiving (Proposition~\ref{prop:hv_current}),
+and deployed archive policy-selection regret under uniform return-estimation
+error (Proposition~\ref{prop:selection_regret}).

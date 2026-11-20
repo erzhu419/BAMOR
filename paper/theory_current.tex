@@ -1,262 +1,108 @@
-\section{Implementation-Facing Mathematical Properties}
+\section{Conditional Tracking and Archive Selection Proofs}
 \label{sec:theory}
 \label{app:lean}
 
-The statements below are formalized in \path{BAMOR/Implementation.lean},
-namespace \path{BAMOR.Implementation}. They distinguish target construction,
-feedback statistics, conditional tracking and archive evaluation. Algebra is
-over exact real numbers. The Lean source and its imported auxiliary results
-are replayed with Lean~4.28.0 and Mathlib~4.28.0.
+The results in Section~\ref{sec:theory_main} and below are machine-checked over
+exact real numbers in \path{BAMOR/Implementation.lean} (namespace
+\path{BAMOR.Implementation}, verified with Lean~4.28.0 and Mathlib~4.28.0).
+In addition to the target-projection, continuation-mask, bounded-progress and
+margin-certified stability results summarized in Section~\ref{sec:theory_main}
+(\lean{soft_target_projection}, \lean{terminal_target},
+\lean{truncation_target_difference}, \lean{frozen_target_lipschitz},
+\lean{candidate_reselection_counterexample}, \lean{strict_margin_preserves_winner},
+\lean{margin_selected_target_lipschitz}, \lean{progress_score_bounds} and
+\lean{score_ema_bounds}), this appendix presents the conditional operator-tracking
+and archive-selection bounds.
 
-\subsection{Soft targets and continuation masks}
-\label{app:soft_target}
-
-Let $u\in\Delta^{m-1}$, $b=\gamma(1-d_{\mathrm{term}})$ and
-$e=-\alpha\log\pi_\theta(a'_{j^*}\mid s',v_{j^*},z')$.
-For the selected vector $q$, define $Y_i=r_i+b(q_i+e)$.
-
-\begin{proposition}[Consistent scalar projection]
-\label{prop:soft_projection}
-The v25 targets satisfy
-\begin{equation}
- u^\top Y=u^\top r+b(u^\top q+e).
- \label{eq:soft_projection}
-\end{equation}
-At true termination $b=0$, $Y=r$. Replacing a continuing-task time-limit
-mask $b=\gamma$ by zero removes $\gamma(q_i+e)$ from coordinate $i$.
-\end{proposition}
-\begin{proof}
-Distribute the scalar product and use $\sum_i u_i=1$ for the common entropy
-bonus. The mask identities follow by substitution. Lean:
-\path{soft_target_projection}, \path{terminal_target}, and
-\path{truncation_target_difference}.
-\end{proof}
-
-With the same selected candidate and entropy bonus in two targets,
-$|q_i-\widetilde q_i|\leq\epsilon$ and $b\geq0$ give
-$|Y_i-\widetilde Y_i|\leq b\epsilon$
-(\path{frozen_target_lipschitz}). The qualification about selection matters.
-
-\begin{proposition}[Candidate reselection can amplify vector differences]
-\label{prop:reselection}
-For $u=(1/2,1/2)$, consider candidates $(1,0),(0,0.9)$ and their perturbed
-versions $(1,0),(0,1.1)$, with equal entropy bonuses. All candidate coordinates
-change by at most $0.2$, but the first coordinate of the selected vector changes
-by $1$. Both scalar maximizers are unique.
-\end{proposition}
-\begin{proof}
-The scalar scores change from $(0.5,0.45)$ to $(0.5,0.55)$. The maximizing
-candidate switches from the first to the second. The coordinatewise bound and
-selected-vector difference are checked exactly by
-\path{candidate_reselection_counterexample}; strict score inequalities are
-checked by \path{candidate_reselection_unique}.
-\end{proof}
-
-Thus the scalar maximum's non-expansiveness cannot be transferred to its
-selected vector. The counterexample also applies to equal twin critics and
-fixed candidate actions; neither critic disagreement nor a tie is necessary.
-
-\begin{proposition}[Margin-certified target stability]
-\label{prop:candidate_margin}
-Fix a nonempty finite set of candidate actions and their context inputs,
-$u\in\Delta^{m-1}$, reward $r$ and bootstrap multiplier $b\geq0$.
-For candidate $j$, let $q_j$ be the coordinatewise minimum of the two critic
-vectors, $e_j$ its entropy bonus and $s_j=u^\top q_j+e_j$ its ranking score.
-Compare these with perturbed values $\widetilde q_j,\widetilde e_j$ satisfying
-\begin{equation}
- |q_{j,i}-\widetilde q_{j,i}|\leq\epsilon,\qquad
- |e_j-\widetilde e_j|\leq\rho,\qquad
- \delta=\epsilon+\rho,\quad \epsilon,\rho\geq0.
- \label{eq:candidate_perturbation}
-\end{equation}
-If $s_{j^*}-s_j>2\delta$ for every $j\neq j^*$, then $j^*$ is the unique
-maximizer of both score sets. The corresponding soft targets satisfy
-\begin{equation}
- |Y_i-\widetilde Y_i|\leq b\delta\quad\text{for every }i,
- \qquad
- |u^\top Y-u^\top\widetilde Y|\leq b\delta.
- \label{eq:margin_target_bound}
-\end{equation}
-\end{proposition}
-\begin{proof}
-The simplex conditions and the triangle inequality give
-$|s_j-\widetilde s_j|\leq\epsilon+\rho=\delta$.
-Hence $\widetilde s_{j^*}-\widetilde s_j
-\geq s_{j^*}-s_j-2\delta>0$.
-With the selected index unchanged, the coordinatewise target difference is
-$b|(q_{j^*,i}-\widetilde q_{j^*,i})+(e_{j^*}-\widetilde e_{j^*})|
-\leq b\delta$. Simplex projection gives the scalar bound.
-Lean: \path{soft_score_perturbation},
-\path{strict_margin_preserves_winner}, and
-\path{margin_selected_target_lipschitz}.
-\end{proof}
-
-\subsection{Progress-score properties}
-\label{app:progress}
-
-For the first and second half-block reward means $a,b\in\mathbb R^m$ and
-the frozen positive scale $s$, write
-\begin{equation}
- P(a,b;s)=\frac{1}{m}\sum_i\tanh\frac{b_i-a_i}{s_i}.
-\end{equation}
-
-\begin{proposition}[Bounded, centered block feedback]
-\label{prop:progress}
-For $m\geq1$, $-1\leq P\leq1$. For any per-objective offset $c$,
-$P(a+c,b+c;s)=P(a,b;s)$. Positive rescaling preserves the score if the
-supplied scales are rescaled by the same coordinatewise factors. If
-$q,P\in[-1,1]$ and $\eta\in[0,1]$, then
-$(1-\eta)q+\eta P\in[-1,1]$.
-\end{proposition}
-\begin{proof}
-Each hyperbolic tangent is in $(-1,1)$, so its finite average is in $[-1,1]$.
-Offsets cancel in the difference, and common nonzero factors cancel in the
-ratio. The score update is a convex combination. Lean:
-\path{progress_score_bounds}, \path{progress_translation_invariant},
-\path{progress_rescaling_invariant}, and \path{score_ema_bounds}.
-\end{proof}
-
-Starting at zero, v25's score EMA remains bounded by induction; unselected
-arms and incomplete blocks leave scores unchanged. Its fixed $10^{-6}$ scale
-floor means that rescaling invariance need not hold when clipping changes.
-The propositions concern the statistic on supplied observations and scales,
-not an invariant training trajectory. A reward increase caused by a mode
-change enters the same numerator as an improvement caused by learning.
-
-\subsection{Conditional tracking with update error}
+\subsection{Conditional tracking under selected update operators}
 \label{app:tracking_current}
 
-Let $T_{n,o}$ be a family of maps on a metric space, $o_n$ the realized
-selected arm and $q_n^*$ a reference trajectory. Assume, for all $n,o,x,y$,
+Let $T_{n,o}$ denote a family of update maps on a metric space $(X, d)$, $o_n$
+the realized configuration at step $n$, and $q_n^*$ a reference value trajectory.
+Assume that for all $n, o$ and $x, y \in X$,
 \begin{align}
- d(T_{n,o}x,T_{n,o}y)&\leq\gamma d(x,y),\qquad 0\leq\gamma<1,\nonumber\\
- d(q_{n+1},T_{n,o_n}q_n)&\leq\epsilon,\nonumber\\
- d(T_{n,o_n}q_n^*,q_{n+1}^*)&\leq\Delta,
- \qquad \epsilon,\Delta\geq0.
+ d(T_{n,o}x, T_{n,o}y) &\leq \gamma\,d(x,y),\qquad 0 \leq \gamma < 1,\nonumber\\
+ d(q_{n+1}, T_{n,o_n}q_n) &\leq \epsilon,\nonumber\\
+ d(T_{n,o_n}q_n^*, q_{n+1}^*) &\leq \Delta,
+ \qquad \epsilon, \Delta \geq 0,
  \label{eq:tracking_assumptions}
 \end{align}
-The last quantity includes the selected operator's mismatch with the reference,
-not just physical environment drift.
+where $\epsilon$ bounds single-step stochastic approximation error and $\Delta$
+jointly captures environmental regime drift and operator-reference mismatch.
 
 \begin{proposition}[Approximate selected-map tracking]
 \label{prop:tracking_current}
-Under Eq.~\eqref{eq:tracking_assumptions}, for every $n\geq0$,
+Under Eq.~\eqref{eq:tracking_assumptions}, for every $n \geq 0$,
 \begin{equation}
- d(q_n,q_n^*)\leq\gamma^n d(q_0,q_0^*)+
-                    \frac{\epsilon+\Delta}{1-\gamma}.
+ d(q_n, q_n^*) \leq \gamma^n d(q_0, q_0^*) +
+                    \frac{\epsilon + \Delta}{1 - \gamma}.
 \end{equation}
 \end{proposition}
 \begin{proof}
-Two triangle inequalities yield
-$d(q_{n+1},q_{n+1}^*)\leq\gamma d(q_n,q_n^*)+\epsilon+\Delta$.
-Apply the geometric recurrence bound \path{BAMOR.anytime_tracking_bound}.
-The full composition is \path{approximate_selected_tracking}.
+Two applications of the triangle inequality give
+\begin{align*}
+d(q_{n+1},q_{n+1}^*)
+ &\leq d(q_{n+1},T_{n,o_n}q_n) + d(T_{n,o_n}q_n,T_{n,o_n}q_n^*) \\
+ &\qquad {}+ d(T_{n,o_n}q_n^*,q_{n+1}^*) \\
+ &\leq \gamma\,d(q_n,q_n^*)+\epsilon+\Delta.
+\end{align*}
+Unrolling the geometric recurrence yields the stated bound. Machine-checked in
+Lean via \lean{BAMOR.anytime_tracking_bound} and
+\lean{approximate_selected_tracking}.
 \end{proof}
 
-The residual term is an upper bound, not a lower error floor, and the initial
-error term remains part of the bound. No comparison with CAPQL follows from
-this recurrence alone.
+The argument applies contractivity to the same realized operator on both
+trajectories. It assumes the displayed bounds for the selected maps and
+does not establish them for stochastic neural updates or for trajectories
+with different routing decisions. The local margin bound concerns a target
+calculation and does not imply that the training update map is contractive.
 
-The arm sequence may depend on observed history: the inequality compares two
-inputs using the \emph{same} selected map at that step. It is not a comparison
-between two feedback trajectories that can choose different arms. The finite
-state/action auxiliary operator in \path{BAMOR.lean} uses per-objective action
-maxima and frozen belief/penalty parameters. Its contraction theorem is valid
-for that operator. Proposition~\ref{prop:reselection} shows why the vector
-candidate update needs separate treatment.
-
-\subsection{Continuous hypervolume and policy selection}
+\subsection{Continuous hypervolume monotonicity and archive policy selection}
 \label{app:archive_current}
 
-Fix the mode, encoder, return vectors $J(p)$ and reference $r$. A candidate
-$p$ denotes an actor/preference pair. For a finite archive $A$, define
+Fix a physical mode, context encoder, return vector map $J(p) \in \mathbb{R}^m$
+and reference point $r \in \mathbb{R}^m$, where each candidate $p$ indexes an
+actor--preference pair. For any finite archive $A$, define the dominated region
+and continuous Lebesgue hypervolume under maximization:
 \begin{equation}
- D_r(A)=\bigcup_{p\in A}[r,J(p)],\qquad
- \mathrm{HV}_r(A)=\operatorname{vol}_m(D_r(A)),
+ D_r(A) = \bigcup_{p \in A}[r, J(p)],\qquad
+ \mathrm{HV}_r(A) = \operatorname{vol}_m(D_r(A)),
 \end{equation}
-where the interval is coordinatewise and is empty when any upper coordinate
-is below the reference. This is the maximization convention.
+where $[r, J(p)]$ is empty whenever any coordinate satisfies $J_i(p) < r_i$.
 
 \begin{proposition}[Continuous archive monotonicity]
 \label{prop:hv_current}
-The dominated region is compact and measurable with finite volume, and
-$A\subseteq B$ implies
-$D_r(A)\subseteq D_r(B)$ and $\mathrm{HV}_r(A)\leq\mathrm{HV}_r(B)$.
+For every finite archive $A$, $D_r(A)$ is compact and measurable with finite
+Lebesgue volume, and $A \subseteq B$ implies $D_r(A) \subseteq D_r(B)$ and
+$\mathrm{HV}_r(A) \leq \mathrm{HV}_r(B)$.
 \end{proposition}
 \begin{proof}
-Each finite-coordinate rectangle is compact and measurable; the union is
-finite, so its Lebesgue volume is finite. Every rectangle indexed by $A$ also
-occurs in $B$, and Lebesgue measure is monotone. Lean:
-\path{dominated_region_measurable}, \path{dominated_region_mono}, and
-\path{hypervolume_mono}. The measure is initially valued in $[0,\infty]$;
-\path{hypervolume_ne_top} proves finiteness, and
-\path{hypervolume_toReal_mono} transfers monotonicity to the real-valued HV
-used here. This concerns continuous volume rather than a grid-cell count.
+Each axis-aligned box $[r, J(p)]$ is compact and measurable, so any finite union
+has finite Lebesgue measure; set inclusion preserves measure monotonicity.
+Machine-checked in Lean: \lean{dominated_region_measurable},
+\lean{dominated_region_mono}, \lean{hypervolume_mono}, \lean{hypervolume_ne_top}
+and \lean{hypervolume_toReal_mono}.
 \end{proof}
 
-\begin{proposition}[From estimated archive scores to a selected policy]
+\begin{proposition}[Archive policy-selection regret under estimation error]
 \label{prop:selection_regret}
-Fix a query and scalar scores $J,\widehat J$ on a nonempty finite archive $A$.
-If $|\widehat J(p)-J(p)|\leq\epsilon$ for every $p\in A$ and
-$\hat p\in\arg\max_{p\in A}\widehat J(p)$, then
+Fix a deployment preference query and true versus estimated scalarized returns
+$J, \widehat{J}$ over a nonempty finite archive $A$. If
+$|\widehat{J}(p) - J(p)| \leq \epsilon$ for all $p \in A$ and
+$\hat{p} \in \arg\max_{p \in A}\widehat{J}(p)$, then
 \begin{equation}
- \max_{p\in A}J(p)-J(\hat p)\leq2\epsilon.
+ \max_{p \in A} J(p) - J(\hat{p}) \leq 2\epsilon.
 \end{equation}
 \end{proposition}
 \begin{proof}
-For every $p\in A$,
-$J(p)\leq\widehat J(p)+\epsilon\leq\widehat J(\hat p)+\epsilon
-\leq J(\hat p)+2\epsilon$. Take the finite maximum. Lean:
-\path{archive_selection_regret}.
+For every $p \in A$, $J(p) \leq \widehat{J}(p) + \epsilon \leq \widehat{J}(\hat{p}) + \epsilon \leq J(\hat{p}) + 2\epsilon$;
+taking the maximum over $p \in A$ completes the proof. Machine-checked in Lean:
+\lean{archive_selection_regret}.
 \end{proof}
 
-This is a conditional policy-selection bound, not regret of the training-arm
-selector. It requires a uniform evaluation-error bound and an actual selection
-rule. Archive HV supplies neither. The experiments report fixed-rollout archive
-coverage and direct final-policy utility separately.
-
-\subsection{Proof scope and retained auxiliary results}
-
-The current results formalize target consistency, bounded score updates,
-margin-certified target stability, conditional tracking and fixed-value archive
-comparisons. The margin condition uses matched candidates and explicit bounds
-on critic and entropy outputs; these bounds have not been established along
-the training trajectories. Equality at the $2\delta$ threshold can produce a
-tie, whereas failing the sufficient condition does not imply a switch.
-The results do not prove
-convergence of the implemented actor--critic or a causal improvement from its
-progress selector. No uniform return-estimation error bound is established by
-the three-reset evaluation protocol. Updating the encoder, re-estimating old
-returns or replacing archive members changes the object in
-Proposition~\ref{prop:hv_current}.
-
-The earlier contraction, localized-drift, anchor and belief results remain in
-\path{BAMOR.lean} and \path{RegimeBelief.lean}. Their definitions concern the
-auxiliary frozen tabular model. Anchor concavity is with respect to the
-preference, not actor parameters. \path{BAMOR-Counterproof.lean} retains its
-Q-dependent-belief examples; its posterior-ratio threshold assumes a specific
-power sequence, rather than deriving a BOCD detection rate. These results are
-retained in the proof repository without duplicating their full historical
-exposition in this appendix.
-
-\subsection{Historical v23 target and score}
-\label{app:v23_legacy}
-
-The v23 critic used the episode-end mask $d$, including time limits, and
-different scalar and vector targets:
-\begin{equation}
- y_s=u^\top r+\gamma(1-d)(u^\top q+e),\qquad
- \mathbf y_v=r+\gamma(1-d)q.
-\end{equation}
-Hence $y_s-u^\top\mathbf y_v=\gamma(1-d)e$ for simplex weights. V24 repaired
-both the mask and this target inconsistency; v25 retains those repairs.
-
-For a 1,500-transition block, v23 used $g_t=w_t^\top r_t$ and
-$R_k=\overline g_k-0.08\,\operatorname{std}(g_t)
--0.04(\overline g_k-\min_t g_t)$.
-With $\delta_k=R_k-B$, its updates were $B\leftarrow0.9B+0.1R_k$,
-$S\leftarrow0.9S+0.1|\delta_k|$, followed by
-$q_o\leftarrow0.87q_o+0.13\tanh(\delta_k/\max(S,10^{-6}))$.
-The first block initialized $B=R_k,S=1$ before these updates.
-V25 replaces this score and starts its scored blocks after 5,000 transitions;
-the operator configurations and family-allocation rule are unchanged.
+The archive in Table~\ref{tab:matched_archive} includes the final actor and
+uses one final encoder. Proposition~\ref{prop:hv_current} gives weak
+monotonicity for the resulting fixed return sets. Strict gains are empirical.
+Proposition~\ref{prop:selection_regret} bounds a single archive query under
+uniform estimation accuracy. The experiments evaluate coverage, and do not
+measure that accuracy or the utility of a deployed archive selector.

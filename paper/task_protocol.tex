@@ -1,80 +1,26 @@
-\section{Task and Evaluation Specification}
+\section{Benchmark Protocol, Statistical Details and Interaction Accounting}
 \label{app:task_details}
 
-\subsection{Piecewise-stationary modes}
+\subsection{Reward coordinates, switching schedule and locked-mode evaluation}
 
-Table~\ref{tab:task_modes} specifies the v5 MO-Gymnasium tasks. Each mode
-rescales the base MuJoCo parameters; unlisted multipliers are one and reward
-shifts are zero. For base reward $r_j^{\mathrm{base}}$, scale $\rho_j$ and a
-finite nonzero cap parameter $c_j$, the transformed coordinate is
-\begin{equation}
- r_j=|c_j|\tanh\!\left(
-      \frac{\rho_j r_j^{\mathrm{base}}}{|c_j|}\right),
- \label{eq:mode_reward_transform}
-\end{equation}
-An infinite cap leaves $\rho_j r_j^{\mathrm{base}}$ unchanged. Finite caps
-give smooth, symmetric saturation with the tabulated magnitudes $|c_j|$.
+In Table~\ref{tab:task_modes}, base reward coordinates correspond to forward
+velocity and negative control cost on HalfCheetah ($m=2$); forward velocity,
+torso height and negative control cost on Hopper ($m=3$); and $x$-velocity,
+$y$-velocity and negative control cost on Ant ($m=3$). Base survival and
+contact terms follow MO-Gymnasium v5 prior to applying mode scaling $\rho_j$
+and smooth saturation $|c_j|\tanh(\rho_j r_j^{\mathrm{base}}/|c_j|)$. Training
+begins in mode~0, and an independently seeded regime clock ensures identical
+mode-transition histories across all paired methods on each seed.
 
-\begin{table}[htbp]
-\centering\small
-\caption{Mode parameters used by both methods. $g$, $m$, $f$ and $d$ multiply
-gravity, body masses, geom friction and joint damping, respectively.
-Reward coordinates follow the base task order.}
-\label{tab:task_modes}
-\begin{tabular}{@{}llccc@{}}
-\toprule
-Task & Mode & Physics changes & Reward scale & Soft-cap magnitudes\\
-\midrule
-\multirow{4}{*}{HalfCheetah}
- & Normal & --- & $(1,1)$ & $(\infty,\infty)$\\
- & Low speed & $m=2,\ g=0.6$ & $(1,1)$ & $(0.3,\infty)$\\
- & Low cost & $m=0.5,\ g=1.5$ & $(1,1)$ & $(\infty,0.05)$\\
- & Locked & $d=3$ & $(1,1)$ & $(1,0.2)$\\
-\midrule
-\multirow{4}{*}{Hopper}
- & Normal & --- & $(1,1,1)$ & $(\infty,\infty,\infty)$\\
- & Fragile & $m=1.5$ & $(1,1,1)$ & $(\infty,0.5,\infty)$\\
- & Cheap energy & --- & $(1,1,1)$ & $(\infty,\infty,0.05)$\\
- & Grounded & $g=1.5$ & $(1,1,1)$ & $(0.5,0.3,\infty)$\\
-\midrule
-\multirow{3}{*}{Ant}
- & Energy save & $m=2,\ f=1.5$ & $(0.1,0.1,5)$ & $(\infty,\infty,\infty)$\\
- & Race & $g=0.7,\ f=0.5$ & $(0.1,5,0.1)$ & $(\infty,\infty,\infty)$\\
- & Cautious & $g=1.5,\ f=0.3$ & $(5,0.1,0.2)$ & $(\infty,\infty,\infty)$\\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Coordinates are forward velocity and negative control cost on HalfCheetah;
-forward velocity, jumping height and negative control cost on Hopper; and
-$x$ velocity, $y$ velocity and negative control cost on Ant. Hopper's base
-survival bonus and Ant's base survival/contact terms enter every coordinate
-before the mode transformation.
-
-Training starts in mode zero. Dwell lengths are
-$D=\max\{1000,\lfloor X\rfloor\}$ for $X$ exponentially distributed with
-scale 25,000; the next mode is uniform among the other modes. Episode resets
-preserve the mode and switching clock. The independently seeded schedule gives
-paired methods identical mode histories. The controller observes states and
-rewards, not mode labels or historical anchor metadata.
-
-\subsection{Locked-mode final-policy evaluation}
-
-Evaluation uses deterministic actions and, for BAMOR, fresh context trackers,
-fixing the mode and requested preference within each episode.
-The two-objective grid is
-$W_2=\{(i/20,1-i/20):i=0,\ldots,20\}$; the three-objective grid is
-$W_3=\{(i/5,j/5,(5-i-j)/5):i,j\in\mathbb Z_{\geq0},\ i+j\leq5\}$.
-Both contain 21 weights, including vertices. Every weight in mode $h$ uses
-the three reset seeds $100000+1000s+10h+i$, with training seed $s$ and
-$i\in\{0,1,2\}$. Return vectors are averaged over these episodes before
-computing direct utility or HV. Termination or a 1,000-step limit ends an
-episode. Evaluation performs no parameter updates and contributes no samples
-to training replay or operator scores.
-
-The fixed HV reference is $(-50,-3000)$ on HalfCheetah and
-$(-50,-100,-3000)$ on Hopper and Ant. HV is computed within each mode and
-then averaged across modes. At 75k each method evaluates one final actor; at
-50k each evaluates 19 retained actors. BAMOR pairs all its actors with the
-final encoder. Archive evaluation describes a policy set, not an online
-learning curve.
+At evaluation, actions are deterministic and BAMOR initializes fresh context
+trackers at the start of each episode while holding the test mode $h$ and
+commanded preference $w$ fixed throughout the rollout ($L \leq 1000$). The
+21-point full-simplex evaluation grids are
+$W_2 = \{(i/20, 1 - i/20) : i = 0, \ldots, 20\}$ for $m=2$ and
+$W_3 = \{(i/5, j/5, (5 - i - j)/5) : i, j \in \mathbb{Z}_{\geq 0},\ i + j \leq 5\}$
+for $m=3$. Each mode--weight pair uses three deterministic reset seeds
+$100000 + 1000s + 10h + i$ ($i \in \{0, 1, 2\}$ for training seed $s$),
+averaging episode returns prior to computing direct utility $U$ or mode-wise
+hypervolume against fixed reference points $(-50, -3000)$ on HalfCheetah and
+$(-50, -100, -3000)$ on Hopper and Ant. Evaluation trajectories never enter
+replay buffers or portfolio routing scores.

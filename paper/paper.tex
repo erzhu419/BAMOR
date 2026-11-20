@@ -6,10 +6,10 @@
 \usepackage{algorithm}
 \usepackage{algorithmic}
 \usepackage{xurl}
-\usepackage[round,authoryear]{natbib}
+\usepackage[numbers,square,sort&compress]{natbib}
 \let\cite\citep
 \usepackage[linktoc=all, bookmarksdepth=3, pdfstartview=FitH]{hyperref}
-\hypersetup{colorlinks=true, linkcolor=blue, filecolor=magenta, urlcolor=cyan}
+\hypersetup{colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue}
 \urlstyle{same}
 \usepackage{amsmath}
 \usepackage{mathtools}
@@ -17,12 +17,14 @@
 \usepackage{amssymb}
 \usepackage{bbold}
 \usepackage{graphicx}
-\usepackage[export]{adjustbox}
-\usepackage[dvipsnames]{xcolor}
 \usepackage{float}
 \usepackage{placeins}
+\setcounter{topnumber}{3}
+\renewcommand{\topfraction}{0.90}
+\renewcommand{\textfraction}{0.08}
+\renewcommand{\floatpagefraction}{0.75}
 \usepackage{caption}
-\captionsetup[figure]{name=Fig.}
+\captionsetup[figure]{name=Fig.,labelfont=bf,labelsep=space}
 \usepackage{booktabs}
 \usepackage{multirow}
 \usepackage{array}
@@ -42,130 +44,157 @@
 \newtheorem{example}[theorem]{Example}
 \setlength{\emergencystretch}{2em}
 \allowdisplaybreaks[2]
-\DeclareRobustCommand{\lean}[1]{\texttt{\detokenize{#1}}}
-\newcommand{\bamorv}{BAMOR-v25}
+\DeclareRobustCommand{\lean}[1]{\nolinkurl{#1}}
+\newcommand{\bamorv}{BAMOR}
 
 \graphicspath{ {./} }
 
-\title{BAMOR: Progress-Driven Update Portfolios for\\Non-Stationary Multi-Objective Reinforcement Learning}
-
-\author{
-  Yifan Zhang\thanks{Central South University, \href{mailto:erzhu419@gmail.com}{erzhu419@gmail.com}, \href{mailto:204201048@csu.edu.cn}{204201048@csu.edu.cn}} \and
-  Liang Zheng\thanks{Central South University, \href{mailto:zhengliang@csu.edu.cn}{zhengliang@csu.edu.cn}}
-}
+\input{article_title}
+\title{\BAMORArticleTitle}
+\author{}
 \date{}
+\hypersetup{pdftitle={\BAMORArticleTitle},pdfauthor={}}
 
 \begin{document}
 \maketitle
 
 
 \begin{abstract}
-Non-stationary multi-objective control requires both adapting behavior to
-observed transitions and allocating a finite learning budget. We present BAMOR,
-a context-conditioned actor--critic that allocates 1,500-interaction training
-blocks using normalized vector reward progress. Its 18 fixed arms vary
-preference sampling, relabeling, candidate search and regularization while
-sharing one actor and twin vector critics. Allocation uses training rewards;
-an optional actor archive supplies a separate coverage outcome. Lean-verified
-analysis establishes soft-target consistency, bounded feedback and a strict
-score-margin condition for local target stability.
+Pareto hypervolume measures the coverage of a policy's return set. In
+preference-conditioned control, a separate question is how much utility the
+policy delivers at the requested preference. We study both outcomes in custom
+piecewise-stationary locomotion tasks using BAMOR, a context-conditioned
+actor--critic that allocates training blocks across preference samplers and
+update configurations. In a prespecified 20-seed comparison at 75,000
+interactions, BAMOR's mean requested-preference utility exceeded that of
+concave-augmented Pareto Q-learning (CAPQL) by 55.0\% on HalfCheetah and 6.0\%
+on Hopper. Both primary confidence intervals included zero. Mean final-policy
+hypervolume was lower on both tasks.
 
-An independent 20-seed comparison of the unchanged v25 implementation with
-CAPQL on custom piecewise-stationary HalfCheetah and Hopper uses 75,000
-training interactions per run. Observed mean utility at the requested
-preference is 55.0\% and 6.0\% higher, with 13 of 20 paired wins on each
-task; both prespecified 97.5\% intervals include zero. Mean final hypervolume
-is 4.8\% and 5.8\% lower, and measured training time is 1.67 and 1.73 times
-CAPQL's. Ant remains a negative transfer case, and score-blind controls give
-task-dependent effects. These findings separate final-policy utility,
-policy-set coverage and the contribution of feedback-driven allocation.
+A retrospective baseline extension changed only CAPQL's training sampler.
+Uniform full-simplex sampling raised its mean utility on HalfCheetah by 47.6\%
+and lowered it on Hopper by 14.2\%. Against this variant, BAMOR's utility
+difference on HalfCheetah remained uncertain. On Hopper, the interval for
+BAMOR's 23.5\% mean advantage excluded zero in the retrospective comparison.
+In separate experiments, retaining 19 snapshots increased observed coverage
+over the included final actor on all 25 seeds. Progress-score ablations gave
+mixed results. On Ant, disabling candidate searches partially recovered
+mixed-preference utility under score-neutral allocation, and a gap to CAPQL
+remained. Lean verifies a vector-target reselection example and a sufficient
+score margin for local stability of matched candidates. Together these
+results characterize sampler sensitivity, preference execution and archive
+coverage under a fixed interaction budget.
 \end{abstract}
 
-\noindent\textbf{Keywords:} multi-objective reinforcement learning; non-stationary control; adaptive update portfolio; preference-conditioned policy.
+\noindent\textbf{Keywords:} multi-objective reinforcement learning; non-stationary continuous control; preference-aligned execution; update portfolio; preference sampling; formal verification.
 
 
 % ════════════════════════════════════════════════════════════════════════════
 \section{Introduction}
 % ════════════════════════════════════════════════════════════════════════════
 
-Multi-objective reinforcement learning (MORL) learns policies for conflicting
-objectives~\cite{Hayes2022MORL}. For a preference-conditioned controller,
-success requires producing useful behavior at the requested preference, not
-only covering a large Pareto region. These outcomes differ because a return
-set does not record which preference elicited each behavior.
+Multi-objective reinforcement learning (MORL) seeks policies that trade off
+conflicting reward coordinates across user preferences~\cite{Hayes2022MORL}.
+In standard MORL benchmarks, performance is predominantly summarized by the
+hypervolume (HV) of evaluated return vectors. For a single preference-conditioned
+controller deployed online, however, set-level coverage and preference-aligned
+execution are fundamentally distinct objectives: HV credits any non-dominated
+return vector regardless of whether it was produced at the preference weight
+that requested it, whereas operational deployment requires accurate scalarized
+utility at the commanded weight itself.
 
-Changing dynamics or reward responses can change the usefulness of training
-updates. Broad preference coverage, recovery-oriented sampling and extreme
-preferences compete for a fixed interaction budget. Adaptive operator selection
-and learning-progress curricula already address online allocation in optimization
-and neural learning~\cite{DaCosta2008AOS,Graves2017Curriculum}. Here allocation
-jointly changes collected preferences and MORL replay updates under changing
-dynamics. We study this configuration problem through unchanged BAMOR-v25,
-separating final-policy execution, archive coverage and feedback attribution.
+This distinction becomes especially consequential in sample-constrained,
+piecewise-stationary continuous control, where unobserved shifts in physical
+parameters and objective saturation alter both reachable return geometries and
+the effectiveness of training updates. A fixed interaction budget makes the
+choice of training preferences consequential. A cone around equal weights,
+as used in the CAPQL experiments~\cite{Lu2023CAPQL}, concentrates samples near
+the center. A uniform simplex sampler extends support toward the boundary.
+We test how this change affects direct utility under a common evaluation grid
+on two tasks with different dynamics and reward coordinates. Adaptive operator
+selection and curriculum allocation have been studied in evolutionary
+optimization and multi-task learning~\cite{DaCosta2008AOS,Graves2017Curriculum},
+and provide context for combining preference sampling, replay relabeling and
+candidate action search in a shared MORL actor--critic.
 
-BAMOR combines per-transition context with block-level update allocation.
-The context summarizes observed transition history; a portfolio selector
-changes sampling, relabeling, candidate search and regularization for one
-shared actor--critic. Its feedback compares normalized reward coordinates
-across the two halves of a block. This avoids directly scoring changes in
-sampled preference weights as changes in reward progress. Family allocation
-floors and randomized exploration preserve access to low-scoring arms.
-An optional archive is evaluated separately from final-policy execution.
+We address these challenges through BAMOR, a context-conditioned update
+portfolio framework coupled with a decoupled evaluation and diagnostic study.
+At the transition level, BAMOR conditions a shared policy and twin vector
+critics on observed dynamics via reward exponential averages, a lightweight
+local action-response probe and a temporal-contrastive transition latent,
+requiring no ground-truth regime labels. At the 1,500-step block level, a
+portfolio allocates updates among coverage, recovery and extreme-preference
+families. The selector corrects family allocation deficits and uses bounded,
+scale-normalized reward changes estimated from training transitions. An
+optional actor archive is retained passively to separate multi-policy Pareto
+coverage from single-policy preference execution.
 
-Our contributions are:
+The main contributions of this work are threefold:
 \begin{enumerate}
-    \item \textbf{MORL update portfolio.} An explicit combination of transition context, preference sampling, relabeling and candidate updates trains shared networks, with bounded reward-coordinate feedback and no additional selector evaluation rollouts.
-    \item \textbf{Independent final-policy evidence.} A prespecified twenty-seed CAPQL comparison reports direct utility, final hypervolume and cost at equal interaction budgets; archive-matched and score-blind controls examine retention and feedback separately.
-    \item \textbf{Implementation-facing analysis.} Lean proofs establish target consistency and feedback bounds. A vector-reselection counterexample and strict margin certificate characterize local target stability, with conditional tracking and archive properties.
+    \item \textbf{Context-conditioned quota-regulated MORL portfolio.} We formulate an integrated architecture combining label-free transition-context encoding, shared vector actor--critic training, and quota-regulated block allocation across preference-sampling, relabeling and candidate-search configurations, cleanly separating single-actor preference execution from multi-snapshot archive coverage.
+    \item \textbf{Paired evaluation of utility, coverage and sampler sensitivity.} A prespecified CAPQL comparison and a retrospective sampler-only extension distinguish requested-preference utility from return-set coverage under equal interaction budgets. Separate archive, routing and Ant experiments characterize where gains depend on the evaluation object or training configuration.
+    \item \textbf{Local target stability and archive properties.} A reselection example shows how an arbitrarily small scalar-score change can produce an order-one vector-target jump. Lean~4 verifies a fixed numerical instance, a strict score-margin certificate for local target stability, and conditional tracking and archive bounds.
 \end{enumerate}
 
 \section{Related Work}
 % ════════════════════════════════════════════════════════════════════════════
 
-\subsection{Multi-objective reinforcement learning}
-Envelope Q-learning~\cite{Yang2019Envelope} learns preference-conditioned
-values; GPI-LS~\cite{Alegre2023GPILS} combines generalized policy improvement
-with linear support. CAPQL~\cite{Lu2023CAPQL} introduces concave-augmented
-Pareto Q-learning with entropy augmentation and preference-conditioned vector
-critics. These are established building blocks. Hindsight Preference
-Replay~\cite{Shianifar2026HPR} uses return-aligned or neighborhood relabeling
-without changing CAPQL's architecture or losses. BAMOR instead jointly varies
-sampling, relabeling, candidate counts and regularization for context-conditioned
-networks. Robust policy bootstrapping~\cite{Abdelfattah2023Bootstrapping}
-adapts through a coverage set of steppingstone policies; BAMOR's optional
-archive retains actors without bootstrapping the current controller.
+\subsection{Preference-conditioned multi-objective reinforcement learning}
+Envelope Q-learning~\cite{Yang2019Envelope} generalizes Bellman backups over
+preference weights through convex-envelope maximization, and GPI-LS~\cite{Alegre2023GPILS}
+couples generalized policy improvement with linear-support weight selection.
+CAPQL~\cite{Lu2023CAPQL} introduces concave-augmented Pareto Q-learning with
+entropy regularization on preference-conditioned vector critics, training
+within a narrow angular cone around equal weights in its reported experiments.
+CAPQL already evaluates scalarized returns at sampled preferences. Our
+comparison pairs that type of execution measure with return-set coverage
+on a common locked-mode grid. Hindsight Preference
+Replay (HPR)~\cite{Shianifar2026HPR} augments off-policy replay via
+return-aligned or neighborhood weight relabeling while keeping CAPQL's fixed
+network and update rule. Rather than relying on a single static sampler or
+relabeling heuristic, BAMOR coordinates heterogeneous sampling, relabeling,
+candidate-ranking and regularization configurations over a context-conditioned
+backbone, and explicitly contrasts requested-preference execution against
+Pareto set hypervolume. Robust policy bootstrapping~\cite{Abdelfattah2023Bootstrapping}
+maintains steppingstone policies to warm-start optimization after regime
+changes; BAMOR's optional snapshot archive instead serves purely as a coverage
+output without altering online controller training.
 
-\subsection{Online allocation and algorithm configuration}
-Adaptive operator selection separates credit assignment from probability
-adaptation; smoothed rewards and exploration floors are established
-strategies~\cite{DaCosta2008AOS}. Learning-progress curricula use bandits to
-allocate examples among tasks~\cite{Graves2017Curriculum}. Online RL algorithm
-selection~\cite{Laroche2018Selection} chooses among off-policy learners trained
-on shared trajectories; BAMOR switches update configurations
-for one continuously trained actor--critic instead of selecting different
-learners' policies. Dynamic algorithm configuration learns state-dependent
-parameter control across instances~\cite{Biedenkapp2020DAC}, including
-heterogeneous controls for multi-objective evolutionary
-optimization~\cite{Xue2022MADAC}. BAMOR uses an online rule rather than a
-separately trained configuration policy. Its contribution is the specified
-MORL combination and its separate analysis of execution, coverage and feedback.
+\subsection{Portfolio allocation and dynamic algorithm configuration}
+Adaptive operator selection separates operator credit estimation from selection
+probabilities using smoothed feedback and minimum probability floors~\cite{DaCosta2008AOS},
+while automated curricula allocate training effort via learning-progress
+signals~\cite{Graves2017Curriculum}. In reinforcement learning, online algorithm
+selection~\cite{Laroche2018Selection} chooses among separate off-policy learners
+sharing a replay buffer, whereas dynamic algorithm configuration (DAC) trains
+meta-policies across problem instances~\cite{Biedenkapp2020DAC}, including
+multi-agent hyperparameter control in evolutionary multi-objective
+optimization~\cite{Xue2022MADAC}. Under tight single-run interaction budgets
+where meta-training across instances is infeasible, BAMOR regulates a shared
+actor--critic via deterministic family quota floors combined with zero-rollout
+reward-coordinate progress routing.
 
-\subsection{Non-stationary and robust RL}
-Piecewise-stationary MDPs~\cite{Padakandla2020Survey,
-Lecarpentier2019NonStationary} model abrupt changes; contextual
-MORL~\cite{Teoh2025MOCMDP} studies context-dependent multi-objective environments.
-BAPR~\cite{Zhang2025BAPR} combines Bayesian online change-point
-detection~\cite{Adams2007BOCD} with robust ensemble SAC~\cite{Haarnoja2018SAC},
-while RE-SAC~\cite{Zhang2025RESAC} separates risk through structural penalties.
-Robust MDPs~\cite{Wiesemann2013RobustMDP} represent uncertainty through
-ambiguity sets. BAMOR inherits BAPR's adaptation motivation but uses observed
-transition context and progress-based allocation rather than its belief update
-or RE-SAC's penalties. The analysis concerns implemented targets, feedback and
-archives.
+\subsection{Non-stationary and robust continuous control}
+Piecewise-stationary MDPs~\cite{Padakandla2020Survey,Lecarpentier2019NonStationary}
+model abrupt environmental shifts between latent regimes. Contextual
+MORL~\cite{Teoh2025MOCMDP} examines generalization across parameterized
+multi-objective tasks, and robust MDPs~\cite{Wiesemann2013RobustMDP} optimize
+worst-case returns over ambiguity sets. BAPR (preprint, arXiv:2605.16170)
+combines change-point beliefs and context-conditioned Soft Actor-Critic
+(SAC)~\cite{Haarnoja2018SAC} for single-objective piecewise-stationary
+control. BAMOR extends the transition-context approach to vector rewards
+and preference-conditioned policies. It replaces explicit change-point
+beliefs with label-free context and allocates training across a portfolio
+of update configurations.
 
 
 % ════════════════════════════════════════════════════════════════════════════
 \input{method_v23}
+
+\paragraph{Use of generative AI.}
+Google Gemini assisted with manuscript restructuring and presentation.
+OpenAI Codex assisted with manuscript revision, statistical cross-checks and
+preparation of the reproducibility materials.
 
 \section{Experiments}
 \label{sec:experiments}
@@ -176,71 +205,74 @@ archives.
 \section{Discussion}
 \label{sec:discussion}
 
-The utility--HV ordering makes the execution objective consequential.
-Direct utility preserves the requested-preference/behavior association, whereas
-HV describes the return set. Their disagreement can occur even for identical
-sets (Section~\ref{sec:problem_v23}); the observed comparison therefore concerns
-two distinct outcomes. Different reward scales also make HalfCheetah's larger
-utility difference task-specific.
+\paragraph{Execution, coverage and sampler sensitivity.}
+A return set can have high hypervolume even when its behaviors are poorly
+matched to the preferences that request them (Section~\ref{sec:problem}).
+The sampler-only contrast in CAPQL changes observed mean utility by
+$+47.61\%$ on HalfCheetah and $-14.20\%$ on Hopper. The two tasks differ in
+physics, reward coordinates and objective count, so the experiment does not
+identify the role of dimension alone. BAMOR uses the same portfolio design
+on both tasks, with the highest observed mean utility among the three tested
+configurations.
 
-Retention expands the available behavior set; block allocation changes the
-training trajectory of one shared policy. Hopper's archive results favor
-coverage, while score-blind controls do not identify a consistent feedback
-benefit. Ant further separates useful vertex behavior from poor mixed-weight
-execution. Together these observations make the complete-method comparison,
-selector ablation and archive evaluation complementary, rather than substitutes.
+\paragraph{Snapshot retention and training choices.}
+Retention increases the number of evaluated candidates. The archive gains
+measure this increase in coverage for one training method. Using the archive
+to fulfill a particular preference requires a policy-selection rule and
+separate evaluation. The score-neutral comparison keeps the family quota
+mechanism in both arms, and the observed routing effects vary by task.
+Ant exhibits a large difference between querying the actor at a mixed weight
+and applying a vertex behavior to that query. The own-preference ablations
+show that candidate search contributes to the observed deficit under some
+settings. Attribution to gradient routing, target bias or simplex sampling
+would require interventions that vary these mechanisms separately.
 
-\subsection{Scope and limitations}
-\label{sec:limits}
+\subsection{Limitations}
+The primary comparison used independent seeds, with tasks and the utility
+hypothesis motivated by a pilot. The sampler extension reused the inspected
+cohort. The main runs match interactions, while BAMOR uses a 64-width
+context-conditioned network and more candidate evaluations than 256-width
+memoryless CAPQL. HPR and GPI-LS were not evaluated. A common backbone and a
+score-neutral control at 75k on both primary tasks would help separate
+representation, update configuration and routing effects.
 
-Both primary utility intervals include zero: the study establishes neither
-superiority nor equivalence in expected utility. Tasks and the utility
-hypothesis were selected from a pilot, although confirmation seeds and analysis
-were fixed before training. Three episodes per preference give noisy estimates;
-observed wins and minima do not establish population robustness. Ant remains
-negative, and adaptive allocation has no consistent score-blind advantage.
-There is no matched comparison with HPR or established adaptive allocation
-rules; the CAPQL comparison does not isolate the portfolio's individual
-learning operations.
-
-Equal interactions do not equalize computation or architecture. BAMOR uses
-width 64, CAPQL width 256, and their replay expansion and candidate work differ.
-BAMOR's measured runtime is higher. The 50k CAPQL archive cohort omitted
-action-space and Python replay RNG seeds; it is retrospective, unlike the fully
-seeded 75k studies. Invalid continuations are excluded
-(Appendix~\ref{app:experiment_details}). Different cohorts do not identify a
-causal effect of longer training.
-
-The tasks have custom physics/reward modes, two or three objectives and short
-training horizons; a trajectory need not visit every mode. Locked-mode final
-evaluation does not measure switch-aligned recovery or performance on unseen
-families. Archive HV depends on the grid, noisy returns and final encoder; it
-is neither an online learning curve nor a deployment selection guarantee.
-
-The margin certificate requires matched candidates and bounded critic/entropy
-perturbations, not established along training. Neural approximation and learned
-context do not inherit auxiliary contraction results; componentwise Bellman
-maxima can also be jointly unachievable. Bounded progress is not an unbiased
-causal arm-value estimate because learning, preferences and modes all affect
-it. No neural-convergence or training-selector-regret theorem is established.
-Archive-selection bounds require uniform return accuracy, and fixed-value HV
-monotonicity does not cover changing the encoder or re-estimating returns.
+Only two of the 20 training histories per main task visited all four modes.
+Evaluation holds each mode fixed and uses three resets per preference.
+Switch-aligned recovery, learning curves across budgets and performance on
+new task families remain open. The context includes an observation-coordinate
+ratio specific to the implementation, and replay retains context generated
+by earlier encoder parameters. Half-block reward differences can reflect
+preference sampling, episode resets and mode changes as well as learning.
+The Ant interventions use five development seeds, and the independent
+residual-actor study has five seeds with a different design. The formal results
+assume matched candidates for local stability, contraction and residual bounds
+for tracking, or uniform return-estimation accuracy for archive selection.
+Their assumptions have not been established along neural training.
 
 \section{Conclusion}
+On two piecewise-stationary locomotion tasks, BAMOR had higher observed mean
+requested-preference utility and lower mean final-policy hypervolume than
+native CAPQL at 75k interactions. Both primary utility contrasts remained
+uncertain. Changing CAPQL's training sampler substantially altered the
+HalfCheetah comparison, and the Hopper contrast with full-simplex CAPQL
+remained positive under the follow-up's interval procedure. Separate results
+show increased coverage from retaining checkpoints and partial recovery of
+mixed-preference utility in Ant ablations. Together with the local
+target-stability result, the experiments motivate reporting requested-preference
+utility, return-set coverage and routing ablations separately.
 
-BAMOR combines transition-derived context with progress-driven allocation of
-fixed updates to a shared actor--critic. Its unchanged v25 implementation gives
-higher observed mean direct utility than CAPQL on HalfCheetah and Hopper at
-75k interactions, alongside lower final HV, higher runtime and primary intervals
-including zero. Archive and score-blind controls distinguish retention from
-feedback; Ant records a transfer failure. Target consistency, bounded feedback
-and margin-certified local stability provide implementation-facing foundations
-for this separation of execution, coverage and learning allocation.
+\section*{Statements and Declarations}
+\paragraph{Data and code availability.}
+The simulation records supporting the reported results and the analysis and
+training code are available in the supplementary material (Online Resource~1).
+The archive contains compact seed-level records rather than raw trajectories
+or model checkpoints.
 
-\section*{Acknowledgments}
-This work was supported by the National Natural Science Foundation of China (Grant No. 72371251), the Natural Science Foundation for Distinguished Young Scholars of Hunan Province (Grant No. 2024JJ2080), and the Key Research and Development Program of Hunan Province of China (Grant No. 2024JK2007).
+\paragraph{Online Resource 1.}
+Reproducibility archive (\texttt{ESM\_1.zip}): frozen protocols, compact
+simulation records, analysis scripts, training code and Lean proof sources.
 
-\bibliographystyle{plainnat}
+\bibliographystyle{unsrtnat}
 \bibliography{refs}
 
 \input{appendix}
