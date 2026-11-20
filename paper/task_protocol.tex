@@ -24,3 +24,13 @@ averaging episode returns prior to computing direct utility $U$ or mode-wise
 hypervolume against fixed reference points $(-50, -3000)$ on HalfCheetah and
 $(-50, -100, -3000)$ on Hopper and Ant. Evaluation trajectories never enter
 replay buffers or portfolio routing scores.
+
+The two-objective grid has two vertices and 19 interior points. The
+three-objective grid has three vertices, 12 non-vertex boundary points and six
+strictly interior points. The uniform average over this grid is an evaluation
+choice, not an integral over uniformly distributed preference vectors.
+For the prior-exposure split, a mode is seen for a seed if it generated at
+least one training transition. Only two seeds per main task saw all four
+modes; two saw one, five saw two and eleven saw three. This yields 53 seen
+and 27 unseen seed--mode cells per task. The evaluation locks the requested
+mode from reset and does not carry context across a switch.

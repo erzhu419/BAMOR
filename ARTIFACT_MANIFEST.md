@@ -19,6 +19,9 @@ submission materials are not included in this Git tree.
 - Architecture diagram (TikZ, Fig. 1): `paper/Fig1.tex`
 - Main empirical evaluation & Ant diagnostics: `paper/experiments_matched.tex`
 - Empirical table generator (8 tables): `paper/make_evidence_tables.py`
+- Revision diagnostics and 75k score-neutral tables: `paper/make_nca_review_tables.py`
+- Reduction from saved evaluations and allocation histories: `collect_nca_review.py`
+- 75k score-neutral run entry point: `run_nca_score_ablation.py`
 - Portfolio configuration generator (18 slots, 14 settings, 13 distinct
   behaviors on three-objective tasks): `paper/make_v23_operator_table.py`
 - 20-seed utility & per-mode figure generator (Fig. 2): `paper/make_utility_figure.py` (`paper/Fig2.pdf`)

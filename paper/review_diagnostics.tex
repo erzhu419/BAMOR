@@ -1,0 +1,46 @@
+\section{Execution Diagnostics and Interval Sensitivity}
+\label{app:review_diagnostics}
+
+Tables~\ref{tab:grid_modes} and~\ref{tab:grid_geometry} use the same
+locked-mode, final-policy returns as the main comparison and the Ant
+development study. The utility and shortfall means use equal seed
+weights; modes and requests within each reported stratum are equally
+weighted within a seed. The same-reset command maximum is descriptive.
+
+\input{table_ci_sensitivity}
+\input{table_grid_modes}
+\input{table_grid_geometry}
+\input{table_ant_geometry}
+\FloatBarrier
+
+\subsection{Allocation traces for the 75k score ablation}
+
+Count displacement gives the minimum number of post-warmup assignments
+that must change to make the two slot histograms equal. The chronological
+measure counts mismatches at equal block indices, irrespective of whether
+the two runs selected the same slots in another order. Slot names follow
+Table~\ref{tab:operators}.
+\input{table_slot_shift}
+\input{table_slot_counts}
+\FloatBarrier
+
+\section{Secondary Archive Coverage and 50k Routing Study}
+\label{sec:archive_quota}
+
+In the separate 50k cohorts, archive hypervolume exceeded final-actor
+hypervolume on all 25 seeds, with ratios of means of $+35.10\%$ on
+HalfCheetah, $+91.53\%$ on Hopper and $+22.91\%$ on Ant
+(Table~\ref{tab:matched_archive}). The final actor is one of the 19
+snapshots, evaluated with the same final encoder. Weak monotonicity follows
+from inclusion (Proposition~\ref{prop:hv_current}); the measured increases
+reflect additional covered behaviors, not an evaluated deployment rule.
+
+\input{table_matched_archive}
+
+The 50k score-neutral comparison retained quotas, warmup and exploration.
+Mean archive and final hypervolume differences were negative on HalfCheetah
+and Ant. Hopper's mean Final HV rose by $59.56\%$ with scores (two wins,
+one loss, two ties), but omitting the largest favorable pair gives
+$-2.96\%$. Table~\ref{tab:selector_effect} retains all five pairs.
+
+\input{table_selector_effect}

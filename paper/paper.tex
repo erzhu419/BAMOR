@@ -60,30 +60,28 @@
 
 
 \begin{abstract}
-Pareto hypervolume measures the coverage of a policy's return set. In
-preference-conditioned control, a separate question is how much utility the
-policy delivers at the requested preference. We study both outcomes in custom
-piecewise-stationary locomotion tasks using BAMOR, a context-conditioned
-actor--critic that allocates training blocks across preference samplers and
-update configurations. In a prespecified 20-seed comparison at 75,000
-interactions, BAMOR's mean requested-preference utility exceeded that of
-concave-augmented Pareto Q-learning (CAPQL) by 55.0\% on HalfCheetah and 6.0\%
-on Hopper. Both primary confidence intervals included zero. Mean final-policy
-hypervolume was lower on both tasks.
-
-A retrospective baseline extension changed only CAPQL's training sampler.
-Uniform full-simplex sampling raised its mean utility on HalfCheetah by 47.6\%
-and lowered it on Hopper by 14.2\%. Against this variant, BAMOR's utility
-difference on HalfCheetah remained uncertain. On Hopper, the interval for
-BAMOR's 23.5\% mean advantage excluded zero in the retrospective comparison.
-In separate experiments, retaining 19 snapshots increased observed coverage
-over the included final actor on all 25 seeds. Progress-score ablations gave
-mixed results. On Ant, disabling candidate searches partially recovered
-mixed-preference utility under score-neutral allocation, and a gap to CAPQL
-remained. Lean verifies a vector-target reselection example and a sufficient
-score margin for local stability of matched candidates. Together these
-results characterize sampler sensitivity, preference execution and archive
-coverage under a fixed interaction budget.
+Pareto coverage does not tell whether a policy produces the right behavior
+when queried at a particular preference. We distinguish requested utility
+from the best observed utility obtainable by changing only the command
+to the same actor. We study these outcomes using BAMOR, a context-conditioned
+actor--critic with a portfolio of update configurations. Training uses
+piecewise-stationary locomotion tasks; evaluation locks each mode from reset.
+At 75,000 interactions on HalfCheetah and Hopper, BAMOR had higher observed
+mean requested utility and lower hypervolume than native concave-augmented
+Pareto Q-learning (CAPQL), but neither primary interval excluded zero.
+Switching CAPQL to uniform simplex sampling reduced the HalfCheetah utility
+difference from 105.15 to 14.13. The analogous Hopper comparison favored BAMOR
+in the retrospective bootstrap analysis, but not in a paired $t$ interval.
+The same-actor gap and mode-exposure split show that mean utility can conceal
+reversals: for interior Hopper preferences, BAMOR had lower requested
+utility and a larger gap than native CAPQL. On Ant, querying the same actor
+at an energy vertex improved the score of 66 out of 70 mixed-energy
+requests in one mode. Restricting candidate search recovered part of the
+deficit under score-neutral allocation. In a matched 75,000-interaction
+ablation, progress scores changed the allocation, but utility contrasts
+with score-neutral routing remained uncertain on both main tasks.
+A machine-checked margin condition
+characterizes local target stability without guaranteeing neural training.
 \end{abstract}
 
 \noindent\textbf{Keywords:} multi-objective reinforcement learning; non-stationary continuous control; preference-aligned execution; update portfolio; preference sampling; formal verification.
@@ -100,8 +98,11 @@ hypervolume (HV) of evaluated return vectors. For a single preference-conditione
 controller deployed online, however, set-level coverage and preference-aligned
 execution are fundamentally distinct objectives: HV credits any non-dominated
 return vector regardless of whether it was produced at the preference weight
-that requested it, whereas operational deployment requires accurate scalarized
-utility at the commanded weight itself.
+that requested it, whereas direct utility scores the outcome at the
+commanded weight. The latter can improve even for a policy that ignores its
+preference input. We therefore also compare each requested response with
+what the same actor could have produced under another command on the
+evaluation grid.
 
 This distinction becomes especially consequential in sample-constrained,
 piecewise-stationary continuous control, where unobserved shifts in physical
@@ -132,7 +133,7 @@ coverage from single-policy preference execution.
 The main contributions of this work are threefold:
 \begin{enumerate}
     \item \textbf{Context-conditioned quota-regulated MORL portfolio.} We formulate an integrated architecture combining label-free transition-context encoding, shared vector actor--critic training, and quota-regulated block allocation across preference-sampling, relabeling and candidate-search configurations, cleanly separating single-actor preference execution from multi-snapshot archive coverage.
-    \item \textbf{Paired evaluation of utility, coverage and sampler sensitivity.} A prespecified CAPQL comparison and a retrospective sampler-only extension distinguish requested-preference utility from return-set coverage under equal interaction budgets. Separate archive, routing and Ant experiments characterize where gains depend on the evaluation object or training configuration.
+    \item \textbf{Preference execution after training with mode switches.} Paired comparisons with two CAPQL samplers measure utility and hypervolume after equal training budgets. Same-actor command shortfall diagnoses whether better behaviors were available on the same grid; splits by mode exposure and preference region expose heterogeneity, and Ant ablations test a specific update choice.
     \item \textbf{Local target stability and archive properties.} A reselection example shows how an arbitrarily small scalar-score change can produce an order-one vector-target jump. Lean~4 verifies a fixed numerical instance, a strict score-margin certificate for local target stability, and conditional tracking and archive bounds.
 \end{enumerate}
 
@@ -143,6 +144,15 @@ The main contributions of this work are threefold:
 Envelope Q-learning~\cite{Yang2019Envelope} generalizes Bellman backups over
 preference weights through convex-envelope maximization, and GPI-LS~\cite{Alegre2023GPILS}
 couples generalized policy improvement with linear-support weight selection.
+Average utility at user preferences already appears in the evaluation of
+envelope Q-learning~\cite{Yang2019Envelope}. Preference-controllable
+reinforcement learning~\cite{Yang2025PreferenceControllable} studies producing
+behaviors in the requested region of a Pareto frontier. De las Heras Molins
+et al.~\cite{Molins2026Controllability} distinguish controllability from
+conventional return metrics. Our empirical question is how these
+aspects diverge after training with hidden mode switches. The same-actor
+comparison diagnoses available alternatives without purporting to measure
+all aspects of controllability.
 CAPQL~\cite{Lu2023CAPQL} introduces concave-augmented Pareto Q-learning with
 entropy regularization on preference-conditioned vector critics, training
 within a narrow angular cone around equal weights in its reported experiments.
@@ -211,16 +221,19 @@ matched to the preferences that request them (Section~\ref{sec:problem}).
 The sampler-only contrast in CAPQL changes observed mean utility by
 $+47.61\%$ on HalfCheetah and $-14.20\%$ on Hopper. The two tasks differ in
 physics, reward coordinates and objective count, so the experiment does not
-identify the role of dimension alone. BAMOR uses the same portfolio design
-on both tasks, with the highest observed mean utility among the three tested
-configurations.
+identify the role of dimension alone. In particular, Hopper's mean
+requested-utility contrast with native CAPQL reverses for interior
+requests. The same-actor shortfall tells whether better evaluated responses
+were available under other commands; it does not certify that the
+original input meaningfully influences the actor.
 
-\paragraph{Snapshot retention and training choices.}
-Retention increases the number of evaluated candidates. The archive gains
-measure this increase in coverage for one training method. Using the archive
-to fulfill a particular preference requires a policy-selection rule and
-separate evaluation. The score-neutral comparison keeps the family quota
-mechanism in both arms, and the observed routing effects vary by task.
+\paragraph{Training choices and snapshot retention.}
+The matched 75k score ablation changed slot assignments but did not show a
+consistent utility gain. It controls score use, not the value of quotas
+or any individual operator. Means on opposite sides of zero and wide
+intervals leave the utility effect unresolved. The archive results
+describe coverage from evaluating more candidates; using the archive to
+fulfill a request requires a selection rule and separate evaluation.
 Ant exhibits a large difference between querying the actor at a mixed weight
 and applying a vertex behavior to that query. The own-preference ablations
 show that candidate search contributes to the observed deficit under some
@@ -230,16 +243,17 @@ would require interventions that vary these mechanisms separately.
 \subsection{Limitations}
 The primary comparison used independent seeds, with tasks and the utility
 hypothesis motivated by a pilot. The sampler extension reused the inspected
-cohort. The main runs match interactions, while BAMOR uses a 64-width
-context-conditioned network and more candidate evaluations than 256-width
-memoryless CAPQL. HPR and GPI-LS were not evaluated. A common backbone and a
-score-neutral control at 75k on both primary tasks would help separate
-representation, update configuration and routing effects.
+cohort, and the Hopper inference is interval-sensitive. The main runs match
+interactions but differ in context, network width, candidate work and the
+training action rule. They compare complete systems rather than isolating
+any one difference. HPR and GPI-LS were not evaluated.
 
-Only two of the 20 training histories per main task visited all four modes.
-Evaluation holds each mode fixed and uses three resets per preference.
-Switch-aligned recovery, learning curves across budgets and performance on
-new task families remain open. The context includes an observation-coordinate
+The exposure strata contain different modes and are not randomized.
+Evaluation uses three resets per preference and a locked mode. It measures
+neither carryover across a switch nor the gain from selecting a command or
+checkpoint on independent data. Switch-aligned recovery, learning curves
+across budgets and performance on new task families remain open.
+The context includes an observation-coordinate
 ratio specific to the implementation, and replay retains context generated
 by earlier encoder parameters. Half-block reward differences can reflect
 preference sampling, episode resets and mode changes as well as learning.
@@ -250,16 +264,18 @@ for tracking, or uniform return-estimation accuracy for archive selection.
 Their assumptions have not been established along neural training.
 
 \section{Conclusion}
-On two piecewise-stationary locomotion tasks, BAMOR had higher observed mean
-requested-preference utility and lower mean final-policy hypervolume than
-native CAPQL at 75k interactions. Both primary utility contrasts remained
-uncertain. Changing CAPQL's training sampler substantially altered the
-HalfCheetah comparison, and the Hopper contrast with full-simplex CAPQL
-remained positive under the follow-up's interval procedure. Separate results
-show increased coverage from retaining checkpoints and partial recovery of
-mixed-preference utility in Ant ablations. Together with the local
-target-stability result, the experiments motivate reporting requested-preference
-utility, return-set coverage and routing ablations separately.
+In switched training followed by locked-mode evaluation, the final actor's
+return set did not determine what a user received from a requested command.
+BAMOR's primary comparisons with native CAPQL did not establish utility
+superiority. The sampler-only control explained most of the observed
+HalfCheetah difference, and the retrospective Hopper finding depended on
+the interval method. Same-actor re-scoring revealed preference-region and
+mode-exposure differences that overall utility masked. Ant provided a
+direct example of command mismatch and partial recovery from a targeted
+training intervention. These observations motivate reporting requested
+utility, same-actor command shortfall and return-set coverage separately.
+The matched score-neutral comparison found no consistent utility benefit
+from using progress scores at this budget.
 
 \section*{Statements and Declarations}
 \paragraph{Data and code availability.}

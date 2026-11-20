@@ -1,0 +1,39 @@
+\subsection{Matched progress-score ablation at 75k interactions}
+\label{sec:routing75}
+
+To isolate the contribution of using the progress scores, we added
+a score-neutral condition for the 20 original BAMOR seeds on each
+main task. It computes the same statistics but routes with all scores
+set to zero, retaining the same backbone, stochastic collection
+rule, operator library, warmup and family quotas. Thus the treatment
+is access to scores for allocation, not the cost of computing scores.
+The score-on arm reuses the original runs. This is a retrospective
+completion on the inspected cohort, with shared training mode histories,
+evaluation weights and reset seeds.
+
+Turning scores on changed mean direct utility by $-14.41$ on HalfCheetah
+and $+15.95$ on Hopper. Both interval methods include zero for both tasks
+(Table~\ref{tab:routing75}). The matched comparison does not establish
+that using the scores improves final-policy utility.
+
+\input{table_routing75}
+
+Of the 46 complete blocks, the first ten are scheduled. The 36
+subsequent complete blocks use the selector, whether it is correcting a
+quota deficit or sampling a family with no deficit. The final 1,000-step
+partial block is selected but emits no complete-block feedback.
+Tables~\ref{tab:slot_shift} and~\ref{tab:slot_counts} report how block
+counts and actual assignments change across the paired runs. On average,
+the complete post-warmup slot differs at 12.9 of 36 positions on
+HalfCheetah and 17.3 on Hopper. The five exact utility ties on HalfCheetah
+and the one on Hopper are also the pairs with identical logged
+assignments, including the partial block. Subsequent trajectory and
+random-stream differences can contribute to the assignment differences,
+so these are not one-step effects of a score.
+
+\input{nca_routing_cost}
+The additional condition consumed \NcaTrainingInteractions{} training
+interactions, \NcaEvaluationInteractions{} final-policy evaluation
+interactions and \NcaEnvironmentInitializationProbeSteps{} initialization
+probe steps.
+\FloatBarrier

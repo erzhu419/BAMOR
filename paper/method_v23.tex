@@ -11,10 +11,11 @@ steps. At each step, the controller observes transitions without mode labels
 and conditions decisions on a user preference weight
 $w \in \Delta^{m-1} = \{w \in \mathbb{R}_{\geq 0}^m : \sum_{i=1}^m w_i = 1\}$,
 optimizing discounted scalarized value $w^\top \mathbf{Q}$ with $\gamma = 0.99$.
-At deployment, our primary object is the single final preference-conditioned
-policy $\pi_T$, which infers online context from its own transition history
-within an episode; an optional finite archive $A$ of periodically saved actor
-snapshots defines a secondary coverage output.
+The primary evaluation object is the single final preference-conditioned
+policy $\pi_T$, which infers context from its own transition history within
+an episode. Training includes switches, but evaluation holds the mode fixed
+and resets context at each episode. An optional finite archive $A$ of
+periodically saved actor snapshots defines a secondary coverage output.
 
 For each locked physical regime $h \in \{1,\ldots,H\}$ and preference weight
 $w$ in a full-simplex evaluation grid $W$, let
@@ -38,8 +39,26 @@ fidelity directly, we evaluate \emph{preference-aligned direct utility}:
           w^\top \widehat{\mathbf{J}}_h(\pi, w),
  \label{eq:direct_utility}
 \end{equation}
-which scores the deployed policy strictly at the requested preference $w$,
+which scores the policy strictly at the requested preference $w$,
 without post-hoc maximization over alternative weights or archived policies.
+
+Direct utility can increase when returns improve under every command, even
+if a policy ignores its preference input. To distinguish obtainable utility
+from command assignment, define the \emph{same-actor command shortfall}
+for a mode and request:
+\begin{equation}
+ G_h(\pi,w) = \max_{v\in W} w^\top \widehat{\mathbf{J}}_h(\pi,v)
+                   - w^\top \widehat{\mathbf{J}}_h(\pi,w).
+ \label{eq:command_gap}
+\end{equation}
+Both terms use the same actor, mode and reset seeds. Let $G$ be the average
+over modes and requests and $U_{\mathrm{grid}}$ the corresponding average of
+the first term, so that $U_{\mathrm{grid}}=U+G$. A large $G_h$ shows that a
+different command elicited a better evaluated behavior for that request.
+A zero gap need not imply controllability: all commands could elicit the
+same behavior. Maximizing and scoring on the same saved resets can also
+favor noise. We use the gap to diagnose existing behaviors, not as an
+estimate of an online command selector's held-out gain.
 
 \paragraph{Analytical decoupling of direct utility and hypervolume.}
 Consider a single mode ($H=1$) and two requested vertex preferences

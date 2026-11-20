@@ -4,8 +4,8 @@
 \caption{BAMOR training and evaluation. Past transitions supply context $z_t$.
 After warmup, each 1,500-step block uses one of 18 independently scored slots to train
 the shared actor and critics. The slots encode 14 parameter settings and
-13 distinct behaviors on three-objective tasks. Evaluation measures utility
-$U(\pi_T)$ at the requested preference and hypervolume $\overline{\mathrm{HV}}$
-for the final actor or the snapshot archive}
+13 distinct behaviors on three-objective tasks. Evaluation measures requested
+utility $U$ and command shortfall $G$ for the final actor, and hypervolume
+$\overline{\mathrm{HV}}$ for the final actor or snapshot archive}
 \label{fig:architecture}
 \end{figure}

@@ -44,11 +44,15 @@ Four preference-sampling rules parameterize the portfolio across $m$ objectives
        \texttt{stratified} uses the $(m+1)$-point corner-center set
        $\mathcal{E}_m$, so slots C5 and R2 coincide functionally with C4 on
        three-objective tasks (yielding 13 functionally distinct settings on
-       $m = 3$, with zero discrete mass on two-objective simplex edges).
+       $m = 3$, with zero discrete mass on non-vertex edges of the
+       three-objective simplex).
  \item \texttt{mixed}: during interaction at step $t$, selects \texttt{edge}
        when $t \equiv 0 \pmod 3$ ($1/3$), \texttt{stratified} on remaining even
-       steps ($1/6$), and $\mathrm{Dir}(\mathbf{1}_m)$ on remaining odd steps
-       ($1/2$); in replay, each draw independently selects
+       steps ($1/3$), and $\mathrm{Dir}(\mathbf{1}_m)$ on remaining odd steps
+       ($1/3$). Each branch occurs twice per six consecutive steps.
+       For three objectives, the first two branches together assign two
+       thirds of interaction requests to the corners-plus-center set.
+       In replay, each draw independently selects
        $\mathrm{Dir}(\mathbf{1}_m)$ or \texttt{stratified} with probability
        $0.5$ each.
 \end{itemize}
@@ -70,6 +74,9 @@ and then samples a slot within that family (temperature $0.28$, exploration
 mixture $0.16$). Within-family sampling still uses slot scores during family
 deficit correction. The score-neutral control passes zero scores to routing
 and keeps the quotas, warmup blocks and exploration mixtures.
+At 75k interactions there are 46 complete feedback blocks: ten scheduled
+warmup blocks and 36 subsequent blocks. The last 1,000 training steps use
+a selected slot but provide no complete-block score.
 
 \begin{table}[htbp]
 \centering\small

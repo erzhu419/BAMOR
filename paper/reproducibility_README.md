@@ -25,21 +25,26 @@ With TeX Live (including TikZ and BibTeX) and `latexmk` installed, run:
 ```sh
 python -m pip install -r requirements.txt
 python paper/make_evidence_tables.py
+python paper/make_nca_review_tables.py
 python paper/make_v23_operator_table.py
 python paper/make_utility_figure.py
 cd paper
 latexmk -pdf -interaction=nonstopmode -halt-on-error Fig1.tex paper.tex
 ```
 
-The generation commands consume compact local JSON records and regenerate eight
+The generation commands consume compact local JSON records and regenerate the
 empirical tables, the operator table and Figure 2. The TikZ architecture
 diagram is built by LaTeX. `paper/evidence_sources.md` maps sources to claims.
+The new reductions in `results/nca_review_20261120/` preserve seed-level
+command utility, shortfall, mode history and block allocation. When individual
+run JSON is present, `collect_nca_review.py --output <path>` reproduces the
+grid reduction; add `--routing` to reduce the 75k score-neutral control.
 To check the data without overwriting any reported results, run the evidence
 tests from the archive root.
 
 ```sh
-python -m pytest -q test_evidence_tables.py
 PYTHONPATH=third_party/morl-baselines OMP_NUM_THREADS=1 python -m pytest -q \
+  test_evidence_tables.py test_nca_review.py \
   test_progress_selector.py test_consistent_targets.py test_candidate_margin.py \
   test_capql_full_simplex.py test_utility_confirmation.py \
   test_ant_ownpref_actor_ablation.py test_pairwise_residual.py
@@ -60,6 +65,12 @@ python run_capql_full_simplex.py --root reruns/full_simplex --env mo-halfcheetah
 The `--summarize` options of the training runners require complete rerun
 cohorts, not the compact records. The table and figure commands above are
 sufficient to reproduce the analysis from the compact records.
+
+`run_nca_score_ablation.py` trains the matched score-neutral arm. It takes
+`--env`, `--seed`, and `--root`; it accepts the corresponding completed
+score-on receipt from the included `iclr_utility_confirmation_20260927`
+readout.
+The frozen revision protocol is in `markdown/NCA_review_protocol.md`.
 
 ## Verify the Lean proofs
 
